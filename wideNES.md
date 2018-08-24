@@ -202,7 +202,7 @@ Everything looks normal, nothing fancy... except look at the Status Bar! It's co
 Now, look at the same raw dump, but captured after scanline 196...
 
 <p align="center">
-  <img align="center" src="resources/wideNES/raw_vram_status_bar.png"/>
+  <img align="center" src="resources/wideNES/raw_vram_status.png"/>
 </p>
 
 The level now looks terrible, but the status bar is completely intact!
@@ -257,7 +257,7 @@ It's simple, but it works pretty well!
 For example, look how much the scene transitions stand-out when plotting the perceptual hash over time in _The Legend of Zelda_:
 
 <p align="center">
-  <img align="center" src="resources/wideNES/perceptual_bash_zelda.png"/>
+  <img align="center" src="resources/wideNES/perceptual_hash_zelda.png"/>
 </p>
 
 At the moment, wideNES uses a fixed-threshold between perceptual hash values to trigger a scene transition, but this is far from ideal. Different games can use different palettes, and there are many cases when wideNES thinks there is a scene transition when there isn't. Ideally, a dynamic-threshold should be implemented, but no such method is implemented in wideNES at the moment.
@@ -296,11 +296,11 @@ Aside from the UI though, ANESE and wideNES could both use some compatibility an
 
 There are quite a few compatibility issues, with several games playing incorrectly / not booting at all. Fortunately, just because ANESE isn't a great emulator, does not mean that wideNES is a bad technique. The principles wideNES relies on are solid, and should be easy to implement in other emulators!
 
-Performance wise, ANESE and wideNES are not the greatest, occasionally dipping below 60fps, even on relatively powerful PCs! There are many optimizations that should be implemented in ANESE and wideNES. For wideNES, there is lots of room for improvement in regards to how the frames are recorded, how the map is rendered, and how hashes are sampled.
+Performance wise, ANESE and wideNES are not the greatest, with some relatively powerful PCs occationally dipping below 60fps! There are many optimizations that really should be implemented in ANESE and wideNES. Aside from general improvements in ANESE core, wideNES can definately improve how frames are recorded, how the map is rendered, and how hashes are sampled.
 
 ## Conclusion
 
-While i've discussed the major aspects of how wideNES works, there many smaller techniques wideNES uses that work together to improve the final results. For example, wideNES keeps a map of each frame's true-hash and it's scroll values, which are used to allow "reentrant" scenes. This feature, and many more, are described in the heavily-commented source for wideNES, available on the [project's GitHub page](https://github.com/daniel5151/ANESE).
+While i've discussed the major aspects of how wideNES works, there many smaller techniques wideNES uses that work together to improve the final results. For example, wideNES keeps a map of each frame's true-hash and it's scroll values, which are used to allow "reentrant" scenes. This feature, and many more, are described in the heavily-commented source for wideNES, available on the [wideNES project-page](https://prilik.com/ANESE/wideNES).
 
 Working on wideNES has been a truly awesome experience, but with another semester at the University of Waterloo right around the corner, I doubt i'll get the chance to work on wideNES for a while. wideNES to a point where it mostly works, and i'm glad I could write this post discussing some of the tech behind it!
 
