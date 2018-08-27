@@ -1,7 +1,7 @@
 
 # wideNES - Peeking Past the Edge of NES Games
 
-In the mid 1980's, the Nintendo Entertainment System (NES) was _the_ home console to have. Boasting the best sound, the best graphics, and the best games of any home-console to date, it pushed the envelope for what home-gaming could be. To this day, titles like _Super Mario Bros._, _The Legend of Zelda_, and _Metroid_ are hailed as some of the best games of all time.
+In the mid 1980s, the Nintendo Entertainment System (NES) was _the_ home console to have. Boasting the best sound, the best graphics, and the best games of any home-console to date, it pushed the envelope for what home-gaming could be. To this day, titles like _Super Mario Bros._, _The Legend of Zelda_, and _Metroid_ are hailed as some of the best games of all time.
 
 Well, it's been over 30 years since the NES was released, and while those classic games have aged well, the same can't be said for the hardware they ran on. With a screen-resolution of just 256x240, the NES didn't give games all that much screen real-estate to work with. Nevertheless, intrepid game developers squeezed amazing, iconic worlds into NES games: the maze-like dungeons of _The Legend of Zelda_, the sprawling planet of _Metroid_, or the colorful levels of _Super Mario Bros._. And yet, due to the NES's hardware limitations, gamers only ever experienced these worlds a single 256x240 viewport at a time...
 
