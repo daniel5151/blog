@@ -1,2 +1,18 @@
-theme: jekyll-theme-midnight
+title: Thoughts and Projects
+author: Daniel Prilik
+email: daniel@prilik.com
+description: >-
+  "Thoughts and Projects" is a collection of interesting and (hopefully)
+  entertaining posts and articles written by Daniel Prilik. Typically, he
+  writes about projects he has worked on, or technologies he found cool.
+baseurl: "/blog"
+# twitter_username: danielprilik
+github_username: daniel5151
+theme: minima
 google_analytics: UA-58621690-1
+plugins:
+  - jekyll-feed
+  - jekyll-redirect-from
+  - jemoji
+include:
+  - "_assets"
