@@ -4,8 +4,9 @@ email: daniel@prilik.com
 description: >-
   "Thoughts and Projects" is a collection of interesting and (hopefully)
   entertaining posts and articles written by Daniel Prilik. Typically, he
-  writes about projects he has worked on, or technologies he found cool.
+  writes about projects he's worked on, or technologies that he found cool.
 baseurl: "/blog"
+show_excerpts: true
 # twitter_username: danielprilik
 github_username: daniel5151
 theme: minima
@@ -14,5 +15,5 @@ plugins:
   - jekyll-feed
   - jekyll-redirect-from
   - jemoji
-include:
-  - "_assets"
+sass:
+  style: compressed
