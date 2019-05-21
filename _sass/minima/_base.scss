@@ -153,8 +153,7 @@ blockquote {
 /**
  * Code formatting
  */
-pre,
-code {
+pre {
   @include relative-font-size(0.875);
   background: #191919;
   border-radius: 2px;

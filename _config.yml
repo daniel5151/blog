@@ -1,10 +1,10 @@
-title: Thoughts and Projects
+title: Prilik Writes About Tech
 author: Daniel Prilik
 email: daniel@prilik.com
 description: >-
-  "Thoughts and Projects" is a collection of interesting and (hopefully)
-  entertaining posts and articles written by Daniel Prilik. Typically, he
-  writes about projects he's worked on, or technologies that he found cool.
+  "Prilik Writes About Tech" is a blog where Daniel Prilik occationally
+  writes interesting and (hopefully) entertaining posts about projects he's
+  worked on, or technologies he thought were cool.
 baseurl: "/blog"
 show_excerpts: true
 # twitter_username: danielprilik
