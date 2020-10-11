@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+    <title>Paravirtualized Devices in crosvm - a Performance Panacea for Modern VMs :: prilik&#39;s blog</title>
+  
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<meta name="robots" content="noodp" />
+<link rel="canonical" href="https://prilik.com/blog/post/crosvm-paravirt/" />
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-58621690-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+
+
+<link rel="stylesheet" href="https://prilik.com/blog/assets/style.css">
+
+  <link rel="stylesheet" href="https://prilik.com/blog/assets/blue.css">
+
+
+
+
+
+
+<link rel="apple-touch-icon" href="https://prilik.com/blog/img/apple-touch-icon-192x192.png">
+
+  <link rel="shortcut icon" href="https://prilik.com/blog/img/favicon/blue.png">
+
+
+
+<meta name="twitter:card" content="summary" />
+
+
+
+<meta property="og:locale" content="en" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Paravirtualized Devices in crosvm - a Performance Panacea for Modern VMs">
+<meta property="og:description" content="Paravirtualized devices enable modern VMs to reach near-native speeds in IO heavy workloads such as file access, networking, and graphics processing. In a nutshell, by informing a virtualized OS of the fact that it&#39;s running within a VM, the virtualized OS can use special drivers that directly communicate and cooperate with the host OS, resulting in some incredible performance gains!" />
+<meta property="og:url" content="https://prilik.com/blog/post/crosvm-paravirt/" />
+<meta property="og:site_name" content="prilik&#39;s blog" />
+
+  
+    <meta property="og:image" content="https://prilik.com/blog/img/favicon/blue.png">
+  
+
+<meta property="og:image:width" content="2048">
+<meta property="og:image:height" content="1024">
+
+
+  <meta property="article:published_time" content="2019-05-16 00:00:00 -0400 EDT" />
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body class="blue">
+
+
+<div class="container center headings--one-size">
+
+  <header class="header">
+  <div class="header__inner">
+    <div class="header__logo">
+      <a href="/blog">
+  <div class="logo">
+    prilik&#39;s blog
+  </div>
+</a>
+
+    </div>
+    <div class="menu-trigger">menu</div>
+  </div>
+  
+    <nav class="menu">
+  <ul class="menu__inner menu__inner--desktop">
+    
+      
+        
+          <li><a href="https://github.com/daniel5151">github</a></li>
+        
+      
+        
+          <li><a href="/blog/">posts</a></li>
+        
+      
+        
+          <li><a href="https://prilik.com">whoami</a></li>
+        
+      
+      
+    
+
+    
+  </ul>
+
+  <ul class="menu__inner menu__inner--mobile">
+    
+      
+        <li><a href="https://github.com/daniel5151">github</a></li>
+      
+    
+      
+        <li><a href="/blog/">posts</a></li>
+      
+    
+      
+        <li><a href="https://prilik.com">whoami</a></li>
+      
+    
+    
+  </ul>
+</nav>
+
+  
+</header>
+
+
+  <div class="content">
+    
+<div class="post">
+  <h1 class="post-title">
+    <a href="https://prilik.com/blog/post/crosvm-paravirt/">Paravirtualized Devices in crosvm - a Performance Panacea for Modern VMs</a></h1>
+  <div class="post-meta">
+    
+      <span class="post-date">
+        2019-05-16 
+      </span>
+      <span> - 18 minute read</span>
+    
+    
+  </div>
+
+  
+  <span class="post-tags">
+    
+    #<a href="https://prilik.com/blog/tags/virtualization/">virtualization</a>&nbsp;
+    
+    #<a href="https://prilik.com/blog/tags/emulation/">emulation</a>&nbsp;
+    
+    #<a href="https://prilik.com/blog/tags/rust/">rust</a>&nbsp;
+    
+  </span>
+  
+
+  
+
+  
+    <div class="table-of-contents">
+      <h2>
+        
+          Table of Contents
+        
+      </h2>
+      <nav id="TableOfContents">
+  <ul>
+    <li>
+      <ul>
+        <li><a href="#virtual-machines---an-overview">Virtual Machines - An Overview</a></li>
+        <li><a href="#virtual-devices---the-cornerstone-of-virtualization">Virtual Devices - The Cornerstone of Virtualization</a></li>
+        <li><a href="#paravirtualization---a-performance-panacea">Paravirtualization - A Performance Panacea</a></li>
+        <li><a href="#case-study---a-rng-device">Case Study - A RNG Device</a>
+          <ul>
+            <li><a href="#a-virtual-hrng-device---rngboi-1337rs">A Virtual HRNG Device - rngboi-1337.rs</a>
+              <ul>
+                <li><a href="#vcpuexitmmioread">VcpuExit::MmioRead</a></li>
+                <li><a href="#virtual-devices-in-crosvm">Virtual Devices in crosvm</a></li>
+                <li><a href="#implementing-rngboi-1337">Implementing rngboi-1337</a></li>
+                <li><a href="#instantiating-rngboi-1337">Instantiating rngboi-1337</a></li>
+                <li><a href="#rngboi-1337-performance">rngboi-1337 Performance</a></li>
+              </ul>
+            </li>
+            <li><a href="#a-paravirtualized-rng-device---virtio-rng">A Paravirtualized RNG Device - virtio-rng</a>
+              <ul>
+                <li><a href="#virtio-devices-in-crosvm">virtio Devices in crosvm</a></li>
+                <li><a href="#implementing-virtio-rng">Implementing virtio-rng</a></li>
+                <li><a href="#virtio-rng-performance">virtio-rng Performance</a></li>
+              </ul>
+            </li>
+          </ul>
+        </li>
+        <li><a href="#conclusion">Conclusion</a></li>
+      </ul>
+    </li>
+  </ul>
+</nav>
+    </div>
+  
+
+  <div class="post-content"><div>
+        <p>This winter, while interning on the ChromeOS team at Google, I got the chance to work on <em>Crostini</em>: the collection of tools and infrastructure that enables ChromeOS to run Linux applications within a secure, sandboxed environment. Crostini gives users a local Debian-based Linux environment with everything one would expect from a standard Linux installation, such as shell access, root-privileges, permission to install packages, etc&hellip; To maintain the strict security model of ChromeOS, this environment lives within a container, <em>within a virtual machine</em>. This double-encapsulation helps to ensure that even if the Linux installation is compromised, the rest of user&rsquo;s system isn&rsquo;t compromised along with it.</p>
+<p>Sitting at the heart of the Crostini project is <a href="https://chromium.googlesource.com/chromiumos/platform/crosvm/"><em>crosvm</em></a>, a Virtual Machine Manager written from the ground-up to run lightweight, secure, and performant Linux VMs. crosvm is a lot like VirtualBox or QEMU, except for the fact that it&rsquo;s written in a memory-safe language (Rust!), and that it only implements <em>just</em> enough functionality to run <em>Linux</em> VMs (i.e: you won&rsquo;t be running <a href="https://en.wikipedia.org/wiki/TempleOS">TempleOS</a> on crosvm anytime soon).</p>
+<p>While crosvm was the first Virtual Machine Manager (VMM) written in Rust, it definitely won&rsquo;t be the last. Rust&rsquo;s strong memory and data-race safety, expressive syntax, and excellent C interoperability makes it a fantastic language for writing VMMs. You might have heard about crosvm&rsquo;s more publicized-about cousin, <a href="https://firecracker-microvm.github.io/"><em>Firecracker</em></a>, which is a fork of crosvm that&rsquo;s being developed by Amazon to speed up their serverless infrastructure. Well, in December 2018, employees from Intel, Red Hat, and Alibaba also joined in on the fun, and created the <a href="https://opensource.com/article/19/3/rust-virtual-machine">rust-vmm</a> working group. rust-vmm seeks to standardize the basic building blocks of VMMs written in Rust, making it a lot easier to write a custom VMM tailored for any use-case!</p>
+<p>Suffice it to say, it&rsquo;s an incredibly exciting time to be working on VMs!</p>
+<p>During my internship, I got the chance to work on crosvm directly, and in doing so, I learned a <em>lot</em> about the low-level details of how VMs work. As you might expect, there&rsquo;s a whole world of complex and incredible code that powers the VMs we use today. Today, I&rsquo;ll be diving into just one aspect of that infrastructure: <em>paravirtualized devices</em>.</p>
+<p>Paravirtualized devices are the &ldquo;secret sauce&rdquo; that enable modern VMs to reach near-native speeds in IO heavy workloads such as file access, networking, and graphics output.
+In a nutshell, by informing virtualized OSs of the fact that they&rsquo;re running within a VM, OSs can make use of special <em>paravirtualized</em> device drivers. Unlike regular device drivers, which try to communicate with physical hardware and therefore require an expensive hardware emulation layer to work correctly in a VM, paravirtualized drivers <em>directly</em> communicate and cooperate with the VM, resulting in some incredible performance gains!</p>
+<p>If you&rsquo;re interested in learning a more about this fascinating aspect of VM infrastructure, and walking through a hands-on example of how modern hypervisors like crosvm implement both virtual and paravirtualized devices, keep reading!</p>
+<h2 id="virtual-machines---an-overview">Virtual Machines - An Overview<a href="#virtual-machines---an-overview" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
+<p>Lets start off with a pretty high-level question: <em>What is a virtual machine?</em></p>
+<p>Simply put, a <em>virtual machine</em> (VM) is a computer that isn&rsquo;t directly tied to any physical hardware. VMs run operating systems on <em>virtual CPUs</em> (VCPUs) with their own <em>virtual</em> address spaces and <em>virtual</em> devices, presenting OSs with an environment that <em>looks and feels</em> like physical hardware, but is actually created entirely within software! By abstracting away any concrete physical hardware, VMs make it possible for a single computer to run multiple virtualized OSs simultaneously, enabling seemingly impossible feats such as running Windows <em>within a window!</em></p>
+<p><em>Hypervisors</em> are the programs responsible for setting up and managing VMs, with a single hypervisor &ldquo;host&rdquo; typically managing one or more individual VM &ldquo;guests.&rdquo; Some well-known hypervisors include VirtualBox, VMware, Parallels, and QEMU, but there are also plenty of smaller hypervisors being developed today&hellip; like crosvm!</p>
+<p>So how does crosvm work?</p>
+<p>Well, to <em>grossly</em> oversimplify things: crosvm allocates some memory, loads a Linux kernel into that memory, and hands it off to the <em>KVM</em> kernel API to create a VM with some number of VCPUs.</p>
+<p><em>KVM</em>, the <strong>K</strong>ernel-based <strong>V</strong>irtual <strong>M</strong>achine, is a <em>Type 1</em> hypervisor that&rsquo;s built directly into the Linux kernel itself. A Type 1 hypervisor runs on the &ldquo;bare-metal,&rdquo; and as such, is able to set up and make use the hardware-assisted virtualization technologies available on most modern CPUs, such as Intel&rsquo;s VT-x, or AMD&rsquo;s AMD-V. These hardware extensions can be used to run VCPUs <em>directly</em> on real hardware, resulting in a massive boosts to VM performance!</p>
+<p>But KVM can&rsquo;t work alone. Although it&rsquo;s is well-equipped to handle the VCPU accesses to / from regular RAM-backed memory addresses, KVM has [almost<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup>] no idea how to handle VCPU accesses to <em>devices</em>. Devices, at least for the purposes of this article, are all the hardware components a VCPU interacts with that aren&rsquo;t RAM. i.e: things such as keyboards, mice, disk-controllers, graphics cards, etc&hellip;</p>
+<p align="center">
+  <img alt="A high-level overview of the KVM/QEMU virtualization environment" align="center" src="/blog/assets/crosvm-paravirt/kvm-dark.png"/>
+  <br>
+  <br>
+  <i>A high-level overview of the KVM/crosvm virtualization environment. Modified with permission from original <a href="https://commons.wikimedia.org/wiki/File:Kernel-based_Virtual_Machine.svg">Wikimedia</a> image.</i>
+</p>
+<p>And this is where crosvm comes in.</p>
+<p>crosvm is a <em>Virtual Machine Manager</em> (VMM), or <em>Type 2</em> hypervisor, which runs entirely in userspace and works in tandem with KVM&rsquo;s kernel component to set up and execute VMs. crosvm defines the virtual hardware platform and memory-layout of a VM, manages the execution lifecycle of the VM, and most importantly for this article, implements the logic required to handle the device accesses KVM cannot handle.</p>
+<h2 id="virtual-devices---the-cornerstone-of-virtualization">Virtual Devices - The Cornerstone of Virtualization<a href="#virtual-devices---the-cornerstone-of-virtualization" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
+<p>One common way that CPUs access devices is through the use of Memory Mapped IO (MMIO), an architecture whereby certain regions of the CPU&rsquo;s memory space correspond to registers on connected devices. This makes accessing devices simple, as the CPU can reuse it&rsquo;s existing load / store instructions to talk to connected devices.</p>
+<p>The technique works great in non-virtualized contexts, where the CPU is fully privileged and has unhindered access to these special memory addresses. Unfortunately, VCPUs <em>aren&rsquo;t</em> privileged, so whenever a VCPU attempts to access one of these hardware registers, KVM must pause the VCPU&rsquo;s execution and somehow handle the request. Since it can&rsquo;t handle the request itself, KVM yields execution to crosvm, notifies it that a <em>VMEXIT</em> event has occurred, and waits until crosvm fulfills the request.</p>
+<p>Since crosvm the exact address of the invalid access that caused the VMEXIT, it can look-up an appropriate <em>virtual</em> device to handle the access. Virtual devices emulate the hardware interface of some existing physical device, reimplementing its functionality in pure software. For example, lets say the VCPU tries to read a byte from a serial controller hardware register via MMIO. The hypervisor would catch the invalid access, pause the VCPU, and call a <em>virtual</em> serial controller to handle it. The virtual serial controller might then read some data from a TTY, and return the latest available byte back to crosvm. Prior to resuming the VCPU, crosvm would modify the VCPUs state to make it <em>look</em> like its hardware access succeeded, thereby spoofing the guest OS into thinking it successfully accessed an actual hardware register!</p>
+<p>While this technique is conceptually simple to implement, it does come with one <em>big</em> caveat: VMEXITs are <em>incredibly expensive</em>.
+You thought CPU context switches between <em>processes</em> were bad? Imagine CPU context switches between <em>entire operating systems!</em></p>
+<p>The overhead of continuous VMEXITs can absolutely cripple VM performance, especially when emulating high-throughput devices such as network cards or disk controllers.</p>
+<p>If only there was some way to avoid these expensive context switches&hellip;</p>
+<h2 id="paravirtualization---a-performance-panacea">Paravirtualization - A Performance Panacea<a href="#paravirtualization---a-performance-panacea" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
+<p>In traditional virtualization, guests have <em>no idea</em> they are being virtualized.
+In <em>para</em>virtualization, guests <em>know</em> that they&rsquo;re being run in a VM, which offers up a whole world of optimization opportunities.
+Instead of using regular device drivers, OSs can implement <em>paravirtualied drivers</em> that are clever enough to <em>avoid</em> VMEXITs entirely!</p>
+<p>Paravirtualized device drivers really are a performance panacea for VMs, especially when dealing with high-throughput tasks like disk IO or networking.</p>
+<p>While there are many different ways of implementing paravirtualized devices (such as Xen, VMware Tools, VirtualBox Tools, etc&hellip;), I&rsquo;ll be taking a look at <em>virtio</em>, a popular and open standard for writing paravirtualized devices and drivers. virtio is lightweight, performant, and easy to reason about, making it perfect for small, lightweight, performant hypervisors like crosvm.</p>
+<p>To get a better idea of how virtual and paravirtualized devices work, and see first-hand how paravirtualized devices can dramatically improve VM performance, let&rsquo;s see how a virtual device might be replaced with a virtio paravirtualized device.</p>
+<h2 id="case-study---a-rng-device">Case Study - A RNG Device<a href="#case-study---a-rng-device" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
+<p>One useful feature provided by the Linux kernel is random number generation (RNG).
+By reading from the <code>/dev/urandom</code> special file, Linux programs can access a seemingly never-ending stream of random bytes.</p>
+<p>Typically, the Linux kernel seeds it&rsquo;s RNGs using the randomness of things such as user keyboard / mouse input, or the minor variations in spinning-disk access times.
+Unfortunately, these sources of entropy tend to be hard to come by in VMs.</p>
+<p>Another way to boost the entropy of a Linux machine is by providing it with a physical <a href="https://en.wikipedia.org/wiki/Hardware_random_number_generator">hardware random number generator (HRNG)</a>. These devices use physical processes to generate randomness.</p>
+<p>Lets consider two different ways to we might implement a <em>virtual</em> HRNG device. Under the hood, both virtual device will simply read from the host&rsquo;s <code>/dev/urandom</code>, but they will differ in how they relay that information back to the VM:</p>
+<ul>
+<li>The first device will emulate the interface of some physical MMIO&rsquo;d <a href="https://en.wikipedia.org/wiki/Hardware_random_number_generator">hardware random number generator (HRNG)</a> device</li>
+<li>The second device will use virtio to directly return random data from the host</li>
+</ul>
+<p>I&rsquo;ll be walking though how these devices could be implemented in crosvm, but if you&rsquo;re curious, similar implementations can be found in other hypervisors too (like this one from <a href="https://github.com/qemu/qemu/blob/master/hw/virtio/virtio-rng.c">QEMU</a>).</p>
+<p><em>Note:</em> Paravirtualizing an RNG device probably <em>won&rsquo;t</em> dramatically increase a VM&rsquo;s performance (that is, unless the VM <em>continuously</em> reads from /dev/urandom). That said, RNG devices are <em>very</em> simple to implement, which makes them perfect example for illustrating the principles behind virtual and paravirtualized devices. These same concepts apply to other, more complicated paravirtualized devices such as block devices or network cards, which <em>do</em> dramatically increase performance.</p>
+<h3 id="a-virtual-hrng-device---rngboi-1337rs">A Virtual HRNG Device - rngboi-1337.rs<a href="#a-virtual-hrng-device---rngboi-1337rs" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h3>
+<p>Lets imagine we have a physical RNG device, the RNGBOI-1337, that generates random data from the <a href="https://www.thechiefstoryteller.com/2014/07/16/turbo-encabulator-best-worst-jargon/">modial interactions of magneto-reluctance</a>. The RNGBOI-1337 is dead-simple: a single 32bit <code>rng0</code> register at device offset 0 returns a random number whenever it&rsquo;s read.</p>
+<p>Since the RNGBOI-1337 is so simple, the Linux kernel has a built-in driver that seeds the Linux entropy pool by reading from <code>rng0</code>. Awesome!</p>
+<p>When creating our VM, we&rsquo;ll specify that a RNGBOI-1337 exists and is accessible as a MMIO device at address <code>0x80001000</code>, and we&rsquo;ll implement a virtual device called <code>rngboi-1337</code> to handle any requests.</p>
+<p><em>Note</em>: I&rsquo;ll be glossing over <em>how</em> exactly the OS finds out about the existence of its connected device, and the specific implementation details of the guest Linux RNG driver, as those details can be surprisingly complicated. Suffice it to say, the Linux VM will attempt to read a random number from MMIO address <code>0x80001000</code> at some point during it&rsquo;s execution.</p>
+<p>Let&rsquo;s see how crosvm would implements <code>rngboi-1337</code>.</p>
+<h4 id="vcpuexitmmioread">VcpuExit::MmioRead<a href="#vcpuexitmmioread" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h4>
+<p>The VCPU is chugging along, happily executing instructions, when all of a sudden it tries to access the RNGBOI-1337.
+KV immediately stops the VCPU, yields control back to crosvm, and informs it that the VCPU tried to read from a particular MMIO address.</p>
+<p>The relevant bit of code in crosvm that handles VCPU MMIO reads is pretty straightforward:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust"><span style="color:#75715e">// crosvm/src/linux.rs:996
+</span><span style="color:#75715e"></span><span style="color:#a6e22e">&#39;vcpu_loop</span>: <span style="color:#a6e22e">loop</span> {
+    <span style="color:#75715e">// Run the VCPU
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">match</span> vcpu.run() {
+        <span style="color:#75715e">// The VCPU is reading `size` bytes from a MMIO `address`:
+</span><span style="color:#75715e"></span>        Ok(VcpuExit::MmioRead { address, size }) <span style="color:#f92672">=&gt;</span> {
+            <span style="color:#75715e">// allocate a buffer big enough for the read...
+</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> data <span style="color:#f92672">=</span> [<span style="color:#ae81ff">0</span>; <span style="color:#ae81ff">8</span>];
+            <span style="color:#75715e">// ... and fill the buffer by reading from the MMIO bus.
+</span><span style="color:#75715e"></span>            mmio_bus.read(address, <span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> data[..size]);
+             <span style="color:#75715e">// Finally, push that return value back to the VCPU.
+</span><span style="color:#75715e"></span>            <span style="color:#66d9ef">let</span> _ <span style="color:#f92672">=</span> vcpu.set_data(<span style="color:#f92672">&amp;</span>data[..size]);
+        }
+        <span style="color:#75715e">// ...
+</span><span style="color:#75715e"></span>    }
+    <span style="color:#75715e">// Continue looping to resume the VCPU...
+</span><span style="color:#75715e"></span>}
+</code></pre></div><p>Looks like we need to place a virtual RNGBOI-1337 device onto the mmio_bus at address <code>0x80001000</code>!</p>
+<h4 id="virtual-devices-in-crosvm">Virtual Devices in crosvm<a href="#virtual-devices-in-crosvm" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h4>
+<p><code>BusDevice</code> is the <em>trait</em> (Rust lingo for interface) that all virtual devices must implement:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust"><span style="color:#75715e">// (simplified from) crosvm/devices/src/bus.rs:19
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">pub</span> <span style="color:#66d9ef">trait</span> BusDevice: Send {
+    <span style="color:#e6db74">/// Reads at `offset` from this device
+</span><span style="color:#e6db74"></span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">read</span>(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> self, offset: <span style="color:#66d9ef">u64</span>, data: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">mut</span> [<span style="color:#66d9ef">u8</span>]) {}
+    <span style="color:#e6db74">/// Writes at `offset` into this device
+</span><span style="color:#e6db74"></span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">write</span>(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> self, offset: <span style="color:#66d9ef">u64</span>, data: <span style="color:#66d9ef">&amp;</span>[<span style="color:#66d9ef">u8</span>]) {}
+}
+
+</code></pre></div><p>This makes sense: given an offset from the base-address of the device, read / write some number of bytes from the devices registers.</p>
+<h4 id="implementing-rngboi-1337">Implementing rngboi-1337<a href="#implementing-rngboi-1337" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h4>
+<p>What might a virtual RNGBOI-1337 device in crosvm look like?</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust"><span style="color:#75715e">// (would be at) crosvm/devices/src/rngboi-1337.rs
+</span><span style="color:#75715e">// simplified for brevity
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">use</span> std::fs::File;
+<span style="color:#66d9ef">use</span> <span style="color:#66d9ef">crate</span>::BusDevice;
+
+<span style="color:#66d9ef">const</span> RNG0_REG: <span style="color:#66d9ef">u64</span> <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>;
+
+<span style="color:#e6db74">/// A rngboi-1337 HRNG device
+</span><span style="color:#e6db74"></span><span style="color:#66d9ef">pub</span> <span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Rngboi1337</span> {
+    random_file: <span style="color:#a6e22e">File</span>,
+}
+
+<span style="color:#66d9ef">impl</span> Rngboi1337 {
+    <span style="color:#e6db74">/// Constructs a new rngboi-1337 device pointing to /dev/urandom
+</span><span style="color:#e6db74"></span>    <span style="color:#66d9ef">pub</span> <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">new</span>() -&gt; <span style="color:#a6e22e">Cmos</span> {
+        Rngboi1337 {
+            random_file: <span style="color:#a6e22e">File</span>::open(<span style="color:#e6db74">&#34;/dev/urandom&#34;</span>).unwrap();
+        }
+    }
+}
+
+<span style="color:#66d9ef">impl</span> BusDevice <span style="color:#66d9ef">for</span> Cmos {
+    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">read</span>(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> self, offset: <span style="color:#66d9ef">u64</span>, data: <span style="color:#66d9ef">&amp;</span><span style="color:#a6e22e">mut</span> [<span style="color:#66d9ef">u8</span>]) {
+        <span style="color:#66d9ef">match</span> offset {
+            <span style="color:#75715e">// read data directly from /dev/urandom directly into the buffer
+</span><span style="color:#75715e"></span>            RNG0_REG <span style="color:#f92672">=&gt;</span> self.random_file.read_exact(data).unwrap();
+            o <span style="color:#f92672">=&gt;</span> panic<span style="color:#f92672">!</span>(<span style="color:#e6db74">&#34;bad read offset on rngboi-1337 device: {}&#34;</span>, o),
+        }
+    }
+
+    <span style="color:#75715e">// no need to implement write, default no-op functionality is just fine
+</span><span style="color:#75715e"></span>}
+</code></pre></div><p>&hellip;and that&rsquo;s it! It&rsquo;s short, sweet, and to the point.
+The code pretty-much speaks for itself.</p>
+<h4 id="instantiating-rngboi-1337">Instantiating rngboi-1337<a href="#instantiating-rngboi-1337" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h4>
+<p>At some point during VM instantiation, crosvm adds the <code>rngboi-1337</code> device to the MMIO bus, which ends up being as simple as:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust"><span style="color:#75715e">// Bus::insert(device, base, len (in bytes));
+</span><span style="color:#75715e"></span>mmio_bus.insert(Rngboi1337::new(), <span style="color:#ae81ff">0x80001000</span>, <span style="color:#ae81ff">1</span>);
+</code></pre></div><p>Now, whenever the VCPU reads from <code>0x80001000</code>, crosvm calls the <code>rngboi-1337</code> read method, reads some data from <code>/dev/urandom</code>, and successfully fulfill the VCPUs read request. Nice!</p>
+<h4 id="rngboi-1337-performance">rngboi-1337 Performance<a href="#rngboi-1337-performance" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h4>
+<p>While this new virtual device was easy to write, easy to grok, and easy to maintain, it will end up absolutely <em>crippling</em> performance whenever the VM reads <em>lots</em> of random data.</p>
+<p>Say the VM tries to fill a buffer with random bytes by reading from a connected RNGBOI-1337 device:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">// somewhere in the linux kernel
+</span><span style="color:#75715e"></span><span style="color:#75715e">#define RNGBOI_RNG0 ((u32*)0x80001000)
+</span><span style="color:#75715e"></span>
+u32 buf [<span style="color:#ae81ff">512</span>];
+<span style="color:#66d9ef">for</span> (<span style="color:#66d9ef">int</span> i <span style="color:#f92672">=</span> <span style="color:#ae81ff">0</span>; i <span style="color:#f92672">&lt;</span> <span style="color:#ae81ff">512</span>; i<span style="color:#f92672">++</span>) {
+    buf <span style="color:#f92672">=</span> <span style="color:#f92672">*</span>RNGBOI_RNG0;
+}
+</code></pre></div><p>Unfortunately, since <code>rngboi-1337</code> <em>must</em> conform the physical interface specified by the <em>physical</em> RNGBOI-1337 device, it can only transfer a single byte of data each time it&rsquo;s accessed. And therein lies the problem:</p>
+<p><em>Every. Single. Access. Results. In. A. VMEXIT.</em></p>
+<p>If only there was some <em>alternative</em> RNG device that <em>wasn&rsquo;t</em> limited to emulating a piece of existing physical hardware&hellip;</p>
+<h3 id="a-paravirtualized-rng-device---virtio-rng">A Paravirtualized RNG Device - virtio-rng<a href="#a-paravirtualized-rng-device---virtio-rng" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h3>
+<p>The virtio spec describes the setup and management of <em>virtqueues</em> - lockless data structures that provide asynchronous communication between guest drivers and host devices. Virtqueues reside in some a RAM-backed guest memory region, one where guests read/write from without triggering a VMEXIT. Since the hypervisor is able to access the entirety of guest memory (after all, it <em>is</em> hyper-privileged), it monitors the queues for any incoming requests, and responds by writing responses directly back into the queues.</p>
+<p>The virtio spec defines <a href="http://docs.oasis-open.org/virtio/virtio/v1.0/cs04/virtio-v1.0-cs04.html#x1-2330004">a simple <code>virtio-rng</code> device</a> that enables guests to request large amounts of random data from a host. Its interface is incredibly straightforward:</p>
+<ul>
+<li>The guest driver places a pointer to a buffer it wants filled with random data onto the device&rsquo;s single virtqueue.</li>
+<li>The host device monitors the queue, and whenever a new buffer appears, writes random bytes into the specified buffer.</li>
+<li>The guest driver is notified once the buffer is filled.</li>
+</ul>
+<p>To keep things focused, I won&rsquo;t be covering the details of how the <code>virtio-rng</code> Linux kernel driver works under the hood, and instead, I&rsquo;ll be focusing on the host-side device implementation. Suffice it to say that, the kernel driver manages to set up the <code>virtio-rng</code> virtqueue, and begins to request data through it.</p>
+<p>Lets see how crosvm goes about implementing <code>virtio-rng</code>.</p>
+<h4 id="virtio-devices-in-crosvm">virtio Devices in crosvm<a href="#virtio-devices-in-crosvm" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h4>
+<p>Similarly to how crosvm&rsquo;s <code>BusDevice</code> trait makes it easy to create new virtual devices, crosvm&rsquo;s <code>VirtioDevice</code> trait that makes it easy to create virtio paravirtualized devices.</p>
+<p>The <code>VirtioDevice</code> trait abstracts away most of the nitty-gritty details required to set up virtio devices (as outlined in this <a href="http://docs.oasis-open.org/virtio/virtio/v1.0/cs04/virtio-v1.0-cs04.html#x1-90002">lengthy section of the virtio spec</a>), and exposes an easy-to-use interface with overridable methods that specific virtio devices fill-in.</p>
+<p>crosvm also provides an incredibly useful abstraction over virtqueues, aptly called <code>Queue</code>, which makes the virtqueues a lot easier, including creating an iterator interface for the virtqueue that makes reading incoming requests quite straightforward.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust"><span style="color:#75715e">// (greatly simplified from) crosvm/devices/src/virtio_device.rs
+</span><span style="color:#75715e"></span><span style="color:#66d9ef">pub</span> <span style="color:#66d9ef">trait</span> VirtioDevice: Send {
+    <span style="color:#e6db74">/// The virtio device type.
+</span><span style="color:#e6db74"></span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">device_type</span>(<span style="color:#f92672">&amp;</span>self) -&gt; <span style="color:#66d9ef">u32</span>;
+
+    <span style="color:#e6db74">/// The maximum size of each queue that this device supports.
+</span><span style="color:#e6db74"></span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">queue_max_sizes</span>(<span style="color:#f92672">&amp;</span>self) -&gt; <span style="color:#66d9ef">&amp;</span>[<span style="color:#66d9ef">u16</span>];
+
+    <span style="color:#e6db74">/// Activates this device for real usage.
+</span><span style="color:#e6db74"></span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">activate</span>(
+        <span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> self,
+        mem: <span style="color:#a6e22e">GuestMemory</span>,
+        queues: Vec<span style="color:#f92672">&lt;</span>Queue<span style="color:#f92672">&gt;</span>,
+        queue_evts: Vec<span style="color:#f92672">&lt;</span>EventFd<span style="color:#f92672">&gt;</span>,
+    );
+}
+</code></pre></div><p>For the purposes of this discussion, I&rsquo;ve omitted and simplified many of the methods present on the actual <code>VirtioDevice</code> trait. The methods presented above comprise the minimum required interface that virtio devices must implement. The rest of the methods deal with more complex device configuration and crosvm implementation details.</p>
+<p>Lets go over what each of these methods is responsible for:</p>
+<p><code>device_type</code> is called during device setup, and determines what type of virtio device the <code>VirtioDevice</code> implements. The virtio spec assigned each type of virtio device a <a href="http://docs.oasis-open.org/virtio/virtio/v1.0/cs04/virtio-v1.0-cs04.html#x1-1560005">unique id</a>. For example, a virtio network card (virtio-net) has an id of 1, and a virtio entropy device (virtio-rng) has an id of 4.</p>
+<p><code>queue_max_sizes</code> is called during device setup, and specifies the number of virtqueues a device has, and how large each virtqueue is. For example, virtio-net requires at least 3 different virtqueues, 2+ to send / receive packets, and 1 for control. virtio-rng isn&rsquo;t as complex, and only requires a single virtqueue.</p>
+<p>Lastly, <code>activate</code> is called once crosvm finishes setting up the virtio device, and is responsible for spawning a new thread that will monitor the virtqueues for any incoming requests. This method is the one we&rsquo;ll be focusing on, as it&rsquo;s where all the magic happens.</p>
+<h4 id="implementing-virtio-rng">Implementing virtio-rng<a href="#implementing-virtio-rng" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h4>
+<p>Lets start by getting some boilerplate out of the way. We&rsquo;ll create a new virtio device of <code>TYPE_RNG</code> (4) with a single virtqueue of, say, 256 elements.
+The activate method will simply spawn a new thread with a <code>Worker</code> that will monitor the queues. We&rsquo;ll see how the Worker is implemented shortly.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust"><span style="color:#75715e">// (greatly simplified from) crosvm/devices/src/virtio/rng.rs
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">use</span> std::fs::File;
+<span style="color:#66d9ef">use</span> std::thread;
+
+<span style="color:#66d9ef">use</span> sys_util::{EventFd, GuestMemory, PollContext, PollToken};
+<span style="color:#66d9ef">use</span> <span style="color:#66d9ef">super</span>::{Queue, VirtioDevice, TYPE_RNG};
+
+<span style="color:#e6db74">/// Virtio device that exposes host entropy to the guest OS.
+</span><span style="color:#e6db74"></span><span style="color:#66d9ef">pub</span> <span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Rng</span> {}
+
+<span style="color:#66d9ef">impl</span> Rng {
+    <span style="color:#e6db74">/// Create a new virtio-rng device that gets random data from /dev/urandom.
+</span><span style="color:#e6db74"></span>    <span style="color:#66d9ef">pub</span> <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">new</span>() -&gt; <span style="color:#a6e22e">Rng</span> {
+        Rng {}
+    }
+}
+
+<span style="color:#66d9ef">impl</span> VirtioDevice <span style="color:#66d9ef">for</span> Rng {
+    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">device_type</span>(<span style="color:#f92672">&amp;</span>self) -&gt; <span style="color:#66d9ef">u32</span> { TYPE_RNG }
+     <span style="color:#75715e">// a single queue with 256 slots
+</span><span style="color:#75715e"></span>    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">queue_max_sizes</span>(<span style="color:#f92672">&amp;</span>self) -&gt; <span style="color:#66d9ef">&amp;</span>[<span style="color:#66d9ef">u16</span>] { <span style="color:#f92672">&amp;</span>[<span style="color:#ae81ff">256</span>] }
+
+    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">activate</span>(
+        <span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> self,
+        mem: <span style="color:#a6e22e">GuestMemory</span>,
+        <span style="color:#66d9ef">mut</span> queues: Vec<span style="color:#f92672">&lt;</span>Queue<span style="color:#f92672">&gt;</span>,
+        <span style="color:#66d9ef">mut</span> queue_evts: Vec<span style="color:#f92672">&lt;</span>EventFd<span style="color:#f92672">&gt;</span>,
+    ) {
+        <span style="color:#66d9ef">let</span> requestq <span style="color:#f92672">=</span> queues.remove(<span style="color:#ae81ff">0</span>);
+        <span style="color:#66d9ef">let</span> requestq_evt <span style="color:#f92672">=</span> queue_evts.remove(<span style="color:#ae81ff">0</span>);
+        thread::Builder::new()
+            .name(<span style="color:#e6db74">&#34;virtio_rng&#34;</span>.to_string())
+            .spawn(<span style="color:#66d9ef">move</span> <span style="color:#f92672">||</span> {
+                <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> worker <span style="color:#f92672">=</span> Worker {
+                    requestq,
+                    mem,
+                };
+                worker.run(requestq_evt);
+            });
+    }
+}
+
+<span style="color:#66d9ef">struct</span> <span style="color:#a6e22e">Worker</span> {
+    queue: <span style="color:#a6e22e">Queue</span>,     <span style="color:#75715e">// requestq virtqueue
+</span><span style="color:#75715e"></span>    mem: <span style="color:#a6e22e">GuestMemory</span>, <span style="color:#75715e">// handle to GuestMemory
+</span><span style="color:#75715e"></span>}
+
+<span style="color:#66d9ef">impl</span> Worker {
+    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">run</span>(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> self, queue_evt: <span style="color:#a6e22e">EventFd</span>) -&gt; {
+        <span style="color:#75715e">// TODO
+</span><span style="color:#75715e"></span>    }
+}
+</code></pre></div><p>This is essentially the actual code for virtio-rng in crosvm, albeit with all the error handling, and some of the more complex interrupt-signaling logic stripped out (for clarity&rsquo;s sake). It&rsquo;s pretty straightforward, right?</p>
+<p>Lets take a look at the Worker thread now, as that&rsquo;s where the real &ldquo;meat&rdquo; of the device&rsquo;s implementation is.</p>
+<p>crosvm sets up an <a href="http://man7.org/linux/man-pages/man2/eventfd.2.html">eventfd</a>-based notification system, so that whenever the guest driver places a request on the virtqueue, the <code>queue_evt</code> event is triggered. Thus, the first we do in the worker thread is poll the EventFd for incoming events:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust"><span style="color:#66d9ef">impl</span> Worker {
+    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">run</span>(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> self, queue_evt: <span style="color:#a6e22e">EventFd</span>) {
+        <span style="color:#75715e">#[derive(PollToken)]</span>
+        <span style="color:#66d9ef">enum</span> <span style="color:#a6e22e">Token</span> {
+            QueueAvailable,
+        }
+
+        <span style="color:#66d9ef">let</span> poll_ctx <span style="color:#f92672">=</span> PollContext::new().add(<span style="color:#f92672">&amp;</span>queue_evt, Token::QueueAvailable);
+
+        <span style="color:#a6e22e">&#39;poll</span>: <span style="color:#a6e22e">loop</span> {
+            <span style="color:#66d9ef">for</span> event <span style="color:#66d9ef">in</span> poll_ctx.wait().iter_readable() {
+                <span style="color:#66d9ef">match</span> event.token() {
+                    Token::QueueAvailable <span style="color:#f92672">=&gt;</span> {
+                        queue_evt.read(); <span style="color:#75715e">// acknowledge the event
+</span><span style="color:#75715e"></span>                        <span style="color:#75715e">/* process the queue */</span>
+                    }
+                }
+            }
+        }
+    }
+}
+</code></pre></div><p>Now that all the boilerplate is out of the way, we can write the core logic of the virtio-rng device: getting a buffer from the virtqueue, and filling it with some random bytes from <code>/dev/urandom</code>.</p>
+<p>Now, this code is a <em>bit</em> verbose, and fully understanding it requires understanding how virtio <a href="http://docs.oasis-open.org/virtio/virtio/v1.0/cs04/virtio-v1.0-cs04.html#x1-300005">recycles virtqueue elements</a>. That said, the code boils down to essentially what you&rsquo;d expect: iterate over any messages waiting on the queue, write some data from <code>/dev/urandom</code> into the buffer they point to, and signal to the guest that the request has been fulfilled.</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust"><span style="color:#66d9ef">impl</span> Worker {
+    <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">process_queue</span>(<span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> self) -&gt; <span style="color:#66d9ef">bool</span> {
+        <span style="color:#66d9ef">let</span> <span style="color:#66d9ef">mut</span> used_desc <span style="color:#f92672">=</span> Vec::new(); <span style="color:#75715e">// maintain a list of used requests
+</span><span style="color:#75715e"></span>
+        <span style="color:#66d9ef">for</span> avail_desc <span style="color:#66d9ef">in</span> self.queue.iter(<span style="color:#f92672">&amp;</span>self.mem) {
+            <span style="color:#75715e">// Fill the buffer with data from the random device on the host.
+</span><span style="color:#75715e"></span>            self.mem.read_to_memory(
+                avail_desc.addr, <span style="color:#75715e">// pointer to buffer in guest memory
+</span><span style="color:#75715e"></span>                <span style="color:#f92672">&amp;</span><span style="color:#66d9ef">mut</span> File::open(<span style="color:#e6db74">&#34;/dev/urandom&#34;</span>).unwrap(),
+                avail_desc.len <span style="color:#66d9ef">as</span> <span style="color:#66d9ef">usize</span>, <span style="color:#75715e">// size of buffer
+</span><span style="color:#75715e"></span>            );
+
+            used_desc.push((avail_desc.index, avail_desc.len));
+        }
+
+        <span style="color:#66d9ef">for</span> <span style="color:#f92672">&amp;</span>(desc_index, len) <span style="color:#66d9ef">in</span> <span style="color:#f92672">&amp;</span>used_desc {
+            self.queue.add_used(<span style="color:#f92672">&amp;</span>self.mem, desc_index, len);
+        }
+
+        <span style="color:#66d9ef">if</span> used_desc.size() <span style="color:#f92672">&gt;</span> <span style="color:#ae81ff">0</span> {
+            <span style="color:#75715e">// signal to guest that request has been fulfilled
+</span><span style="color:#75715e"></span>            <span style="color:#75715e">// implementation omitted for brevity
+</span><span style="color:#75715e"></span>        }
+    }
+}
+</code></pre></div><p>Phew, that&rsquo;s a lot of code! Especially for something as simple as a RNG device!
+And that doesn&rsquo;t even include the complicated setup and kernel driver code!</p>
+<p>So what did we gain by going through all that effort?</p>
+<h4 id="virtio-rng-performance">virtio-rng Performance<a href="#virtio-rng-performance" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h4>
+<p>Lets compare our virtual rngboi-1337 device to this new virtio-rng device:</p>
+<table>
+<thead>
+<tr>
+<th>rngboi-1337</th>
+<th>virtio-rng</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Simple kernel driver and host devices</td>
+<td>More complex kernel drivers and host devices</td>
+</tr>
+<tr>
+<td>Filling a buffer of size N requires N requests</td>
+<td>Filling a buffer of size N requires <em>1</em> request</td>
+</tr>
+<tr>
+<td>Requests are synchronous (guest must VMEXIT)</td>
+<td>Requests are completely asynchronous</td>
+</tr>
+</tbody>
+</table>
+<p>Although we&rsquo;ve lost the simplicity of the basic virtual device model, we&rsquo;ve also gotten rid of any and all VMEXITs, and established a way to mass-transfer data between a guest and host totally asynchronously!</p>
+<p>How awesome is that!</p>
+<h2 id="conclusion">Conclusion<a href="#conclusion" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
+<p>I wasn&rsquo;t exaggerating when I said that paravirtualized devices are a performance panacea for modern VMs. By implementing devices such as network cards, block devices, and even <a href="https://chromium.googlesource.com/chromiumos/platform/crosvm/+/refs/heads/master/devices/src/virtio/wl.rs">window managers</a>) as paravirtualized devices, modern VMs can provide all the security and convenience of virtualization with near native-hardware performance.</p>
+<p>If I&rsquo;ve whet your appetite for virtual machine internals, paravirtualized devices, and Linux virtualization technologies, check out some of these awesome resources:</p>
+<ul>
+<li>The rust-vmm working group&rsquo;s work on <a href="https://github.com/rust-vmm">Github</a></li>
+<li>Patrick Dumais&rsquo;s excellent <a href="http://www.dumais.io/index.php?article=aca38a9a2b065b24dfa1dee728062a12">writeup</a> on implementing virtio drivers in his hobby-OS</li>
+<li><a href="https://developer.ibm.com/articles/l-virtio/">Virtio: An I/O virtualization framework for Linux</a></li>
+<li><a href="http://haifux.org/lectures/312/High-Level%20Introduction%20to%20the%20Low-Level%20of%20Virtualization.pdf">High-level introduction to virtualization&rsquo;s low-level</a></li>
+</ul>
+<p>Thanks for reading!</p>
+<hr>
+<section class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1" role="doc-endnote">
+<p>KVM does have a few built-in device models for some very basic devices, e.g: a basic PIC. <a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</section>
+      </div></div>
+
+  
+  
+<div class="pagination">
+    <div class="pagination__title">
+        <span class="pagination__title-h">Read other posts</span>
+        <hr />
+    </div>
+    <div class="pagination__buttons">
+        
+        
+        <span class="button next">
+            <a href="https://prilik.com/blog/post/widenes/">
+                <span class="button__text">wideNES - Peeking Past the Edge of NES Games</span>
+                <span class="button__icon">→</span>
+            </a>
+        </span>
+        
+    </div>
+</div>
+
+  
+
+  
+
+</div>
+
+  </div>
+
+  
+    <footer class="footer">
+  <div class="footer__inner">
+    
+      <div class="copyright copyright--user">
+        <span>Copyright &copy; Daniel Prilik :: Licensed under <a target="_blank" rel="external noopener license" href="https://creativecommons.org/licenses/by-nd/4.0/">CC-BY-ND-4.0</a>.</span>
+    
+        <span>:: Theme made by <a href="https://twitter.com/panr">panr</a></span>
+      </div>
+  </div>
+</footer>
+
+<script src="https://prilik.com/blog/assets/main.js"></script>
+
+
+
+
+
+
+
+  
+</div>
+
+</body>
+</html>

@@ -1,0 +1,13 @@
+@import "../main.css";
+@import "../header.css";
+@import "../logo.css";
+@import "../pagination.css";
+@import "../post.css";
+@import "../variables.css";
+
+:root {
+  --accent: #42a5f5;
+  --background: #1d1d1d;
+  --color: white;
+  --border-color: rgba(255, 255, 255, 0.1);
+}

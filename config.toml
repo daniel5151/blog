@@ -1,0 +1,91 @@
+baseurl = "https://prilik.com/blog"
+languageCode = "en"
+paginate = 11
+googleAnalytics = "UA-58621690-1"
+publishDir = "docs"
+
+theme = [
+  "terminal"
+]
+
+enableRobotsTXT = true
+staticDir = ["static"]
+
+[markup.goldmark.renderer]
+  unsafe = true # Optional, allows HTML inside your CommonMark content
+[markup.tableOfContents]
+  startLevel = 1 # Suggested, draws TOC using all heading levels
+  endLevel = 6 # Suggested, draws TOC using all heading levels
+[markup.highlight]
+  anchorLineNos = false
+  codeFences = true
+  noClasses = true
+  style = "monokai"
+  tabWidth = 4
+
+[params]
+  # dir name of your main content (default is `content/posts`).
+  # the list of set content will show up on your index page (baseurl).
+  contentTypeName = "post"
+
+  # ["orange", "blue", "red", "green", "pink"]
+  themeColor = "blue"
+
+  # if you set this to 0, only submenu trigger will be visible
+  showMenuItems = 3
+
+  # show selector to switch language
+  showLanguageSelector = false
+
+  # set theme to full screen width
+  fullWidthTheme = false
+
+  # center theme with default width
+  centerTheme = true
+
+  # set a custom favicon (default is a `themeColor` square)
+  # favicon = "favicon.ico"
+
+  # set post to show the last updated
+  # If you use git, you can set `enableGitInfo` to `true` and then post will automatically get the last updated
+  showLastUpdated = false
+  # Provide a string as a prefix for the last update date. By default, it looks like this: 2020-xx-xx [Updated: 2020-xx-xx] :: Author
+  # updatedDatePrefix = "Updated"
+
+  # set all headings to their default size (depending on browser settings)
+  # it's set to `true` by default
+  # oneHeadingSize = false
+
+[languages]
+  [languages.en]
+    languageName = "English"
+    title = "prilik's blog"
+    subtitle = "Somewhat interesting articles, Guaranteed*"
+    owner = ""
+    keywords = ""
+    copyright = "Copyright &copy; Daniel Prilik :: Licensed under <a target=\"_blank\" rel=\"external noopener license\" href=\"https://creativecommons.org/licenses/by-nd/4.0/\">CC-BY-ND-4.0</a>."
+    menuMore = "Show more"
+    readMore = "Read more"
+    readOtherPosts = "Read other posts"
+    missingContentMessage = "Page not found..."
+    missingBackButtonLabel = "Back to home page"
+
+    [languages.en.params.logo]
+      logoText = "prilik's blog"
+      logoHomeLink = "/blog"
+
+    [languages.en.menu]
+      [[languages.en.menu.main]]
+        identifier = "posts"
+        name = "posts"
+        url = "/"
+
+      [[languages.en.menu.main]]
+        identifier = "github"
+        name = "github"
+        url = "https://github.com/daniel5151"
+
+      [[languages.en.menu.main]]
+        identifier = "whoami"
+        name = "whoami"
+        url = "https://prilik.com"

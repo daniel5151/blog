@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+  xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  
+  <url>
+    <loc>https://prilik.com/blog/tags/emulation/</loc>
+    <lastmod>2019-05-16T00:00:00-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://prilik.com/blog/post/crosvm-paravirt/</loc>
+    <lastmod>2019-05-16T00:00:00-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://prilik.com/blog/post/</loc>
+    <lastmod>2019-05-16T00:00:00-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://prilik.com/blog/</loc>
+    <lastmod>2019-05-16T00:00:00-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://prilik.com/blog/tags/rust/</loc>
+    <lastmod>2019-05-16T00:00:00-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://prilik.com/blog/tags/</loc>
+    <lastmod>2019-05-16T00:00:00-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://prilik.com/blog/tags/virtualization/</loc>
+    <lastmod>2019-05-16T00:00:00-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://prilik.com/blog/tags/nes/</loc>
+    <lastmod>2018-08-24T00:00:00-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://prilik.com/blog/post/widenes/</loc>
+    <lastmod>2018-08-24T00:00:00-04:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://prilik.com/blog/categories/</loc>
+  </url>
+  
+</urlset>
