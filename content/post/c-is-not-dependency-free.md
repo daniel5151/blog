@@ -9,8 +9,8 @@ Like any great systems programming language, it doesn't take much of anything to
 get C up and running on a new platform.
 
 In fact, a minimal C "runtime" (typically called
-[`crt0`](https://en.wikipedia.org/wiki/Crt0)) consists of a short prelude of
-machine code that zeroes out the .bss section and hands off execution to `main`.
+[`crt0`](https://en.wikipedia.org/wiki/Crt0)) typically consists of a short
+prelude that zeroes out the .bss section and hands off execution to `main`.
 
 That's it!
 
@@ -25,7 +25,7 @@ the same can't be said about its _standard library_.
 <!--more-->
 
 > To keep things simple, I'll be focusing exclusively on C, though it should be
-> noted that everything here applies to C++ as well. While not a strict subset
+> noted that everything here applies to C++ as well. While not a strict superset
 > of C, C++ inherits most of C's language design and standard library, making it
 > equally susceptible to the issues outlined below.
 
@@ -43,15 +43,15 @@ down at link time. Raise your hand if you've ever been hit with a linker error
 that looks something like this:
 
 ```bash
-/lib/gcc/arm-none-eabi/lib\libc.a(lib_a-writer.o): In function `_write_r':
+/lib/gcc/arm-none-eabi/lib/libc.a(lib_a-writer.o): In function `_write_r':
     writer.c:(.text._write_r+0x20): undefined reference to `_write'
-/lib/gcc/arm-none-eabi/lib\libc.a(lib_a-readr.o): In function `_read_r':
+/lib/gcc/arm-none-eabi/lib/libc.a(lib_a-readr.o): In function `_read_r':
     readr.c:(.text._read_r+0x20): undefined reference to `_read'
-/lib/gcc/arm-none-eabi/lib\libc.a(lib_a-exit.o): In function `exit':
+/lib/gcc/arm-none-eabi/lib/libc.a(lib_a-exit.o): In function `exit':
     exit.c:(.text.exit+0x2c): undefined reference to `_exit'
-/lib/gcc/arm-none-eabi/lib\libc.a(lib_a-isattyr.o): In function `_isatty_r':
+/lib/gcc/arm-none-eabi/lib/libc.a(lib_a-isattyr.o): In function `_isatty_r':
     isattyr.c:(.text._isatty_r+0x18): undefined reference to `_isatty'
-/lib/gcc/arm-none-eabi/lib\libc.a(lib_a-sbrkr.o): In function `_sbrk_r':
+/lib/gcc/arm-none-eabi/lib/libc.a(lib_a-sbrkr.o): In function `_sbrk_r':
     sbrkr.c:(.text._sbrk_r+0x18): undefined reference to `_sbrk'
 gcc: ld returned 1 exit status
 ```
@@ -79,11 +79,10 @@ calls `malloc` if the input buffer is too small to fit the resulting string:
 [^c-contrived-example]
 
 ```c
-#include <stdio.h>
 #include <string.h>
 #include <malloc.h> // Uh oh!
 
-#include "uartprintf.h" // e.g: print bytes over a UART
+#include "myprintf.h" // e.g: a custom printf that writes bytes over a serial port
 
 char* greet(char* name, size_t buf_len) {
     const char* greeting = "Hello ";
@@ -97,7 +96,7 @@ char* greet(char* name, size_t buf_len) {
     if (buf_len > final_size) {
         new_name = name;
     } else {
-        new_name =  malloc(final_size); // This won't work!
+        new_name = malloc(final_size); // This won't work!
     }
 
     memmove(new_name + greeting_len, name, name_len);
@@ -114,11 +113,11 @@ int main() {
     char* greet_1 = greet(large_name_buf, 128);
     char* greet_2 = greet(small_name_buf, 12);
 
-    uartprintf("%p\n", large_name_buf);       // 0x7ffcd8854e90
-    uartprintf("%p: %s\n", greet_1, greet_1); // 0x7ffcd8854e90: Hello Jimothy
+    myprintf("%p\n", large_name_buf);       // 0x7ffcd8854e90
+    myprintf("%p: %s\n", greet_1, greet_1); // 0x7ffcd8854e90: Hello Jimothy
 
-    uartprintf("%p\n", small_name_buf);       // 0x7fffbe5ef094
-    uartprintf("%p: %s\n", greet_2, greet_2); // ERROR: calls `malloc`!
+    myprintf("%p\n", small_name_buf);       // 0x7fffbe5ef094
+    myprintf("%p: %s\n", greet_2, greet_2); // ERROR: calls `malloc`!
 
     return 0;
 }
@@ -132,13 +131,13 @@ dependent. The program might crash with an `unimplemented syscall` error, or
 `malloc` might end up returning a null pointer, which this code (naively)
 doesn't check for (after all, when could `malloc` possibly fail /s).
 
-One classic workaround for these sorts of footguns is to forgoe the C standard
+One classic workaround for these sorts of footguns is to forgo the C standard
 library entirely, and rewrite every method from scratch. After all, how hard can
 it be to
-[implement `memcpy` ](https://stackoverflow.com/questions/17591624/understanding-the-source-code-of-memcpy)
-anyways? And sure, this approach might work fine for the simpler methods, but
-are you really going to want to re-implement something like `sprintf()`
-yourself? Probably not.
+[implement `memcpy`](https://stackoverflow.com/questions/17591624/understanding-the-source-code-of-memcpy)
+anyway? And sure, this approach might work fine for the simpler methods, but are
+you really going to want to re-implement something like `sprintf()` yourself?
+Probably not.
 
 Things get even hairier when using external C libraries. While many C libraries
 proudly market themselves as "dependency-free", quite often they implicitly mean
@@ -160,11 +159,11 @@ platform-agnostic, dependency free bits of code, and all the platform-specific,
 # Rust is _Truly_ Dependency Free
 
 Like any great systems programming language, it doesn't take much of anything to
-get Rust up running on a new platform.
+get Rust up and running on a new platform.
 
 In fact, a minimal Rust "runtime" (cheekily called
-[`r0`](https://github.com/rust-embedded/r0)) consists of a short prelude of
-machine code that zeroes out the .bss section and hands off execution to `main`.
+[`r0`](https://github.com/rust-embedded/r0)) typically consists of a short
+prelude that zeroes out the .bss section and hands off execution to `main`.
 
 That's it\![^rs-panic-handler]
 
@@ -173,9 +172,9 @@ run on just about any hardware platform (well, assuming there's
 [compiler support](https://doc.rust-lang.org/nightly/rustc/platform-support.html)
 for it).
 
-Where Rust differs from C is with respect to it's standard library. Learning
-from the mistakes of C, the Rust language team made the excellent decision to
-split the standard library into two parts:
+Where Rust differs from C is with respect to its standard library. Learning from
+the mistakes of C, the Rust language team made the excellent decision to split
+the standard library into two parts:
 
 -   [`std`](https://doc.rust-lang.org/std/index.html): The full-fledged Rust
     standard library, "[offering] core types, like `Vec<T>` and `Option<T>`,
@@ -188,15 +187,15 @@ split the standard library into two parts:
 
 This seemingly innocuous implementation detail turned out to be absolutely
 _incredible_ for bare-metal programmers, as it made it possible to entirely
-"opt-out" of all the OS-dependent bits of the standard library! By relying on
+"opt-out" of all the OS-dependent bits of the standard library. By relying on
 the `core` library directly, it's possible to write truly portable bare-metal
 code free of any and all "hidden" syscalls!
 
 Unlike C, which allows separate method declarations and implementations (i.e:
 declaring a method in a `.h` header file, and implementing it in a `.c` file),
-Rust requires that methods [not marked as `extern`] are implemented at the same
-time as they are declared, making it _impossible_ to get a linker error when
-writing typical Rust code\! [^rs-link]
+Rust requires that methods are implemented at the same time as they are
+declared, making it _impossible_ to get a linker error when writing typical Rust
+code. [^rs-link]
 
 So, how does a crate (Rust lingo for library/binary) opt out of the `std`
 standard library? Why, using the handy-dandy top-level `#![no_std]` attribute!
@@ -205,16 +204,15 @@ As the name implies, the `#![no_std]` attribute signals to the Rust compiler
 that the crate shouldn't link with `std`, and that it relies on the `core`
 library directly.
 
-`#![no_std]` is transitive down the dependency graph, so accidentally including
-a dependency that relies on `std` within a `no_std` will be rejected by the
-compiler. This transitive properly makes it possible to confidently integrate
-external dependencies from `crate.io`, and be confident that if it compiles, it
-won't inadvertently panic at runtime due to a stubbed out "hidden" syscall
-method!
-
-With Rust, using external dependencies with bare-metal code is not only
-possible, but incredibly safe and ergonomic thanks to `cargo`'s best-in-class
-dependency management story!
+`#![no_std]` is also transitive down the dependency graph, so accidentally
+including a dependency that relies on `std` within a `no_std` will be rejected
+by the compiler. This transitive properly makes it possible to use `cargo`
+(Rust's built-in package manager) to integrate external dependencies from
+`crate.io`, and be confident that if it compiles, it won't inadvertently panic
+at runtime due to a stubbed out "hidden" syscall dependency. With Rust, using
+external dependencies with bare-metal code is not only possible, but thanks to
+`cargo`'s best-in-class dependency management story, it's incredibly ergonomic
+as well!
 
 To really show you the power of `no_std`, lets revisit the `greet` function from
 the last section. Consider the following Rust implementation, which goes out of
@@ -312,8 +310,9 @@ Thanks for reading!
     Emphasis on the word _typical_, which in this case, implies writing Rust
     using the `cargo` package manager, and directly linking to other Rust
     libraries. Rust has a very strong FFI story, and can natively link with
-    `extern "C"` types and functions, but doing so will obviously open the door
-    to all sorts of fun-to-debug linking errors.
+    [`extern`](https://doc.rust-lang.org/std/keyword.extern.html) types and
+    functions, but doing so will obviously open the door to all sorts of
+    fun-to-debug linking errors.
 
 [^alloc]:
     Okay, that's not _exactly_ true, since the `alloc` function is part of the
