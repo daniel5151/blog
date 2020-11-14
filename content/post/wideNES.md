@@ -4,7 +4,7 @@ date = 2018-08-24
 description = "A explanation and exploration of wideNES, a novel technique to automatically and interactively map-out NES games in real time. Experience NES classics like never before... in widescreen!"
 draft = false
 toc = true
-tags = ["emulation", "nes"]
+tags = ["emulation", "nes", "c++"]
 aliases = [
 "/wideNES",
 "/wideNES.html",
