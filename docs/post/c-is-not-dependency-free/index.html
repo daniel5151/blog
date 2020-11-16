@@ -242,7 +242,7 @@ appease the linker by stubbing out
 with some sort of panicking implementation, and working backwards from a crash
 to determine which standard library method can&rsquo;t be used. If you&rsquo;re lucky, your
 toolchain might even include some
-<a href="https://community.arm.com/developer/tools-software/tools/f/armds-forum/5625/key-difference-between-gcc-arm-none-eabi-and-arm-eabi">built-in</a>
+<a href="https://community.arm.com/developer/tools-software/tools/f/arm-compilers-forum/44223/what-are-the-compile-option-differences-between---specs-nosys-specs-and---specs-rdimon-specs-in-arm-none-eabi-gcc">built-in</a>
 syscall stubs.</p>
 <p>In this particular case, it&rsquo;s pretty obvious why the <code>&lt;stdio.h&gt;</code> functions
 wouldn&rsquo;t work when writing bare-metal software. Unfortunately, things aren&rsquo;t

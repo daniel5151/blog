@@ -77,7 +77,7 @@ appease the linker by stubbing out
 with some sort of panicking implementation, and working backwards from a crash
 to determine which standard library method can't be used. If you're lucky, your
 toolchain might even include some
-[built-in](https://community.arm.com/developer/tools-software/tools/f/armds-forum/5625/key-difference-between-gcc-arm-none-eabi-and-arm-eabi)
+[built-in](https://community.arm.com/developer/tools-software/tools/f/arm-compilers-forum/44223/what-are-the-compile-option-differences-between---specs-nosys-specs-and---specs-rdimon-specs-in-arm-none-eabi-gcc)
 syscall stubs.
 
 In this particular case, it's pretty obvious why the `<stdio.h>` functions
