@@ -65,6 +65,12 @@ Oops! Turns out those `<stdio.h>` methods rely on the existence of some
 underlying syscalls, but because this is bare-metal code, they're nowhere to be
 found!
 
+But wait, what about
+[`-ffreestanding`](https://stackoverflow.com/questions/17692428/what-is-ffreestanding-option-in-gcc)?
+Unfortunately, it doesn't actually mitigate the problem much. Sure, the compiler
+won't use its built-in versions of common standard library routines, but it
+won't stop you from writing `#include <stdio.h>` and trying to use them anyways!
+
 Now, this certainly isn't the end of the world. It's entirely possible to
 appease the linker by stubbing out
 [these syscalls](https://wiki.osdev.org/Porting_Newlib#newlib.2Flibc.2Fsys.2Fmyos.2Fsyscalls.c)

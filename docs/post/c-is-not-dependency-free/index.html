@@ -157,7 +157,7 @@ Unfortunately, while C is effectively dependency free at the language level, the
       <span class="post-date">
         2020-11-16 
       </span>
-      <span> - 9 minute read</span>
+      <span> - 10 minute read</span>
     
     
   </div>
@@ -231,6 +231,11 @@ gcc: ld returned 1 exit status
 </code></pre><p>Oops! Turns out those <code>&lt;stdio.h&gt;</code> methods rely on the existence of some
 underlying syscalls, but because this is bare-metal code, they&rsquo;re nowhere to be
 found!</p>
+<p>But wait, what about
+<a href="https://stackoverflow.com/questions/17692428/what-is-ffreestanding-option-in-gcc"><code>-ffreestanding</code></a>?
+Unfortunately, it doesn&rsquo;t actually mitigate the problem much. Sure, the compiler
+won&rsquo;t use its built-in versions of common standard library routines, but it
+won&rsquo;t stop you from writing <code>#include &lt;stdio.h&gt;</code> and trying to use them anyways!</p>
 <p>Now, this certainly isn&rsquo;t the end of the world. It&rsquo;s entirely possible to
 appease the linker by stubbing out
 <a href="https://wiki.osdev.org/Porting_Newlib#newlib.2Flibc.2Fsys.2Fmyos.2Fsyscalls.c">these syscalls</a>
