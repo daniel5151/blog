@@ -222,15 +222,15 @@ As the name implies, the `#![no_std]` attribute signals to the Rust compiler
 that the crate shouldn't link directly with `std`, and that it should instead
 link with the `core` library directly.
 
-`#![no_std]` is also transitive down the dependency graph, so accidentally
+~~`#![no_std]` is also transitive down the dependency graph, so accidentally
 including a dependency that relies on `std` within a `no_std` project will be
-rejected by the compiler. This transitive properly makes it possible to use
-`cargo` (Rust's built-in package manager) to integrate external dependencies
-from `crate.io`, and be confident that if it compiles, it won't inadvertently
-panic at runtime due to a stubbed out "hidden" syscall dependency. With Rust,
-using external dependencies with bare-metal code is not only possible, but
-thanks to `cargo`'s best-in-class dependency management story, it's incredibly
-ergonomic as well!
+rejected by the compiler~~[^transitive_no_std]. This transitive properly makes
+it possible to use `cargo` (Rust's built-in package manager) to integrate
+external dependencies from `crate.io`, and be confident that if it compiles, it
+won't inadvertently panic at runtime due to a stubbed out "hidden" syscall
+dependency. With Rust, using external dependencies with bare-metal code is not
+only possible, but thanks to `cargo`'s best-in-class dependency management
+story, it's incredibly ergonomic as well!
 
 To really show you the power of `no_std`, lets revisit the `greet` function from
 the last section. Consider the following Rust implementation, which goes out of
@@ -342,3 +342,11 @@ Thanks for reading!
     long enough as-is.
 
 [^audit-deps]: Just make sure you audit your dependencies!
+[^transitive_no_std]:
+    As pointed out by
+    [CAD1997](https://www.reddit.com/r/rust/comments/jvasmr/c_is_not_dependency_free/gciq7de/)
+    on Reddit, this is not actually true, as a downstream crate could call
+    `extern crate std;` directly. This is not something that can easily be
+    [linted for](https://github.com/rust-lang/rust/issues/38509), but it can be
+    mitigated by testing on a `no_std` target that doesn't ship with a pre-built
+    `std`.

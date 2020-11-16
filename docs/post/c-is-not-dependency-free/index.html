@@ -368,15 +368,15 @@ standard library? Why, using the handy-dandy top-level <code>#![no_std]</code> a
 <p>As the name implies, the <code>#![no_std]</code> attribute signals to the Rust compiler
 that the crate shouldn&rsquo;t link directly with <code>std</code>, and that it should instead
 link with the <code>core</code> library directly.</p>
-<p><code>#![no_std]</code> is also transitive down the dependency graph, so accidentally
+<p><del><code>#![no_std]</code> is also transitive down the dependency graph, so accidentally
 including a dependency that relies on <code>std</code> within a <code>no_std</code> project will be
-rejected by the compiler. This transitive properly makes it possible to use
-<code>cargo</code> (Rust&rsquo;s built-in package manager) to integrate external dependencies
-from <code>crate.io</code>, and be confident that if it compiles, it won&rsquo;t inadvertently
-panic at runtime due to a stubbed out &ldquo;hidden&rdquo; syscall dependency. With Rust,
-using external dependencies with bare-metal code is not only possible, but
-thanks to <code>cargo</code>&rsquo;s best-in-class dependency management story, it&rsquo;s incredibly
-ergonomic as well!</p>
+rejected by the compiler</del><sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup>. This transitive properly makes
+it possible to use <code>cargo</code> (Rust&rsquo;s built-in package manager) to integrate
+external dependencies from <code>crate.io</code>, and be confident that if it compiles, it
+won&rsquo;t inadvertently panic at runtime due to a stubbed out &ldquo;hidden&rdquo; syscall
+dependency. With Rust, using external dependencies with bare-metal code is not
+only possible, but thanks to <code>cargo</code>&rsquo;s best-in-class dependency management
+story, it&rsquo;s incredibly ergonomic as well!</p>
 <p>To really show you the power of <code>no_std</code>, lets revisit the <code>greet</code> function from
 the last section. Consider the following Rust implementation, which goes out of
 it&rsquo;s way to be as <code>unsafe</code> and un-idiomatic as possible. This could very well be
@@ -419,7 +419,7 @@ Rust playground link)</em></p>
 <p>Even this gnarly, <code>unsafe</code>, un-idiomatic rewrite of the raw C function benefited
 from Rust&rsquo;s <code>no_std</code> guarantees, which made it <em>literally impossible</em> to
 accidentally use the <code>alloc</code> function (Rust&rsquo;s equivalent to <code>malloc</code>) in a
-bare-metal environment!<sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup></p>
+bare-metal environment!<sup id="fnref:5"><a href="#fn:5" class="footnote-ref" role="doc-noteref">5</a></sup></p>
 <hr>
 <p>In conclusion, Rust&rsquo;s <code>no_std</code> feature makes it an excellent language for
 beginners looking to get started with bare-metal programming.</p>
@@ -427,7 +427,7 @@ beginners looking to get started with bare-metal programming.</p>
 implement and/or stub-out a bunch of syscalls is awesome, and being able to
 write/publish/consume portable, bare-metal compatible libraries is absolutely
 <em>game-changing</em> for the traditionally hermetic world of embedded
-development.<sup id="fnref:5"><a href="#fn:5" class="footnote-ref" role="doc-noteref">5</a></sup></p>
+development.<sup id="fnref:6"><a href="#fn:6" class="footnote-ref" role="doc-noteref">6</a></sup></p>
 <p>If you&rsquo;re interested to learn more about using Rust on bare-metal, I&rsquo;d recommend
 checking out the following resources:</p>
 <ul>
@@ -467,15 +467,24 @@ types and functions, but doing so will obviously open the door to all sorts
 of fun-to-debug linking errors. <a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 <li id="fn:4" role="doc-endnote">
+<p>As pointed out by
+<a href="https://www.reddit.com/r/rust/comments/jvasmr/c_is_not_dependency_free/gciq7de/">CAD1997</a>
+on Reddit, this is not actually true, as a downstream crate could call
+<code>extern crate std;</code> directly. This is not something that can easily be
+<a href="https://github.com/rust-lang/rust/issues/38509">linted for</a>, but it can be
+mitigated by testing on a <code>no_std</code> target that doesn&rsquo;t ship with a pre-built
+<code>std</code>. <a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:5" role="doc-endnote">
 <p>That said, if you&rsquo;re working on a platform with RAM to spare, it <em>is</em>
 possible to write allocating <code>no_std</code> code in Rust by linking with the
 <a href="https://doc.rust-lang.org/alloc/index.html"><code>alloc</code></a> crate and providing a
 <a href="https://doc.rust-lang.org/std/alloc/index.html#the-global_allocator-attribute"><code>#[global_allocator]</code></a>
 implementation. That&rsquo;s quite a rabbit hole though, and this blog post is
-long enough as-is. <a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+long enough as-is. <a href="#fnref:5" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:5" role="doc-endnote">
-<p>Just make sure you audit your dependencies! <a href="#fnref:5" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+<li id="fn:6" role="doc-endnote">
+<p>Just make sure you audit your dependencies! <a href="#fnref:6" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 </ol>
 </section>
