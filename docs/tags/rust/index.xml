@@ -7,7 +7,27 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>Copyright &amp;copy; Daniel Prilik :: Licensed under &lt;a target=&#34;_blank&#34; rel=&#34;external noopener license&#34; href=&#34;https://creativecommons.org/licenses/by-nd/4.0/&#34;&gt;CC-BY-ND-4.0&lt;/a&gt;.</copyright>
-    <lastBuildDate>Thu, 16 May 2019 00:00:00 -0400</lastBuildDate><atom:link href="https://prilik.com/blog/tags/rust/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Mon, 16 Nov 2020 00:00:00 -0500</lastBuildDate><atom:link href="https://prilik.com/blog/tags/rust/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>C Is Not Dependency Free</title>
+      <link>https://prilik.com/blog/post/c-is-not-dependency-free/</link>
+      <pubDate>Mon, 16 Nov 2020 00:00:00 -0500</pubDate>
+      
+      <guid>https://prilik.com/blog/post/c-is-not-dependency-free/</guid>
+      <description>&lt;p&gt;Like any great systems programming language, it doesn&amp;rsquo;t take much of anything to
+get C up and running on a new platform.&lt;/p&gt;
+&lt;p&gt;In fact, a minimal C &amp;ldquo;runtime&amp;rdquo; (typically called
+&lt;a href=&#34;https://en.wikipedia.org/wiki/Crt0&#34;&gt;&lt;code&gt;crt0&lt;/code&gt;&lt;/a&gt;) only consists of a short prelude
+that zeroes out the &lt;code&gt;.bss&lt;/code&gt; section and hands off execution to &lt;code&gt;main&lt;/code&gt;.&lt;/p&gt;
+&lt;p&gt;That&amp;rsquo;s it!&lt;/p&gt;
+&lt;p&gt;Compared to other popular programming languages, which require substantial
+runtime machinery to operate (e.g: Java&amp;rsquo;s virtual machine, Go&amp;rsquo;s garbage
+collector, etc&amp;hellip;), C&amp;rsquo;s extremely minimal approach to language design has
+allowed it to run on just about any platform.&lt;/p&gt;
+&lt;p&gt;Unfortunately, while C is effectively dependency free at the &lt;em&gt;language&lt;/em&gt; level,
+the same can&amp;rsquo;t be said about its &lt;em&gt;standard library&lt;/em&gt;.&lt;/p&gt;</description>
+    </item>
+    
     <item>
       <title>Paravirtualized Devices in crosvm - a Performance Panacea for Modern VMs</title>
       <link>https://prilik.com/blog/post/crosvm-paravirt/</link>

@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+    <title>C Is Not Dependency Free :: prilik&#39;s blog</title>
+  
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="Like any great systems programming language, it doesn&amp;rsquo;t take much of anything to get C up and running on a new platform.
+In fact, a minimal C &amp;ldquo;runtime&amp;rdquo; (typically called crt0) only consists of a short prelude that zeroes out the .bss section and hands off execution to main.
+That&amp;rsquo;s it!
+Compared to other popular programming languages, which require substantial runtime machinery to operate (e.g: Java&amp;rsquo;s virtual machine, Go&amp;rsquo;s garbage collector, etc&amp;hellip;), C&amp;rsquo;s extremely minimal approach to language design has allowed it to run on just about any platform.
+Unfortunately, while C is effectively dependency free at the language level, the same can&amp;rsquo;t be said about its standard library.
+" />
+<meta name="keywords" content="" />
+<meta name="robots" content="noodp" />
+<link rel="canonical" href="https://prilik.com/blog/post/c-is-not-dependency-free/" />
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-58621690-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+
+
+<link rel="stylesheet" href="https://prilik.com/blog/assets/style.css">
+
+  <link rel="stylesheet" href="https://prilik.com/blog/assets/blue.css">
+
+
+
+
+
+
+<link rel="apple-touch-icon" href="https://prilik.com/blog/img/apple-touch-icon-192x192.png">
+
+  <link rel="shortcut icon" href="https://prilik.com/blog/img/favicon/blue.png">
+
+
+
+<meta name="twitter:card" content="summary" />
+
+
+
+<meta property="og:locale" content="en" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="C Is Not Dependency Free">
+<meta property="og:description" content="Like any great systems programming language, it doesn&amp;rsquo;t take much of anything to get C up and running on a new platform.
+In fact, a minimal C &amp;ldquo;runtime&amp;rdquo; (typically called crt0) only consists of a short prelude that zeroes out the .bss section and hands off execution to main.
+That&amp;rsquo;s it!
+Compared to other popular programming languages, which require substantial runtime machinery to operate (e.g: Java&amp;rsquo;s virtual machine, Go&amp;rsquo;s garbage collector, etc&amp;hellip;), C&amp;rsquo;s extremely minimal approach to language design has allowed it to run on just about any platform.
+Unfortunately, while C is effectively dependency free at the language level, the same can&amp;rsquo;t be said about its standard library.
+" />
+<meta property="og:url" content="https://prilik.com/blog/post/c-is-not-dependency-free/" />
+<meta property="og:site_name" content="prilik&#39;s blog" />
+
+  
+    <meta property="og:image" content="https://prilik.com/blog/img/favicon/blue.png">
+  
+
+<meta property="og:image:width" content="2048">
+<meta property="og:image:height" content="1024">
+
+
+  <meta property="article:published_time" content="2020-11-16 00:00:00 -0500 EST" />
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body class="blue">
+
+
+<div class="container center headings--one-size">
+
+  <header class="header">
+  <div class="header__inner">
+    <div class="header__logo">
+      <a href="/blog">
+  <div class="logo">
+    prilik&#39;s blog
+  </div>
+</a>
+
+    </div>
+    <div class="menu-trigger">menu</div>
+  </div>
+  
+    <nav class="menu">
+  <ul class="menu__inner menu__inner--desktop">
+    
+      
+        
+          <li><a href="https://github.com/daniel5151">github</a></li>
+        
+      
+        
+          <li><a href="/blog/">posts</a></li>
+        
+      
+        
+          <li><a href="https://prilik.com">whoami</a></li>
+        
+      
+      
+    
+
+    
+  </ul>
+
+  <ul class="menu__inner menu__inner--mobile">
+    
+      
+        <li><a href="https://github.com/daniel5151">github</a></li>
+      
+    
+      
+        <li><a href="/blog/">posts</a></li>
+      
+    
+      
+        <li><a href="https://prilik.com">whoami</a></li>
+      
+    
+    
+  </ul>
+</nav>
+
+  
+</header>
+
+
+  <div class="content">
+    
+<div class="post">
+  <h1 class="post-title">
+    <a href="https://prilik.com/blog/post/c-is-not-dependency-free/">C Is Not Dependency Free</a></h1>
+  <div class="post-meta">
+    
+      <span class="post-date">
+        2020-11-16 
+      </span>
+      <span> - 9 minute read</span>
+    
+    
+  </div>
+
+  
+  <span class="post-tags">
+    
+    #<a href="https://prilik.com/blog/tags/c/">c</a>&nbsp;
+    
+    #<a href="https://prilik.com/blog/tags/c&#43;&#43;/">c&#43;&#43;</a>&nbsp;
+    
+    #<a href="https://prilik.com/blog/tags/rust/">rust</a>&nbsp;
+    
+    #<a href="https://prilik.com/blog/tags/os/">os</a>&nbsp;
+    
+    #<a href="https://prilik.com/blog/tags/no_std/">no_std</a>&nbsp;
+    
+  </span>
+  
+
+  
+
+  
+
+  <div class="post-content"><div>
+        <p>Like any great systems programming language, it doesn&rsquo;t take much of anything to
+get C up and running on a new platform.</p>
+<p>In fact, a minimal C &ldquo;runtime&rdquo; (typically called
+<a href="https://en.wikipedia.org/wiki/Crt0"><code>crt0</code></a>) only consists of a short prelude
+that zeroes out the <code>.bss</code> section and hands off execution to <code>main</code>.</p>
+<p>That&rsquo;s it!</p>
+<p>Compared to other popular programming languages, which require substantial
+runtime machinery to operate (e.g: Java&rsquo;s virtual machine, Go&rsquo;s garbage
+collector, etc&hellip;), C&rsquo;s extremely minimal approach to language design has
+allowed it to run on just about any platform.</p>
+<p>Unfortunately, while C is effectively dependency free at the <em>language</em> level,
+the same can&rsquo;t be said about its <em>standard library</em>.</p>
+<blockquote>
+<p>To keep things simple, I&rsquo;ll be focusing exclusively on C, though it should be
+noted that everything here applies to C++ as well. While not a strict superset
+of C, C++ inherits most of C&rsquo;s language design and standard library, making it
+equally susceptible to the issues outlined below.</p>
+</blockquote>
+<p>Owing to its strong UNIX heritage, the C standard library includes many
+functions and features which assume the existence of some sort of underlying OS.
+For example, even the humble and ubiquitous <code>printf</code> function relies on the
+existence of the <code>write</code> syscall, the idea of file descriptors, the <code>stdout</code>
+stream, etc&hellip;</p>
+<p>When writing bare-metal C code, beginners often absent-mindedly
+<code>#include &lt;stdio.h&gt;</code> in an effort to do some quick-and-dirty <code>printf</code> debugging.
+Unfortunately, while it might appear as though everything is working fine when
+compiling individual translation units, things will inevitably come crashing
+down at link time. Raise your hand if you&rsquo;ve ever been hit with a linker error
+that looks something like this:</p>
+<pre><code>/lib/gcc/arm-none-eabi/lib/libc.a(lib_a-writer.o): In function `_write_r':
+    writer.c:(.text._write_r+0x20): undefined reference to `_write'
+
+/lib/gcc/arm-none-eabi/lib/libc.a(lib_a-readr.o): In function `_read_r':
+    readr.c:(.text._read_r+0x24): undefined reference to `_read'
+
+/lib/gcc/arm-none-eabi/lib/libc.a(lib_a-exit.o): In function `exit':
+    exit.c:(.text.exit+0x2c): undefined reference to `_exit'
+
+/lib/gcc/arm-none-eabi/lib/libc.a(lib_a-isattyr.o): In function `_isatty_r':
+    isattyr.c:(.text._isatty_r+0x18): undefined reference to `_isatty'
+
+/lib/gcc/arm-none-eabi/lib/libc.a(lib_a-sbrkr.o): In function `_sbrk_r':
+    sbrkr.c:(.text._sbrk_r+0x14): undefined reference to `_sbrk'
+
+gcc: ld returned 1 exit status
+</code></pre><p>Oops! Turns out those <code>&lt;stdio.h&gt;</code> methods rely on the existence of some
+underlying syscalls, but because this is bare-metal code, they&rsquo;re nowhere to be
+found!</p>
+<p>Now, this certainly isn&rsquo;t the end of the world. It&rsquo;s entirely possible to
+appease the linker by stubbing out
+<a href="https://wiki.osdev.org/Porting_Newlib#newlib.2Flibc.2Fsys.2Fmyos.2Fsyscalls.c">these syscalls</a>
+with some sort of panicking implementation, and working backwards from a crash
+to determine which standard library method can&rsquo;t be used. If you&rsquo;re lucky, your
+toolchain might even include some
+<a href="https://community.arm.com/developer/tools-software/tools/f/armds-forum/5625/key-difference-between-gcc-arm-none-eabi-and-arm-eabi">built-in</a>
+syscall stubs.</p>
+<p>In this particular case, it&rsquo;s pretty obvious why the <code>&lt;stdio.h&gt;</code> functions
+wouldn&rsquo;t work when writing bare-metal software. Unfortunately, things aren&rsquo;t
+always so simple.</p>
+<p>For example, consider this (admittedly contrived) <code>greet</code> function that only
+calls <code>malloc</code> if the input buffer is too small to fit the resulting
+string:<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup></p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-c" data-lang="c"><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;string.h&gt;</span><span style="color:#75715e">
+</span><span style="color:#75715e">#include</span> <span style="color:#75715e">&lt;malloc.h&gt; // Uh oh!</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>
+<span style="color:#75715e">#include</span> <span style="color:#75715e">&#34;myprintf.h&#34; // hand-rolled printf that writes data over a serial port</span><span style="color:#75715e">
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> <span style="color:#a6e22e">greet</span>(<span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> name, size_t name_buf_len) {
+    <span style="color:#66d9ef">const</span> <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> greeting <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Hello &#34;</span>;
+    <span style="color:#66d9ef">const</span> size_t greeting_len <span style="color:#f92672">=</span> strlen(greeting);
+    <span style="color:#66d9ef">const</span> size_t name_len <span style="color:#f92672">=</span> strlen(name);
+
+    <span style="color:#66d9ef">const</span> size_t final_size <span style="color:#f92672">=</span> name_len <span style="color:#f92672">+</span> greeting_len <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>;
+
+    <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> new_name;
+
+    <span style="color:#66d9ef">if</span> (name_buf_len <span style="color:#f92672">&gt;</span> final_size) {
+        new_name <span style="color:#f92672">=</span> name;
+    } <span style="color:#66d9ef">else</span> {
+        new_name <span style="color:#f92672">=</span> malloc(final_size); <span style="color:#75715e">// This won&#39;t work!!
+</span><span style="color:#75715e"></span>    }
+
+    memmove(new_name <span style="color:#f92672">+</span> greeting_len, name, name_len);
+    memcpy(new_name, greeting, greeting_len);
+    new_name[final_size <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#39;\0&#39;</span>;
+
+    <span style="color:#66d9ef">return</span> new_name;
+}
+
+<span style="color:#66d9ef">int</span> <span style="color:#a6e22e">main</span>() {
+    <span style="color:#66d9ef">char</span> large_name_buf [<span style="color:#ae81ff">128</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Jimothy&#34;</span>;
+    <span style="color:#66d9ef">char</span> small_name_buf [<span style="color:#ae81ff">12</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">&#34;Terrance&#34;</span>;
+
+    <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> greet_1 <span style="color:#f92672">=</span> greet(large_name_buf, <span style="color:#ae81ff">128</span>);
+    <span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> greet_2 <span style="color:#f92672">=</span> greet(small_name_buf, <span style="color:#ae81ff">12</span>);
+
+    printf(<span style="color:#e6db74">&#34;%p</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, large_name_buf);       <span style="color:#75715e">// 0x7ffcd8854e90
+</span><span style="color:#75715e"></span>    printf(<span style="color:#e6db74">&#34;%p: %s</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, greet_1, greet_1); <span style="color:#75715e">// 0x7ffcd8854e90: Hello Jimothy
+</span><span style="color:#75715e"></span>
+    printf(<span style="color:#e6db74">&#34;%p</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, small_name_buf);       <span style="color:#75715e">// 0x7fffbe5ef094
+</span><span style="color:#75715e"></span>    printf(<span style="color:#e6db74">&#34;%p: %s</span><span style="color:#ae81ff">\n</span><span style="color:#e6db74">&#34;</span>, greet_2, greet_2); <span style="color:#75715e">// ERROR: calls `malloc`!
+</span><span style="color:#75715e"></span>
+    <span style="color:#66d9ef">return</span> <span style="color:#ae81ff">0</span>;
+}
+</code></pre></div><p>It&rsquo;s entirely possible that the code will work 99% of the time, but occasionally
+fail in the rare case when the buffer is too small, and <code>malloc</code> ends up getting
+called. <code>malloc</code> typically relies on the
+<a href="https://en.wikipedia.org/wiki/Sbrk"><code>sbrk</code></a> syscall, which in this case, would
+be stubbed out. Depending on how <code>sbrk</code> was stubbed out, The program might crash
+with an <code>unimplemented syscall</code> error, or <code>malloc</code> might return a null pointer,
+which this code (naively) doesn&rsquo;t check for (after all, when was the last time
+<code>malloc</code> failed on your work PC? /s).</p>
+<p>One classic workaround for these sorts of footguns is to forgo the C standard
+library entirely, and rewrite every method from scratch. After all, how hard can
+it be to
+<a href="https://stackoverflow.com/questions/17591624/understanding-the-source-code-of-memcpy">implement <code>memcpy</code></a>
+anyway? And sure, this approach might work fine for the simpler methods, but do
+you <em>really</em> want to re-implement something like <code>sprintf</code> yourself? Probably
+not.</p>
+<p>Things get even hairier when using external C libraries. While many C libraries
+proudly market themselves as &ldquo;dependency-free&rdquo;, they quite often implicitly mean
+that they are <em>external</em> dependency-free, and still rely on the C standard
+library internally. That&rsquo;s not to say that there aren&rsquo;t any <em>truly</em> dependency
+free C libraries as well, there most certainly are. Unfortunately, for a
+beginner systems programmer, the distinction between being &ldquo;external&rdquo; dependency
+free and &ldquo;truly&rdquo; dependency free may not always be so obvious.</p>
+<p>And so, it&rsquo;s often the case the C programmers are left with one of two options:
+use the standard library and be <em>very careful</em> not to use any methods with
+hidden syscall dependencies, or forgo the standard library entirely and re-write
+any bits of functionality they require themselves. Neither one of these options
+is particularly &ldquo;ergonomic&rdquo;, and are far from beginner friendly.</p>
+<p>If only the C standard library had a clear &ldquo;line&rdquo; between all the
+platform-agnostic, dependency free bits of code, and all the platform-specific,
+&ldquo;requires an OS&rdquo; bits of code&hellip;</p>
+<h1 id="rust-is-_truly_-dependency-free">Rust is <em>Truly</em> Dependency Free<a href="#rust-is-_truly_-dependency-free" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h1>
+<p>Like any great systems programming language, it doesn&rsquo;t take much of anything to
+get Rust up and running on a new platform.</p>
+<p>In fact, a minimal Rust &ldquo;runtime&rdquo; (cheekily called
+<a href="https://github.com/rust-embedded/r0"><code>r0</code></a>) only consists of a short prelude
+that zeroes out the <code>.bss</code> section and hands off execution to <code>main</code>.</p>
+<p>That&rsquo;s it!<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup></p>
+<p>Just like C, this extremely minimal approach to language design allows Rust to
+run on just about any platform (well, assuming there&rsquo;s
+<a href="https://doc.rust-lang.org/nightly/rustc/platform-support.html">compiler support</a>
+for it).</p>
+<p>Where Rust differs from C is with respect to its standard library. Learning from
+the mistakes of C, the Rust language team made the excellent decision to split
+the standard library into two parts:</p>
+<ul>
+<li><a href="https://doc.rust-lang.org/std/index.html"><code>std</code></a>: The full-fledged Rust
+standard library, &ldquo;[offering] core types, like <code>Vec&lt;T&gt;</code> and <code>Option&lt;T&gt;</code>,
+library-defined operations on language primitives, standard macros, I/O and
+multithreading, among many other things.&rdquo;</li>
+<li><a href="https://doc.rust-lang.org/core/"><code>core</code></a>: The small <em>dependency-free</em>
+foundation of Rust language. <code>core</code> &ldquo;isn&rsquo;t even aware of heap allocation,
+nor does it provide concurrency or I/O. These things require platform
+integration, and [the <code>core</code>] library is platform-agnostic.&rdquo;</li>
+</ul>
+<p>This seemingly innocuous implementation detail turns out to be absolutely
+<em>incredible</em> for bare-metal programmers, as it makes it possible to entirely
+&ldquo;opt-out&rdquo; of all the OS-dependent bits of the standard library. By relying on
+the <code>core</code> library directly, it&rsquo;s possible to write truly portable bare-metal
+code free of any and all &ldquo;hidden&rdquo; syscalls!</p>
+<p>Unlike C, which allows separate item declarations and implementations (e.g:
+declaring a method in a <code>.h</code> header file, and implementing it in a <code>.c</code> file),
+Rust requires that items are implemented at the same time as they are declared,
+making it <em>impossible</em> to get a linker error when writing typical Rust
+code.<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup></p>
+<p>So, how does a &ldquo;crate&rdquo; (Rust lingo for library/binary) opt out of the <code>std</code>
+standard library? Why, using the handy-dandy top-level <code>#![no_std]</code> attribute!</p>
+<p>As the name implies, the <code>#![no_std]</code> attribute signals to the Rust compiler
+that the crate shouldn&rsquo;t link directly with <code>std</code>, and that it should instead
+link with the <code>core</code> library directly.</p>
+<p><code>#![no_std]</code> is also transitive down the dependency graph, so accidentally
+including a dependency that relies on <code>std</code> within a <code>no_std</code> project will be
+rejected by the compiler. This transitive properly makes it possible to use
+<code>cargo</code> (Rust&rsquo;s built-in package manager) to integrate external dependencies
+from <code>crate.io</code>, and be confident that if it compiles, it won&rsquo;t inadvertently
+panic at runtime due to a stubbed out &ldquo;hidden&rdquo; syscall dependency. With Rust,
+using external dependencies with bare-metal code is not only possible, but
+thanks to <code>cargo</code>&rsquo;s best-in-class dependency management story, it&rsquo;s incredibly
+ergonomic as well!</p>
+<p>To really show you the power of <code>no_std</code>, lets revisit the <code>greet</code> function from
+the last section. Consider the following Rust implementation, which goes out of
+it&rsquo;s way to be as <code>unsafe</code> and un-idiomatic as possible. This could very well be
+a &ldquo;first pass&rdquo; implementation from a C programmer just getting their feet wet
+with Rust:</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust"><span style="color:#75715e">// #![no_std] // Un-comment this and see what happens...
+</span><span style="color:#75715e"></span>
+<span style="color:#66d9ef">use</span> std::alloc::{alloc, Layout};
+
+<span style="color:#66d9ef">unsafe</span> <span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">greet</span>(name: <span style="color:#f92672">*</span><span style="color:#66d9ef">mut</span> <span style="color:#66d9ef">u8</span>, name_buf_len: <span style="color:#66d9ef">usize</span>) -&gt; <span style="color:#f92672">*</span><span style="color:#66d9ef">mut</span> <span style="color:#66d9ef">u8</span> {
+    <span style="color:#66d9ef">const</span> GREETING: <span style="color:#66d9ef">&amp;</span>&#39;static [<span style="color:#66d9ef">u8</span>] <span style="color:#f92672">=</span> <span style="color:#e6db74">b&#34;Hello &#34;</span>;
+
+    <span style="color:#66d9ef">let</span> name_len <span style="color:#f92672">=</span> strlen(name);
+    <span style="color:#66d9ef">let</span> final_size <span style="color:#f92672">=</span> name_len <span style="color:#f92672">+</span> GREETING.len() <span style="color:#f92672">+</span> <span style="color:#ae81ff">1</span>;
+
+    <span style="color:#66d9ef">let</span> new_name;
+    <span style="color:#66d9ef">if</span> name_buf_len <span style="color:#f92672">&gt;</span> final_size {
+        new_name <span style="color:#f92672">=</span> name;
+    } <span style="color:#66d9ef">else</span> {
+        new_name <span style="color:#f92672">=</span> alloc(Layout::from_size_align(final_size, <span style="color:#ae81ff">1</span>).unwrap());
+    }
+
+    new_name.add(GREETING.len()).copy_from(name, name_len);
+    new_name.copy_from_nonoverlapping(GREETING.as_ptr(), GREETING.len());
+    <span style="color:#f92672">*</span>new_name.add(final_size <span style="color:#f92672">-</span> <span style="color:#ae81ff">1</span>) <span style="color:#f92672">=</span> <span style="color:#e6db74">b&#39;\0&#39;</span>;
+
+    new_name
+}
+</code></pre></div><p><em>(You can play around with this example online using
+<a href="https://play.rust-lang.org/?version=stable&amp;mode=debug&amp;edition=2018&amp;gist=ed67db50e68a99e0594e472d87f078ab">this</a>
+Rust playground link)</em></p>
+<p>Without the <code>#![no_std]</code> attribute, this example works just fine. Un-comment the
+<code>#![no_std]</code> attribute, and all of a sudden, the code won&rsquo;t even compile!</p>
+<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-bash" data-lang="bash">error<span style="color:#f92672">[</span>E0433<span style="color:#f92672">]</span>: failed to resolve: use of undeclared type or module <span style="color:#e6db74">`</span>std<span style="color:#e6db74">`</span>
+ --&gt; src/lib.rs:3:5
+  |
+<span style="color:#ae81ff">3</span> | use std::alloc::<span style="color:#f92672">{</span>alloc, Layout<span style="color:#f92672">}</span>;
+  |     ^^^ use of undeclared type or module <span style="color:#e6db74">`</span>std<span style="color:#e6db74">`</span>
+</code></pre></div><p>Look at that!</p>
+<p>Even this gnarly, <code>unsafe</code>, un-idiomatic rewrite of the raw C function benefited
+from Rust&rsquo;s <code>no_std</code> guarantees, which made it <em>literally impossible</em> to
+accidentally use the <code>alloc</code> function (Rust&rsquo;s equivalent to <code>malloc</code>) in a
+bare-metal environment!<sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup></p>
+<hr>
+<p>In conclusion, Rust&rsquo;s <code>no_std</code> feature makes it an excellent language for
+beginners looking to get started with bare-metal programming.</p>
+<p>Being able to quickly get up and running on a new platform without having to
+implement and/or stub-out a bunch of syscalls is awesome, and being able to
+write/publish/consume portable, bare-metal compatible libraries is absolutely
+<em>game-changing</em> for the traditionally hermetic world of embedded
+development.<sup id="fnref:5"><a href="#fn:5" class="footnote-ref" role="doc-noteref">5</a></sup></p>
+<p>If you&rsquo;re interested to learn more about using Rust on bare-metal, I&rsquo;d recommend
+checking out the following resources:</p>
+<ul>
+<li>Philipp Oppermann&rsquo;s excellent series on writing an OS in Rust, particularly
+his post on setting up a
+<a href="https://os.phil-opp.com/freestanding-rust-binary/">Freestanding Rust Binary</a>.</li>
+<li>Cliff L. Biffle&rsquo;s post on rewriting his C++ project
+<a href="http://cliffle.com/blog/m4vga-in-rust/">m4vgalib in Rust</a>.</li>
+<li><a href="https://rust-embedded.github.io/book/">The Embedded Rust Book</a>, which is
+oriented towards embedded systems, such as Microcontrollers.</li>
+<li><a href="https://github.com/rust-embedded/awesome-embedded-rust">awesome-embedded-rust</a></li>
+<li>The official Rust <a href="https://doc.rust-lang.org/core/"><code>core</code></a> docs.</li>
+</ul>
+<p>Thanks for reading!</p>
+<section class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1" role="doc-endnote">
+<p>Yes, this is a contrived example, and would be caught quickly during code
+review by any experienced C programmer. Unfortunately, like many things in
+C, this sort of mistake can easily spiral into a few hours of stressful
+debugging for the inexperienced programmer. <a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2" role="doc-endnote">
+<p>Okay, you got me. Rust also requires a
+<a href="https://doc.rust-lang.org/nomicon/panic-handler.html"><code>#[panic_handler]</code></a>
+routine, which gets called whenever a fatal error occurs (e.g: an assertion
+is broken, a checked array access operation fails, etc&hellip;). But that&rsquo;s it,
+for real this time! <a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:3" role="doc-endnote">
+<p>Emphasis on the word <em>typical</em>, which in this case, implies writing Rust
+using the <code>cargo</code> package manager, and directly linking to other Rust
+libraries. Rust has a very strong FFI story, and can natively link with
+<a href="https://doc.rust-lang.org/std/keyword.extern.html"><code>extern</code></a> C and Rust
+types and functions, but doing so will obviously open the door to all sorts
+of fun-to-debug linking errors. <a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:4" role="doc-endnote">
+<p>That said, if you&rsquo;re working on a platform with RAM to spare, it <em>is</em>
+possible to write allocating <code>no_std</code> code in Rust by linking with the
+<a href="https://doc.rust-lang.org/alloc/index.html"><code>alloc</code></a> crate and providing a
+<a href="https://doc.rust-lang.org/std/alloc/index.html#the-global_allocator-attribute"><code>#[global_allocator]</code></a>
+implementation. That&rsquo;s quite a rabbit hole though, and this blog post is
+long enough as-is. <a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:5" role="doc-endnote">
+<p>Just make sure you audit your dependencies! <a href="#fnref:5" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</section>
+      </div></div>
+
+  
+  
+<div class="pagination">
+    <div class="pagination__title">
+        <span class="pagination__title-h">Read other posts</span>
+        <hr />
+    </div>
+    <div class="pagination__buttons">
+        
+        
+        <span class="button next">
+            <a href="https://prilik.com/blog/post/crosvm-paravirt/">
+                <span class="button__text">Paravirtualized Devices in crosvm - a Performance Panacea for Modern VMs</span>
+                <span class="button__icon">→</span>
+            </a>
+        </span>
+        
+    </div>
+</div>
+
+  
+
+  
+
+</div>
+
+  </div>
+
+  
+    <footer class="footer">
+  <div class="footer__inner">
+    
+      <div class="copyright copyright--user">
+        <span>Copyright &copy; Daniel Prilik :: Licensed under <a target="_blank" rel="external noopener license" href="https://creativecommons.org/licenses/by-nd/4.0/">CC-BY-ND-4.0</a>.</span>
+    
+        <span>:: Theme made by <a href="https://twitter.com/panr">panr</a></span>
+      </div>
+  </div>
+</footer>
+
+<script src="https://prilik.com/blog/assets/main.js"></script>
+
+
+
+
+
+
+
+  
+</div>
+
+</body>
+</html>

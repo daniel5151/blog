@@ -2,14 +2,14 @@
 <html lang="en">
 <head>
   
-    <title>emulation :: prilik&#39;s blog</title>
+    <title>no_std :: prilik&#39;s blog</title>
   
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="" />
 <meta name="keywords" content="" />
 <meta name="robots" content="noodp" />
-<link rel="canonical" href="https://prilik.com/blog/tags/emulation/" />
+<link rel="canonical" href="https://prilik.com/blog/tags/no_std/" />
 
 
 <script type="application/javascript">
@@ -48,9 +48,9 @@ if (!doNotTrack) {
 
 <meta property="og:locale" content="en" />
 <meta property="og:type" content="website" />
-<meta property="og:title" content="emulation">
+<meta property="og:title" content="no_std">
 <meta property="og:description" content="" />
-<meta property="og:url" content="https://prilik.com/blog/tags/emulation/" />
+<meta property="og:url" content="https://prilik.com/blog/tags/no_std/" />
 <meta property="og:site_name" content="prilik&#39;s blog" />
 
   
@@ -64,7 +64,7 @@ if (!doNotTrack) {
 
 
 
-  <link href="/blog/tags/emulation/index.xml" rel="alternate" type="application/rss+xml" title="prilik&#39;s blog" />
+  <link href="/blog/tags/no_std/index.xml" rel="alternate" type="application/rss+xml" title="prilik&#39;s blog" />
 
 
 
@@ -144,65 +144,29 @@ if (!doNotTrack) {
     
       <div class="post on-list">
         <h1 class="post-title">
-          <a href="https://prilik.com/blog/post/crosvm-paravirt/">Paravirtualized Devices in crosvm - a Performance Panacea for Modern VMs</a>
+          <a href="https://prilik.com/blog/post/c-is-not-dependency-free/">C Is Not Dependency Free</a>
         </h1>
         <div class="post-meta">
           <span class="post-date">
-            2019-05-16
+            2020-11-16
           </span>
-          <span> - 18 minute read</span>
+          <span> - 9 minute read</span>
           
         </div>
 
         
           <span class="post-tags">
             
-            #<a href="https://prilik.com/blog/tags/virtualization/">virtualization</a>&nbsp;
-            
-            #<a href="https://prilik.com/blog/tags/emulation/">emulation</a>&nbsp;
-            
-            #<a href="https://prilik.com/blog/tags/rust/">rust</a>&nbsp;
-            
-          </span>
-        
-
-        
-
-        <div class="post-content">
-          
-          Paravirtualized devices enable modern VMs to reach near-native speeds in IO heavy workloads such as file access, networking, and graphics processing. In a nutshell, by informing a virtualized OS of the fact that it&rsquo;s running within a VM, the virtualized OS can use special drivers that directly communicate and cooperate with the host OS, resulting in some incredible performance gains!
-          
-        </div>
-
-        
-        <div>
-          <a class="read-more button"
-            href="/blog/post/crosvm-paravirt/">Read more →</a>
-        </div>
-        
-      </div>
-    
-      <div class="post on-list">
-        <h1 class="post-title">
-          <a href="https://prilik.com/blog/post/widenes/">wideNES - Peeking Past the Edge of NES Games</a>
-        </h1>
-        <div class="post-meta">
-          <span class="post-date">
-            2018-08-24
-          </span>
-          <span> - 16 minute read</span>
-          
-        </div>
-
-        
-          <span class="post-tags">
-            
-            #<a href="https://prilik.com/blog/tags/emulation/">emulation</a>&nbsp;
-            
-            #<a href="https://prilik.com/blog/tags/nes/">nes</a>&nbsp;
+            #<a href="https://prilik.com/blog/tags/c/">c</a>&nbsp;
             
             #<a href="https://prilik.com/blog/tags/c&#43;&#43;/">c&#43;&#43;</a>&nbsp;
             
+            #<a href="https://prilik.com/blog/tags/rust/">rust</a>&nbsp;
+            
+            #<a href="https://prilik.com/blog/tags/os/">os</a>&nbsp;
+            
+            #<a href="https://prilik.com/blog/tags/no_std/">no_std</a>&nbsp;
+            
           </span>
         
 
@@ -210,14 +174,27 @@ if (!doNotTrack) {
 
         <div class="post-content">
           
-          A explanation and exploration of wideNES, a novel technique to automatically and interactively map-out NES games in real time. Experience NES classics like never before&hellip; in widescreen!
+          
+          <p>Like any great systems programming language, it doesn&rsquo;t take much of anything to
+get C up and running on a new platform.</p>
+<p>In fact, a minimal C &ldquo;runtime&rdquo; (typically called
+<a href="https://en.wikipedia.org/wiki/Crt0"><code>crt0</code></a>) only consists of a short prelude
+that zeroes out the <code>.bss</code> section and hands off execution to <code>main</code>.</p>
+<p>That&rsquo;s it!</p>
+<p>Compared to other popular programming languages, which require substantial
+runtime machinery to operate (e.g: Java&rsquo;s virtual machine, Go&rsquo;s garbage
+collector, etc&hellip;), C&rsquo;s extremely minimal approach to language design has
+allowed it to run on just about any platform.</p>
+<p>Unfortunately, while C is effectively dependency free at the <em>language</em> level,
+the same can&rsquo;t be said about its <em>standard library</em>.</p>
+          
           
         </div>
 
         
         <div>
           <a class="read-more button"
-            href="/blog/post/widenes/">Read more →</a>
+            href="/blog/post/c-is-not-dependency-free/">Read more →</a>
         </div>
         
       </div>

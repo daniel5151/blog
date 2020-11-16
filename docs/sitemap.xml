@@ -3,32 +3,57 @@
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   
   <url>
+    <loc>https://prilik.com/blog/tags/c/</loc>
+    <lastmod>2020-11-16T00:00:00-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://prilik.com/blog/post/c-is-not-dependency-free/</loc>
+    <lastmod>2020-11-16T00:00:00-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://prilik.com/blog/tags/c&#43;&#43;/</loc>
+    <lastmod>2020-11-16T00:00:00-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://prilik.com/blog/tags/no_std/</loc>
+    <lastmod>2020-11-16T00:00:00-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://prilik.com/blog/tags/os/</loc>
+    <lastmod>2020-11-16T00:00:00-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://prilik.com/blog/post/</loc>
+    <lastmod>2020-11-16T00:00:00-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://prilik.com/blog/</loc>
+    <lastmod>2020-11-16T00:00:00-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://prilik.com/blog/tags/rust/</loc>
+    <lastmod>2020-11-16T00:00:00-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://prilik.com/blog/tags/</loc>
+    <lastmod>2020-11-16T00:00:00-05:00</lastmod>
+  </url>
+  
+  <url>
     <loc>https://prilik.com/blog/tags/emulation/</loc>
     <lastmod>2019-05-16T00:00:00-04:00</lastmod>
   </url>
   
   <url>
     <loc>https://prilik.com/blog/post/crosvm-paravirt/</loc>
-    <lastmod>2019-05-16T00:00:00-04:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://prilik.com/blog/post/</loc>
-    <lastmod>2019-05-16T00:00:00-04:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://prilik.com/blog/</loc>
-    <lastmod>2019-05-16T00:00:00-04:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://prilik.com/blog/tags/rust/</loc>
-    <lastmod>2019-05-16T00:00:00-04:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://prilik.com/blog/tags/</loc>
     <lastmod>2019-05-16T00:00:00-04:00</lastmod>
   </url>
   
