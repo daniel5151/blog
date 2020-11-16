@@ -9,7 +9,7 @@
     <copyright>Copyright &amp;copy; Daniel Prilik :: Licensed under &lt;a target=&#34;_blank&#34; rel=&#34;external noopener license&#34; href=&#34;https://creativecommons.org/licenses/by-nd/4.0/&#34;&gt;CC-BY-ND-4.0&lt;/a&gt;.</copyright>
     <lastBuildDate>Mon, 16 Nov 2020 00:00:00 -0500</lastBuildDate><atom:link href="https://prilik.com/blog/tags/os/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>C Is Not Dependency Free</title>
+      <title>The C Standard Library Is Not Dependency Free</title>
       <link>https://prilik.com/blog/post/c-is-not-dependency-free/</link>
       <pubDate>Mon, 16 Nov 2020 00:00:00 -0500</pubDate>
       

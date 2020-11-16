@@ -1,5 +1,5 @@
 +++
-title = "C Is Not Dependency Free"
+title = "The C Standard Library Is Not Dependency Free"
 date = 2020-11-16
 draft = false
 tags = ["c", "c++", "rust", "os", "no_std"]
@@ -23,6 +23,12 @@ Unfortunately, while C is effectively dependency free at the _language_ level,
 the same can't be said about its _standard library_.
 
 <!--more-->
+
+> Note: the original title of this post was "C Is Not Dependency Free". This
+> title didn't reflect the actual message I was trying to convey (namely, that
+> it can be tricky for beginners getting started with freestanding C to know
+> which methods they can and can't use), and was disingenuous at best, and
+> actively misleading at worst.
 
 > To keep things simple, I'll be focusing exclusively on C, though it should be
 > noted that everything here applies to C++ as well. While not a strict superset
@@ -168,7 +174,7 @@ If only the C standard library had a clear "line" between all the
 platform-agnostic, dependency free bits of code, and all the platform-specific,
 "requires an OS" bits of code...
 
-# Rust is _Truly_ Dependency Free
+# Rust's Split Standard Library
 
 Like any great systems programming language, it doesn't take much of anything to
 get Rust up and running on a new platform.

@@ -8,11 +8,6 @@
   </url>
   
   <url>
-    <loc>https://prilik.com/blog/post/c-is-not-dependency-free/</loc>
-    <lastmod>2020-11-16T00:00:00-05:00</lastmod>
-  </url>
-  
-  <url>
     <loc>https://prilik.com/blog/tags/c&#43;&#43;/</loc>
     <lastmod>2020-11-16T00:00:00-05:00</lastmod>
   </url>
@@ -44,6 +39,11 @@
   
   <url>
     <loc>https://prilik.com/blog/tags/</loc>
+    <lastmod>2020-11-16T00:00:00-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://prilik.com/blog/post/c-is-not-dependency-free/</loc>
     <lastmod>2020-11-16T00:00:00-05:00</lastmod>
   </url>
   
