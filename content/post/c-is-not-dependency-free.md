@@ -24,12 +24,6 @@ the same can't be said about its _standard library_.
 
 <!--more-->
 
-> Note: the original title of this post was "C Is Not Dependency Free". This
-> title didn't reflect the actual message I was trying to convey (namely, that
-> it can be tricky for beginners getting started with freestanding C to know
-> which methods they can and can't use), and was disingenuous at best, and
-> actively misleading at worst.
-
 > To keep things simple, I'll be focusing exclusively on C, though it should be
 > noted that everything here applies to C++ as well. While not a strict superset
 > of C, C++ inherits most of C's language design and standard library, making it
@@ -224,15 +218,16 @@ link with the `core` library directly.
 
 ~~`#![no_std]` is also transitive down the dependency graph, so accidentally
 including a dependency that relies on `std` within a `no_std` project will be
-rejected by the compiler~~[^transitive_no_std]. This transitive properly makes
-it possible to use `cargo` (Rust's built-in package manager) to integrate
-external dependencies from `crate.io`, and be confident that if it compiles, it
-won't inadvertently panic at runtime due to a stubbed out "hidden" syscall
-dependency. With Rust, using external dependencies with bare-metal code is not
-only possible, but thanks to `cargo`'s best-in-class dependency management
-story, it's incredibly ergonomic as well!
+rejected by the compiler~~ (EDIT: this is not entirely true, see
+[^transitive_no_std]). This transitive properly makes it possible to use `cargo`
+(Rust's built-in package manager) to integrate external dependencies from
+`crate.io`, and be confident that if it compiles, it won't inadvertently panic
+at runtime due to a stubbed out "hidden" syscall dependency. With Rust, using
+external dependencies with bare-metal code is not only possible, but thanks to
+`cargo`'s best-in-class dependency management story, it's incredibly ergonomic
+as well!
 
-To really show you the power of `no_std`, lets revisit the `greet` function from
+To really show off the power of `no_std`, lets revisit the `greet` function from
 the last section. Consider the following Rust implementation, which goes out of
 it's way to be as `unsafe` and un-idiomatic as possible. This could very well be
 a "first pass" implementation from a C programmer just getting their feet wet
