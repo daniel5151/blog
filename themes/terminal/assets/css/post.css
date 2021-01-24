@@ -48,7 +48,7 @@
     border-bottom: var(--border);
 
     &:after {
-      content: '';
+      content: "";
       position: absolute;
       bottom: 2px;
       display: block;
@@ -59,13 +59,17 @@
     a {
       text-decoration: none;
     }
+
+    code {
+      font-size: 0.8em;
+    }
   }
 
   &-tags {
     display: block;
     margin-bottom: 20px;
     font-size: 1rem;
-    opacity: .5;
+    opacity: 0.5;
 
     a {
       text-decoration: none;
@@ -92,7 +96,7 @@
     list-style: none;
 
     li:not(:empty):before {
-      content: '-';
+      content: "-";
       position: absolute;
       left: -20px;
       color: var(--accent);
@@ -123,7 +127,10 @@
   visibility: hidden;
 }
 
-h1:hover a, h2:hover a, h3:hover a, h4:hover a {
+h1:hover a,
+h2:hover a,
+h3:hover a,
+h4:hover a {
   visibility: visible;
 }
 

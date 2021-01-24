@@ -11,6 +11,8 @@ theme = [
 enableRobotsTXT = true
 staticDir = ["static"]
 
+enableEmoji = true
+
 [markup.goldmark.renderer]
   unsafe = true # Optional, allows HTML inside your CommonMark content
 [markup.tableOfContents]
