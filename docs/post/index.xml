@@ -7,7 +7,22 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>Copyright &amp;copy; Daniel Prilik :: Licensed under &lt;a target=&#34;_blank&#34; rel=&#34;external noopener license&#34; href=&#34;https://creativecommons.org/licenses/by-nd/4.0/&#34;&gt;CC-BY-ND-4.0&lt;/a&gt;.</copyright>
-    <lastBuildDate>Mon, 16 Nov 2020 00:00:00 -0500</lastBuildDate><atom:link href="https://prilik.com/blog/post/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 24 Jan 2021 00:00:00 -0500</lastBuildDate><atom:link href="https://prilik.com/blog/post/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Highly Compressed Emoji Shortcode Mapping</title>
+      <link>https://prilik.com/blog/post/emoji-shortcodes/</link>
+      <pubDate>Sun, 24 Jan 2021 00:00:00 -0500</pubDate>
+      
+      <guid>https://prilik.com/blog/post/emoji-shortcodes/</guid>
+      <description>&lt;p&gt;Have you ever wondered what&amp;rsquo;s the smallest amount of static storage (code +
+data) needed to map emoji shortcodes to emoji?&lt;/p&gt;
+&lt;p&gt;Probably not, but now that you&amp;rsquo;ve heard the question, want to find out?&lt;/p&gt;
+&lt;p&gt;If so, then read onwards, and join my on my somewhat useless quest to find a
+highly compressed representation of the entire
+&lt;a href=&#34;https://emojipedia.org/shortcodes/&#34;&gt;shortcode emoji&lt;/a&gt; mapping that can be
+indexed &lt;em&gt;without&lt;/em&gt; requiring any dynamic allocation!&lt;/p&gt;</description>
+    </item>
+    
     <item>
       <title>The C Standard Library Is Not Dependency Free</title>
       <link>https://prilik.com/blog/post/c-is-not-dependency-free/</link>

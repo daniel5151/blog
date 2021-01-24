@@ -7,7 +7,43 @@
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>Copyright &amp;copy; Daniel Prilik :: Licensed under &lt;a target=&#34;_blank&#34; rel=&#34;external noopener license&#34; href=&#34;https://creativecommons.org/licenses/by-nd/4.0/&#34;&gt;CC-BY-ND-4.0&lt;/a&gt;.</copyright>
-    <lastBuildDate>Mon, 16 Nov 2020 00:00:00 -0500</lastBuildDate><atom:link href="https://prilik.com/blog/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 24 Jan 2021 00:00:00 -0500</lastBuildDate><atom:link href="https://prilik.com/blog/tags/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>hacks</title>
+      <link>https://prilik.com/blog/tags/hacks/</link>
+      <pubDate>Sun, 24 Jan 2021 00:00:00 -0500</pubDate>
+      
+      <guid>https://prilik.com/blog/tags/hacks/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>no_std</title>
+      <link>https://prilik.com/blog/tags/no_std/</link>
+      <pubDate>Sun, 24 Jan 2021 00:00:00 -0500</pubDate>
+      
+      <guid>https://prilik.com/blog/tags/no_std/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>rust</title>
+      <link>https://prilik.com/blog/tags/rust/</link>
+      <pubDate>Sun, 24 Jan 2021 00:00:00 -0500</pubDate>
+      
+      <guid>https://prilik.com/blog/tags/rust/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>wasm</title>
+      <link>https://prilik.com/blog/tags/wasm/</link>
+      <pubDate>Sun, 24 Jan 2021 00:00:00 -0500</pubDate>
+      
+      <guid>https://prilik.com/blog/tags/wasm/</guid>
+      <description></description>
+    </item>
+    
     <item>
       <title>c</title>
       <link>https://prilik.com/blog/tags/c/</link>
@@ -27,29 +63,11 @@
     </item>
     
     <item>
-      <title>no_std</title>
-      <link>https://prilik.com/blog/tags/no_std/</link>
-      <pubDate>Mon, 16 Nov 2020 00:00:00 -0500</pubDate>
-      
-      <guid>https://prilik.com/blog/tags/no_std/</guid>
-      <description></description>
-    </item>
-    
-    <item>
       <title>os</title>
       <link>https://prilik.com/blog/tags/os/</link>
       <pubDate>Mon, 16 Nov 2020 00:00:00 -0500</pubDate>
       
       <guid>https://prilik.com/blog/tags/os/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>rust</title>
-      <link>https://prilik.com/blog/tags/rust/</link>
-      <pubDate>Mon, 16 Nov 2020 00:00:00 -0500</pubDate>
-      
-      <guid>https://prilik.com/blog/tags/rust/</guid>
       <description></description>
     </item>
     
