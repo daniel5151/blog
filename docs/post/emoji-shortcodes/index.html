@@ -2,13 +2,17 @@
 <html lang="en">
 <head>
   
-    <title>Highly Compressed Emoji Shortcode Mapping :: prilik&#39;s blog</title>
+    <title>A Quest to Find a Highly Compressed Emoji :shortcode: Lookup Function :: prilik&#39;s blog</title>
   
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Have you ever wondered what&amp;rsquo;s the smallest amount of static storage (code &#43; data) needed to map emoji shortcodes to emoji?
-Probably not, but now that you&amp;rsquo;ve heard the question, want to find out?
-If so, then read onwards, and join my on my somewhat useless quest to find a highly compressed representation of the entire shortcode emoji mapping that can be indexed without requiring any dynamic allocation!
+<meta name="description" content="Have you ever wondered what&amp;rsquo;s the smallest amount of static storage (code &#43; data) needed to map emoji :shortcodes: to emoji?
+Probably not&amp;hellip; but now that you&amp;rsquo;ve heard the question, aren&amp;rsquo;t you at least a little curious what the answer might be?
+After all, it can be fun to take a break from solving &amp;ldquo;important problems&amp;rdquo; and occasionally spend some time working on something entertaining (albeit kinda useless).
+So hey, if you&amp;rsquo;ve got some time to spare, and you&amp;rsquo;re interested in learning a bit about cool topics such as perfect hashing, probabalistic data structures, and 2D dynamic programming algorithms, why not stick around a little while?
+Join me on a [somewhat useless] quest to find a highly compressed emoji :shortcode: lookup function!
+ Thanks to the power of WebAssembly, you can play with the final result right from your browser!
+&amp;mdash;-&amp;gt; Check out the online demo! &amp;lt;&amp;mdash;&amp;ndash;
 " />
 <meta name="keywords" content="" />
 <meta name="robots" content="noodp" />
@@ -51,10 +55,14 @@ if (!doNotTrack) {
 
 <meta property="og:locale" content="en" />
 <meta property="og:type" content="article" />
-<meta property="og:title" content="Highly Compressed Emoji Shortcode Mapping">
-<meta property="og:description" content="Have you ever wondered what&amp;rsquo;s the smallest amount of static storage (code &#43; data) needed to map emoji shortcodes to emoji?
-Probably not, but now that you&amp;rsquo;ve heard the question, want to find out?
-If so, then read onwards, and join my on my somewhat useless quest to find a highly compressed representation of the entire shortcode emoji mapping that can be indexed without requiring any dynamic allocation!
+<meta property="og:title" content="A Quest to Find a Highly Compressed Emoji :shortcode: Lookup Function">
+<meta property="og:description" content="Have you ever wondered what&amp;rsquo;s the smallest amount of static storage (code &#43; data) needed to map emoji :shortcodes: to emoji?
+Probably not&amp;hellip; but now that you&amp;rsquo;ve heard the question, aren&amp;rsquo;t you at least a little curious what the answer might be?
+After all, it can be fun to take a break from solving &amp;ldquo;important problems&amp;rdquo; and occasionally spend some time working on something entertaining (albeit kinda useless).
+So hey, if you&amp;rsquo;ve got some time to spare, and you&amp;rsquo;re interested in learning a bit about cool topics such as perfect hashing, probabalistic data structures, and 2D dynamic programming algorithms, why not stick around a little while?
+Join me on a [somewhat useless] quest to find a highly compressed emoji :shortcode: lookup function!
+ Thanks to the power of WebAssembly, you can play with the final result right from your browser!
+&amp;mdash;-&amp;gt; Check out the online demo! &amp;lt;&amp;mdash;&amp;ndash;
 " />
 <meta property="og:url" content="https://prilik.com/blog/post/emoji-shortcodes/" />
 <meta property="og:site_name" content="prilik&#39;s blog" />
@@ -147,13 +155,13 @@ If so, then read onwards, and join my on my somewhat useless quest to find a hig
     
 <div class="post">
   <h1 class="post-title">
-    <a href="https://prilik.com/blog/post/emoji-shortcodes/">Highly Compressed Emoji Shortcode Mapping</a></h1>
+    <a href="https://prilik.com/blog/post/emoji-shortcodes/">A Quest to Find a Highly Compressed Emoji :shortcode: Lookup Function</a></h1>
   <div class="post-meta">
     
       <span class="post-date">
         2021-01-24 
       </span>
-      <span> - 12 minute read</span>
+      <span> - 15 minute read</span>
     
     
   </div>
@@ -178,22 +186,52 @@ If so, then read onwards, and join my on my somewhat useless quest to find a hig
 
   <div class="post-content"><div>
         <p>Have you ever wondered what&rsquo;s the smallest amount of static storage (code +
-data) needed to map emoji shortcodes to emoji?</p>
-<p>Probably not, but now that you&rsquo;ve heard the question, want to find out?</p>
-<p>If so, then read onwards, and join my on my somewhat useless quest to find a
-highly compressed representation of the entire
-<a href="https://emojipedia.org/shortcodes/">shortcode emoji</a> mapping that can be
-indexed <em>without</em> requiring any dynamic allocation!</p>
-<p>In other words: how we might write a function that accepts shortcode strings as
-input, and outputs UTF-8 emoji as output?</p>
+data) needed to map emoji :shortcodes: to emoji?</p>
+<p>Probably not&hellip; but now that you&rsquo;ve heard the question, aren&rsquo;t you at least a
+little curious what the answer might be?</p>
+<p>After all, it can be fun to take a break from solving &ldquo;important problems&rdquo; and
+occasionally spend some time working on something entertaining (albeit kinda
+useless).</p>
+<p>So hey, if you&rsquo;ve got some time to spare, and you&rsquo;re interested in learning a
+bit about cool topics such as perfect hashing, probabalistic data structures,
+and 2D dynamic programming algorithms, why not stick around a little while?</p>
+<p>Join me on a [somewhat useless] quest to find a highly compressed emoji
+:shortcode: lookup function!</p>
+<blockquote>
+<p>Thanks to the power of WebAssembly, you can play with the final result right
+from your browser!</p>
+<p>&mdash;-&gt; Check out the
+<a href="https://prilik.com/compressed-emoji-shortcodes">online demo</a>! &lt;&mdash;&ndash;</p>
+</blockquote>
+<h2 id="what-even-is-a-highly-compressed-emoji-shortcode-lookup-function">What even is a &ldquo;Highly Compressed Emoji Shortcode Lookup Function&rdquo;?<a href="#what-even-is-a-highly-compressed-emoji-shortcode-lookup-function" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
+<p>Before embarking on our quest, we should probably clarify what it is we&rsquo;re
+looking for exactly exactly.</p>
+<p>We want to write a function that accepts shortcode strings as input, and outputs
+UTF-8 emoji as output:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust"><span style="color:#75715e">// e.g: shortcode_to_emoji(&#34;flamingo&#34;) -&gt; Some(&#34;🦩&#34;)
 </span><span style="color:#75715e"></span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">shortcode_to_emoji</span>(input: <span style="color:#66d9ef">&amp;</span><span style="color:#66d9ef">str</span>) -&gt; Option<span style="color:#f92672">&lt;&amp;</span><span style="color:#66d9ef">str</span><span style="color:#f92672">&gt;</span>
-</code></pre></div><blockquote>
-<p>Thanks to the power of WebAssembly, you can play with the final result right
-from your browser! Check out the
-<a href="https://prilik.com/compressed-emoji-shortcodes">online demo</a>!</p>
+</code></pre></div><p>At first glance, this doesn&rsquo;t seem to difficult: just find a free, open source
+dataset of emoji shortcodes, load that data into memory, construct a hashmap,
+and start querying it - easy peasy!</p>
+<p>Not so fast.</p>
+<p>While that approach would work just fine on your fancy shmancy
+Linux/Windows/macOS/TempleOS powered desktop computer, what if we wanted to run
+this lookup function on something a little bit more&hellip; embedded? If we tried to
+dynamically construct a hashmap at runtime on a tiny, resource-constrained
+ARM/AVR microcontroller, we&rsquo;d very quickly run out of dynamic memory (assuming
+something like <code>malloc</code> is even <em>available</em> on said platform)!</p>
+<p>Indeed, therein lies the need for a &ldquo;Highly Compressed&rdquo; lookup function - if we
+want to run this code on an embedded MCU, the lookup function lookup function
+will have to occupy as little static storage (code <em>and</em> read-only data) as
+possible.</p>
+<blockquote>
+<p>At this point, you might be thinking to yourself &ldquo;who in their right mind
+would want to map emoji shortcodes on embedded hardware?&rdquo; Fair enough! I&rsquo;ve
+included my inspiration behind this wild endeavor in the next section.</p>
+<p>Then again, if you&rsquo;re mostly interested in the problem itself, feel free to
+skip ahead to <a href="#-getting-a-feel-for-the-data-">Getting a feel for the Data</a>.</p>
 </blockquote>
-<h2 id="inspiration">Inspiration<a href="#inspiration" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
+<h2 id="-inspiration-">💡 Inspiration 💡<a href="#-inspiration-" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
 <p>I&rsquo;m a big fan of
 <a href="https://www.reddit.com/r/mechanicalkeyboards">custom mechanical keyboards</a>, as
 aside from looking and sounding awesome, they&rsquo;re also an excellent
@@ -220,13 +258,12 @@ emoji? What am I supposed to do - use my OS&rsquo;s built-in emoji picker like a
 call &ldquo;a total waste of time&rdquo;: writing a Rust library that exports a single
 function that can look up emoji shortcodes using the minimum amount of code +
 read-only data, and without requiring <em>any</em> heap allocation!</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust"><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">shortcode_to_emoji</span>(input: <span style="color:#66d9ef">&amp;</span><span style="color:#66d9ef">str</span>) -&gt; Option<span style="color:#f92672">&lt;&amp;</span><span style="color:#66d9ef">str</span><span style="color:#f92672">&gt;</span>
-</code></pre></div><p>Let&rsquo;s dive into the implementation!</p>
-<h2 id="getting-a-feel-for-the-data">Getting a feel for the Data<a href="#getting-a-feel-for-the-data" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
+<p>Now, without further ado, let&rsquo;s dive into the implementation!</p>
+<h2 id="-getting-a-feel-for-the-data-">📝 Getting a feel for the Data 📝<a href="#-getting-a-feel-for-the-data-" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
 <p>First things first, we&rsquo;ll need a dataset of emoji shortcodes to work with. For
-this project, I decided to use the same emoji shortcode database as used by
-GitHub, since it&rsquo;s the one I&rsquo;m most familiar with, and it&rsquo;s also readily
-available as a big &lsquo;ol
+this project, I decided to use the same emoji database as used by GitHub, since
+it&rsquo;s the one I&rsquo;m most familiar with, and it&rsquo;s also readily available as a big
+&lsquo;ol
 <a href="https://raw.githubusercontent.com/github/gemoji/master/db/emoji.json">JSON blob</a>.
 The particular dataset exhibits the following properties:</p>
 <table>
@@ -260,20 +297,23 @@ The particular dataset exhibits the following properties:</p>
 </tbody>
 </table>
 <p>Converting this data set into a CSV file of raw <code>shortcode,emoji</code> pairs would
-result in roughly ~34kb file. Aside from being a totally impractical data
+result in roughly <strong>~34kb</strong> file. Aside from being a totally impractical data
 structure for querying on a embedded MCU, 34kb is quite a bit of data in an
 embedded context! Let&rsquo;s see if we can do any better&hellip;</p>
-<h2 id="implementation">Implementation<a href="#implementation" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
-<p>My library uses a heavily modified version of the incredible
-<a href="https://github.com/sfackler/rust-phf">rust-phf</a> crate to generate a set of
-<a href="https://en.wikipedia.org/wiki/Perfect_hash_function">perfect hash maps</a> mapping
-shortcodes to emoji at compile time.</p>
-<p>For reference, the unmodified <code>rust-phf</code> crate results in nearly <em>~100kb</em> of
-<code>.rodata</code>, which blows waaaaay past the flash ROM budget of most keyboard MCUs.</p>
-<p>By employing a whole host of optimizations and data layout/representation
-tricks, I was able to crunch that 100kb down to a measly <strong>~20kb of <code>.text</code> +
-<code>.rodata</code></strong>!</p>
-<h3 id="trick-1---storing-hashes-of-keys-instead-of-keys-themselves">Trick 1 - Storing hashes of keys (instead of keys themselves)<a href="#trick-1---storing-hashes-of-keys-instead-of-keys-themselves" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h3>
+<h2 id="-implementation-">🛠️ Implementation 🛠️<a href="#-implementation-" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
+<p>The foundation of my lookup function is a heavily modified version of the
+incredible <a href="https://github.com/sfackler/rust-phf">rust-phf</a> crate to generate a
+set of <a href="https://en.wikipedia.org/wiki/Perfect_hash_function">perfect hash maps</a>
+mapping shortcodes to emoji at compile time.</p>
+<p>Indeed, if we weren&rsquo;t looking for a &ldquo;highly&rdquo; compressed mapping, and were find
+with one that was simply allocation-free, then we could have simply used the
+unmodified <code>rust-phf</code> crate, which would result in <strong>~100kb</strong> of code + data
+overhead. Unfortunately, 100kb blows waaaaay past the flash ROM budget of the
+embedded hardware we are targeting, so we need to get a bit more clever&hellip;</p>
+<p>Spoiler alert: By employing a whole host of optimizations and data
+layout/representation tricks, I was able to crunch that 100kb down to a measly
+<strong>~20kb of <code>.text</code> + <code>.rodata</code></strong>!</p>
+<h3 id="trick-1---storing-hashes-of--keys--instead-of-keys-themselves">Trick 1 - Storing hashes of 🔑 keys 🔑 (instead of keys themselves)<a href="#trick-1---storing-hashes-of--keys--instead-of-keys-themselves" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h3>
 <p>Instead of naively storing the keys as raw strings (which would take up a <em>lot</em>
 of space, around <code>size_of(char*) + 10</code> bytes on average), the hash map only
 stores the <em>hashes</em> of keys.</p>
@@ -293,9 +333,9 @@ with the lookup function directly. It&rsquo;s should be pretty difficult to find
 &ldquo;reasonable&rdquo; false positive inputs (i.e: one that&rsquo;s only a misspelling or two
 away from a valid input).</p>
 <hr>
-<p><strong><em>Digression:</em> Why does a <em>perfect</em> hash function even need to store the keys
-in the first place?</strong></p>
-<p>Like, won&rsquo;t every input just automagically map to the correct value?</p>
+<p><strong><em>Side Note:</em> Why does a <em>perfect</em> hash function even need to store the keys in
+the first place?</strong></p>
+<p>i.e: won&rsquo;t every input just automagically mapped to the correct value?</p>
 <p>Well, while that may be true for <em>valid</em> inputs, plugging an <em>invalid</em> input
 into a PHF will simply return some arbitrary index. To reject invalid inputs,
 most perfect hash maps will include an
@@ -306,11 +346,11 @@ This ensure that invalid inputs are rejected with 100% certainty.</p>
 input errors might result in! A harmless spelling mistake while typing
 <code>😄</code>, compounded with some spectacularly bad statistical chance, could
 somehow result in typing <code>🍆</code> instead. One second you&rsquo;re having a
-friendly chat with a co-worker, when BAM you&rsquo;re suddenly in a meeting with HR
-where you&rsquo;re frantically trying to explain how perfect hash functions work.
+friendly chat with a co-worker, when all of a sudden *WHABAM* you&rsquo;re in a
+meeting with HR frantically trying to explain how perfect hash functions work.
 Yikes 🍆</p>
 <hr>
-<h3 id="trick-2---storing--retrieving-emoji-without-the-overhead-offsets--pointers">Trick 2 - Storing + retrieving emoji without the overhead offsets / pointers<a href="#trick-2---storing--retrieving-emoji-without-the-overhead-offsets--pointers" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h3>
+<h3 id="trick-2---storing-emoji-without-the-overhead-of-offsets-or--pointers-">Trick 2 - Storing emoji without the overhead of offsets or 👉 pointers 👈<a href="#trick-2---storing-emoji-without-the-overhead-of-offsets-or--pointers-" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h3>
 <p>The typical way to store static strings within a map is to store <em>pointers</em> to
 the strings, and storing the strings themselves somewhere else in read-only
 memory. Unfortunately, in this particular situation, this naive way of storing
@@ -322,6 +362,10 @@ bytes long, a <code>size_of(char*) + 1</code> overhead per entry is <em>brutal</
 <p>In memory, this naive table layout would look something like this:</p>
 <p align="center">
   <img alt="A single table storing strings of any length" align="center" src="/blog/assets/emoji-shortcodes/naive_table.png"/>
+  <br>
+  <i>Total overhead:<br><code>size_of(Table) + (Table.Emoji.len * (1 + size_of(char*))) + (raw emoji UTF8)</code></i>
+  <br>
+  <i>(Assuming string length is stored alongside the pointer)</i>
 </p>
 <p>Can we do any better? Absolutely!</p>
 <p>Instead of generating a single map containing all the shortcode-emoji mappings,
@@ -331,16 +375,34 @@ additional pointer indirection.</p>
 <p>In memory, this smarter table layout would look something like this:</p>
 <p align="center">
   <img alt="Multiple tables storing strings of uniform length" align="center" src="/blog/assets/emoji-shortcodes/smarter_table.png"/>
+  <br>
+  <i>Total overhead:<br><code>2 * size_of(Table) + (raw emoji UTF8)</code></i>
 </p>
-<p>Wow, look at all those space saving!</p>
+<p>Look at that! We totally cut out the <code>Table.Emoji.len * (1 + size_of(char*))</code>
+overhead!</p>
+<p>Of course, this optimization did require allocating a whole new table, which
+does incur an additional <code>size_of(Table)</code> bytes of overhead, but if the table
+contains a large number of values, then this extra overhead is negligible with
+respect to the space saved by removing the pointer indirection.</p>
 <p><em>Note:</em> Now that there are multiple tables, the lookup function needs to be
 modified to iterate through <em>all</em> the tables, returning when a result is found.
 This is an easy fix to implement, though it can result in some problems down the
 line&hellip;</p>
-<h3 id="trick-2a---trimming-tiny-tables">Trick 2.a - Trimming Tiny Tables<a href="#trick-2a---trimming-tiny-tables" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h3>
+<h3 id="trick-2a----trimming-tiny-tables-">Trick 2.a - ✂️ Trimming Tiny Tables ✂️<a href="#trick-2a----trimming-tiny-tables-" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h3>
+<p><em>Content Warning: *Spicy* 2D Dynamic Programming Algorithms Ahead</em></p>
 <p>Before covering the last major trick, I should mention an interesting
 optimization opportunity related to generating multiple tables:</p>
 <p>For our particular emoji shortcode dataset, the following tables gets generated:</p>
+<div id="emoji-table">
+<style>
+#emoji-table {
+    width: 300px;
+    margin: auto;
+}
+#emoji-table td {
+    padding: 5px 10px;
+}
+</style>
 <table>
 <thead>
 <tr>
@@ -423,6 +485,7 @@ optimization opportunity related to generating multiple tables:</p>
 </tr>
 </tbody>
 </table>
+</div>
 <p>As it turns out, there are plenty of awkwardly-sized emoji in this data set.
 While most emoji tend to be in the 3-8 byte range, some emoji take up
 substantially more space. For example, the flag of Wales emoji (🏴󠁧󠁢󠁷󠁬󠁳󠁿) takes up a
@@ -470,18 +533,38 @@ introducing any additional space overhead.</p>
 <p>The two questions optimize for the two different shortcomings listed above:
 space saving, and hash-collisions. Which of the two algorithms to use depends on
 the data set and what sort of properties you want the lookup function to have.</p>
-<p>Now, I won&rsquo;t go into the details of how my particular implementation
-consolidates tables (if I&rsquo;m being honest, I wrote that particular algorithm
-<em>very</em> late at night, and it is absolutely <em>horrendous</em>). That said, I did ask
-some of my <a name="smart-friends"></a> smart friends for their thoughts on the
-problem, and I&rsquo;ve gotten some really clever responses back. It seems like the
-optimal solution uses dynamic programming to find the optimal merge order. ✨
-Fancy ✨!</p>
-<p>If there&rsquo;s enough interest, I&rsquo;d love to do a follow-up post where I dive into
-this particular sub-problem in a bit more detail, and discuss the various
-algorithms that one might use to solve this problem. Let me know in the comments
-if that&rsquo;s something you&rsquo;d like to see!</p>
-<h3 id="trick-3---eliminating-invalid-mappings-using-random-chance-and-fixup-tables">Trick 3 - Eliminating invalid mappings using random chance and fixup tables<a href="#trick-3---eliminating-invalid-mappings-using-random-chance-and-fixup-tables" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h3>
+<p>Now, truth be told, the algorithm that&rsquo;s currently implemented in the library on
+GitHub is <em>absolutely horrendous</em>. I wrote it <em>very</em> late at night, and I&rsquo;ve
+been too lazy to delete it + rewrite it ever since.</p>
+<p>Thankfully, I happen to be friends with someone who&rsquo;s pretty darn good at these
+sorts of algorithm questions, and managed to <a href="https://xkcd.com/356/">nerd snipe</a>
+my friend <a href="https://github.com/ethan-hardy">Ethan Hardy</a> into finding a really
+elegant and interesting solution to the problem.</p>
+<p>Since I&rsquo;m more of a &ldquo;maker&rdquo;-type software engineer rather than a &ldquo;computer
+scientist&rdquo;-type software engineer, I asked Ethan to describe the algorithm in
+his own words:</p>
+<blockquote>
+<p>To full optimize our space usage with these tables, we can employ the use of
+some dynamic programming techniques.</p>
+<p>In a nutshell, we can iterate through a DP table storing solutions to
+subproblems restricted over two dimensions: which tables we have available,
+and which table must be the lowest-string-length unmerged table (unmerged here
+meaning not itself merged into another table; having tables with smaller
+strings merged into the table is ok).</p>
+<p>Why this solution works is somewhat non-obvious, and the rationale behind the
+unmerged restriction is also fairly hard to describe&hellip; succinctly. All of
+this is to say that I&rsquo;ve gone ahead and written a full, LaTeX typeset &ldquo;white
+paper&rdquo; that dives into the details of the algorithm.</p>
+<p>You can read the full writeup by clicking on
+<a href="https://github.com/ethan-hardy/emoji_algorithm">this link here</a>.</p>
+<ul>
+<li><em>Ethan Hardy</em></li>
+</ul>
+</blockquote>
+<p>I <em>really</em> recommend checking out Ethan&rsquo;s writeup - it&rsquo;s really cool seeing how
+dynamic programming can be used to solve a &ldquo;real world&rdquo; problem, as opposed to
+just contrived leetcode-style questions.</p>
+<h3 id="trick-3---eliminate-invalid-mappings-using--randomness--and-fixup-tables">Trick 3 - Eliminate invalid mappings using 🎲 randomness 🎲 and fixup tables<a href="#trick-3---eliminate-invalid-mappings-using--randomness--and-fixup-tables" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h3>
 <p>Unfortunately, there is a critical issue associated with using Trick #2 - using
 multiple maps may result in incorrect mappings for <em>valid</em> inputs. In the
 single-map approach, the properties of the PHF ensure that each valid input is
@@ -506,7 +589,9 @@ that seems &ldquo;good enough&rdquo; (i.e: whatever minimum I happened to find w
 randomly iterating through seeds), I export a static &ldquo;fixup&rdquo; table of
 uncompressed <code>(shortcode, emoji)</code> pairs, which gets linearly scanned prior to
 iterating through the main set of hash tables.</p>
-<p>Tada, problem solved!</p>
+<p>Tada, problem solved! And to think, all we needed to do was
+<a href="https://www.youtube.com/watch?t=50&amp;v=N1uiLR6luWo">spin the wheel</a> a couple
+times!</p>
 <p>This seems to work surprisingly well, with the current dataset only requiring a
 miniscule ~250 bytes of fixup-table overhead to achieve perfect accuracy for
 valid inputs (when using a 8-bit key hash).</p>
@@ -517,10 +602,10 @@ hashes outweighed the extra false-positive rates introduced by using an 8-bit
 hash.</p>
 <hr>
 <h2 id="future-work">Future Work?<a href="#future-work" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
-<p>This project is a real hodgepodge of hacks on top of hacks, but nevertheless,
-the end result is a lookup function that crunches ~34kb of raw, un-queryable
-data into a miniscule ~20kb of code + data that can be queried in constant time
-without requiring any dynamic allocation at runtime. Neato!</p>
+<p>This project has been a real hodgepodge of hacks on top of hacks, but
+nevertheless, the end result is a lookup function that crunches ~34kb of raw,
+un-queryable data into a miniscule ~20kb of code + data that can be queried in
+constant time without requiring any dynamic allocation at runtime. Neato!</p>
 <p>I&rsquo;m pretty much done with this project for now, but there are still a few ideas
 that might be worth exploring to compress things down even more:</p>
 <ul>
@@ -560,8 +645,8 @@ optimizing the map&rsquo;s internal representation for this particular use-case.
 <p>The emoji shortcode database is downloaded directly from GitHub&rsquo;s
 <a href="https://github.com/github/gemoji/tree/master">gemoji</a> library.</p>
 <p>Special thanks to <a href="https://github.com/DSouzaM">Matt D&rsquo;Souza</a> and
-<a href="https://github.com/ethan-hardy">Ethan Hardy</a>, who were the
-<a href="#smart-friends">aforementioned</a> &ldquo;smarter friends&rdquo; who I bounced ideas off of.</p>
+<a href="https://github.com/ethan-hardy">Ethan Hardy</a>, who I nerd-sniped into helping me
+with this funky little project.</p>
       </div></div>
 
   
