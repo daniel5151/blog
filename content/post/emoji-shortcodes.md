@@ -123,26 +123,28 @@ embedded context! Let's see if we can do any better...
 
 ## 🛠️ Implementation 🛠️
 
-Since we know all the key-value pairs ahead of time, a good place to start is to
-generate a
+Since we know all the key-value pairs ahead of time, a good place to start off
+might be to generate a
 [perfect hash map](https://en.wikipedia.org/wiki/Perfect_hash_function) of
-shortcodes to emoji at compile time. Unlike typical hash-table hash functions,
-perfect hash functions guarantee that each individual valid input is mapped to a
-_distinct_ index, which means that there is _zero wasted space_ in the
+shortcodes to emoji at compile time. Unlike typical hash functions, _perfect_
+hash functions guarantee that each individual valid input is mapped to a
+_distinct_ index. This property means that there is _zero wasted space_ in the
 underlying hash table.
 
 In fact, the foundation of this entire project is the incredible
-[`rust-phf`](https://github.com/sfackler/rust-phf), which I've heavy modified
-and optimized for this particular use-case. Without doing any modifications, the
-base `rust-phf` crate results in **\~100kb** of code + data overhead.
+[`rust-phf`](https://github.com/sfackler/rust-phf), which I ended up heavy
+modifying and optimizing for this specific use-case. That said, even without
+doing any modifications, the base `rust-phf` crate results in **\~100kb** of
+code + data overhead, and can be used on systems without dynamic allocation.
 
-100kb doesn't _seem_ that bad, but when you consider that the raw data set is
-only \~34kb, and the target platform only has (at most) \~256kb of flash ROM,
-it's clear that there's plenty of room for improvement.
+Now, 100kb doesn't _seem_ that bad, but when you consider that the raw dataset
+of shortcodes + emoji is only \~34kb, and the fact that most embedded platforms
+I'm targeting have at most \~256kb of flash ROM, it's should be obvious that
+there's plenty of room for improvement.
 
-Not to spoil the ending, but by employing a whole host of optimizations and data
-layout/representation tricks outlined below, I was able to crunch that 100kb of
-code + data down to a measly **\~20kb!**
+Not to spoil the ending, but by using the host of optimizations and data
+layout/representation tricks outlined in the next couple sections, that 100kb of
+number ends up shrinking down to a measly **\~20kb!**
 
 ### Trick 1 - Storing hashes of 🔑 keys 🔑 instead of the keys themselves
 
@@ -151,9 +153,9 @@ Let's start off with a guiding question:
 > Why do hash tables need to store both values _and_ keys, even in situations
 > where there's never a need to iterate over key-value pairs in the map?
 
-There are a few reasons, but the one most relevant to this discussion is that
-hash tables need a copy of the original key to prevent _false positive lookups_,
-whereby an invalid key returns an unrelated value.
+This question has a couple different answers, but the one most relevant to this
+discussion is that hash tables need a copy of the original key to prevent _false
+positive lookups_, whereby an invalid key returns an unrelated value.
 
 A fundamental property of hash tables is that given a unlimited set of inputs
 (i.e: all possible strings), and a limited set of outputs (i.e: the \~2000 emoji
@@ -171,7 +173,7 @@ hash tables need to employ some sort of
 > to explain how hashing works, and that this is all just one big
 > misunderstanding! Yikes :scream:
 
-In our case, since we are using a _perfect_ hash function, the conflict
+In our case, since we happen to be using a _perfect_ hash function, the conflict
 resolution strategy happens to be incredibly simple: just include an
 [additional check](https://github.com/sfackler/rust-phf/blob/9b70bd9/phf/src/map.rs#L88)
 that compares the input key against the expected key at that particular index.
@@ -190,31 +192,29 @@ the keys in their entirety?**
 
 At last, we arrive at our first trick: Instead of storing each shortcode key in
 it's entirety as a raw string (which would take up a _lot_ of space, around
-`size_of(char*) + 10` bytes on average), **only store a compressed _secondary
-hash_ of the key!**
+`size_of(char*) + 10` bytes on average), just store a **small _secondary hash_
+of the key!**
 
 This trick results in some absolutely _monstrous_ space savings, cutting the
-\~18kb shortcode string data down to only
-`size_of(hash("input")) * num_shortcodes`, or just **\~4kb** (if using a 16-bit
-hash).
+\~18kb of raw shortcode string data down to just **\~4kb** (i.e:
+`size_of(hash("input")) * num_shortcodes` bytes, assuming a 16-bit hash).
 
 ---
 
-Unfortunately, this trick doesn't come for free: by only storing a hash of the
-key instead of the entire key, **our collision resolution algorithm stops having
-100% accuracy.** Indeed, using this approach, the lookup function will ends up
-having an _infinite_ number of "false positive" inputs that return nonsense
-outputs :scream:
+Unfortunately, this trick doesn't come for free, and brings with it a nasty
+side-effect: since the hash function only stores a _hash_ of the key, **the
+collision resolution algorithm stops being 100% accurate.** Indeed, the lookup
+function ends up having an _infinite_ number of "false positive" inputs :scream:
 
 Fortunately, it turns out that it's possible to greatly reduce the number of
-"reasonable" false positives ("reasonable" as in an input that isn't comprised
-on random gibberish characters) simply by increasing the number of bits used for
-the secondary hash.
+"reasonable" false positives ("reasonable" in the sense that the input isn't
+comprised on random gibberish characters) simply by increasing the number of
+bits used for the secondary hash.
 
 Now, I'm no statistician, so I really can't comment to the theoretical impact of
 using more/less bits to reduce false positives, but I can say that though some
 extensive empirical testing - both via
-[automated stress-testing](https://github.com/daniel5151/compressed-emoji-shortcodes/tree/main/kowalski-analysis)
+[automated testing](https://github.com/daniel5151/compressed-emoji-shortcodes/tree/main/kowalski-analysis)
 and human trials (read: mashing random keys on my keyboard) - it seems that a
 **16-bit hash works almost perfectly**. Heck, if you're really worried about
 space, **even a single byte hash works great!**
@@ -501,6 +501,6 @@ https://github.com/kornelski/gh-emoji.
 The emoji shortcode database is downloaded directly from GitHub's
 [gemoji](https://github.com/github/gemoji/tree/master) library.
 
-Special thanks to [Matt D'Souza](https://github.com/DSouzaM) and
+Special thanks to [Matt D'Souza](https://mattdsouza.com/) and
 [Ethan Hardy](https://github.com/ethan-hardy), who I nerd-sniped into helping me
 with this funky little project.

@@ -299,32 +299,34 @@ result in roughly <strong>~34kb</strong> file. Aside from being a totally imprac
 structure for querying on a embedded MCU, 34kb is quite a bit of data in an
 embedded context! Let&rsquo;s see if we can do any better&hellip;</p>
 <h2 id="-implementation-">🛠️ Implementation 🛠️<a href="#-implementation-" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
-<p>Since we know all the key-value pairs ahead of time, a good place to start is to
-generate a
+<p>Since we know all the key-value pairs ahead of time, a good place to start off
+might be to generate a
 <a href="https://en.wikipedia.org/wiki/Perfect_hash_function">perfect hash map</a> of
-shortcodes to emoji at compile time. Unlike typical hash-table hash functions,
-perfect hash functions guarantee that each individual valid input is mapped to a
-<em>distinct</em> index, which means that there is <em>zero wasted space</em> in the
+shortcodes to emoji at compile time. Unlike typical hash functions, <em>perfect</em>
+hash functions guarantee that each individual valid input is mapped to a
+<em>distinct</em> index. This property means that there is <em>zero wasted space</em> in the
 underlying hash table.</p>
 <p>In fact, the foundation of this entire project is the incredible
-<a href="https://github.com/sfackler/rust-phf"><code>rust-phf</code></a>, which I&rsquo;ve heavy modified
-and optimized for this particular use-case. Without doing any modifications, the
-base <code>rust-phf</code> crate results in <strong>~100kb</strong> of code + data overhead.</p>
-<p>100kb doesn&rsquo;t <em>seem</em> that bad, but when you consider that the raw data set is
-only ~34kb, and the target platform only has (at most) ~256kb of flash ROM,
-it&rsquo;s clear that there&rsquo;s plenty of room for improvement.</p>
-<p>Not to spoil the ending, but by employing a whole host of optimizations and data
-layout/representation tricks outlined below, I was able to crunch that 100kb of
-code + data down to a measly <strong>~20kb!</strong></p>
+<a href="https://github.com/sfackler/rust-phf"><code>rust-phf</code></a>, which I ended up heavy
+modifying and optimizing for this specific use-case. That said, even without
+doing any modifications, the base <code>rust-phf</code> crate results in <strong>~100kb</strong> of
+code + data overhead, and can be used on systems without dynamic allocation.</p>
+<p>Now, 100kb doesn&rsquo;t <em>seem</em> that bad, but when you consider that the raw dataset
+of shortcodes + emoji is only ~34kb, and the fact that most embedded platforms
+I&rsquo;m targeting have at most ~256kb of flash ROM, it&rsquo;s should be obvious that
+there&rsquo;s plenty of room for improvement.</p>
+<p>Not to spoil the ending, but by using the host of optimizations and data
+layout/representation tricks outlined in the next couple sections, that 100kb of
+number ends up shrinking down to a measly <strong>~20kb!</strong></p>
 <h3 id="trick-1---storing-hashes-of--keys--instead-of-the-keys-themselves">Trick 1 - Storing hashes of 🔑 keys 🔑 instead of the keys themselves<a href="#trick-1---storing-hashes-of--keys--instead-of-the-keys-themselves" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h3>
 <p>Let&rsquo;s start off with a guiding question:</p>
 <blockquote>
 <p>Why do hash tables need to store both values <em>and</em> keys, even in situations
 where there&rsquo;s never a need to iterate over key-value pairs in the map?</p>
 </blockquote>
-<p>There are a few reasons, but the one most relevant to this discussion is that
-hash tables need a copy of the original key to prevent <em>false positive lookups</em>,
-whereby an invalid key returns an unrelated value.</p>
+<p>This question has a couple different answers, but the one most relevant to this
+discussion is that hash tables need a copy of the original key to prevent <em>false
+positive lookups</em>, whereby an invalid key returns an unrelated value.</p>
 <p>A fundamental property of hash tables is that given a unlimited set of inputs
 (i.e: all possible strings), and a limited set of outputs (i.e: the ~2000 emoji
 in our data set), a hash collision is essentially guaranteed to happen. As such,
@@ -340,7 +342,7 @@ when all of a sudden *WHABAM* you&rsquo;re in a meeting with HR frantically tryi
 to explain how hashing works, and that this is all just one big
 misunderstanding! Yikes 😱</p>
 </blockquote>
-<p>In our case, since we are using a <em>perfect</em> hash function, the conflict
+<p>In our case, since we happen to be using a <em>perfect</em> hash function, the conflict
 resolution strategy happens to be incredibly simple: just include an
 <a href="https://github.com/sfackler/rust-phf/blob/9b70bd9/phf/src/map.rs#L88">additional check</a>
 that compares the input key against the expected key at that particular index.
@@ -355,26 +357,24 @@ is.</p>
 the keys in their entirety?</strong></p>
 <p>At last, we arrive at our first trick: Instead of storing each shortcode key in
 it&rsquo;s entirety as a raw string (which would take up a <em>lot</em> of space, around
-<code>size_of(char*) + 10</code> bytes on average), <strong>only store a compressed <em>secondary
-hash</em> of the key!</strong></p>
+<code>size_of(char*) + 10</code> bytes on average), just store a <strong>small <em>secondary hash</em>
+of the key!</strong></p>
 <p>This trick results in some absolutely <em>monstrous</em> space savings, cutting the
-~18kb shortcode string data down to only
-<code>size_of(hash(&quot;input&quot;)) * num_shortcodes</code>, or just <strong>~4kb</strong> (if using a 16-bit
-hash).</p>
+~18kb of raw shortcode string data down to just <strong>~4kb</strong> (i.e:
+<code>size_of(hash(&quot;input&quot;)) * num_shortcodes</code> bytes, assuming a 16-bit hash).</p>
 <hr>
-<p>Unfortunately, this trick doesn&rsquo;t come for free: by only storing a hash of the
-key instead of the entire key, <strong>our collision resolution algorithm stops having
-100% accuracy.</strong> Indeed, using this approach, the lookup function will ends up
-having an <em>infinite</em> number of &ldquo;false positive&rdquo; inputs that return nonsense
-outputs 😱</p>
+<p>Unfortunately, this trick doesn&rsquo;t come for free, and brings with it a nasty
+side-effect: since the hash function only stores a <em>hash</em> of the key, <strong>the
+collision resolution algorithm stops being 100% accurate.</strong> Indeed, the lookup
+function ends up having an <em>infinite</em> number of &ldquo;false positive&rdquo; inputs 😱</p>
 <p>Fortunately, it turns out that it&rsquo;s possible to greatly reduce the number of
-&ldquo;reasonable&rdquo; false positives (&ldquo;reasonable&rdquo; as in an input that isn&rsquo;t comprised
-on random gibberish characters) simply by increasing the number of bits used for
-the secondary hash.</p>
+&ldquo;reasonable&rdquo; false positives (&ldquo;reasonable&rdquo; in the sense that the input isn&rsquo;t
+comprised on random gibberish characters) simply by increasing the number of
+bits used for the secondary hash.</p>
 <p>Now, I&rsquo;m no statistician, so I really can&rsquo;t comment to the theoretical impact of
 using more/less bits to reduce false positives, but I can say that though some
 extensive empirical testing - both via
-<a href="https://github.com/daniel5151/compressed-emoji-shortcodes/tree/main/kowalski-analysis">automated stress-testing</a>
+<a href="https://github.com/daniel5151/compressed-emoji-shortcodes/tree/main/kowalski-analysis">automated testing</a>
 and human trials (read: mashing random keys on my keyboard) - it seems that a
 <strong>16-bit hash works almost perfectly</strong>. Heck, if you&rsquo;re really worried about
 space, <strong>even a single byte hash works great!</strong></p>
@@ -677,7 +677,7 @@ optimizing the map&rsquo;s internal representation for this particular use-case.
 <a href="https://github.com/kornelski/gh-emoji">https://github.com/kornelski/gh-emoji</a>.</p>
 <p>The emoji shortcode database is downloaded directly from GitHub&rsquo;s
 <a href="https://github.com/github/gemoji/tree/master">gemoji</a> library.</p>
-<p>Special thanks to <a href="https://github.com/DSouzaM">Matt D&rsquo;Souza</a> and
+<p>Special thanks to <a href="https://mattdsouza.com/">Matt D&rsquo;Souza</a> and
 <a href="https://github.com/ethan-hardy">Ethan Hardy</a>, who I nerd-sniped into helping me
 with this funky little project.</p>
       </div></div>
