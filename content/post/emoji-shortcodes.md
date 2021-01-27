@@ -12,12 +12,16 @@ Probably not... but now that I've posed the question, aren't you at least a
 little curious what the answer might be?
 
 So hey, if you've got some time to spare, why not stick around a while and learn
-a bit about cool topics such as perfect hashing, probabalistic data structures,
+a bit about cool topics such as perfect hashing, probabilistic data structures,
 and 2D dynamic programming algorithms?
 
 Take a break from solving whatever "important problem" you're working on, kick
 back, relax, and join me on my [somewhat useless] quest to find a highly
 compressed emoji :shortcode: lookup function!
+
+<p align="center">
+  <img alt="A GIF of the online demo" align="center" src="/blog/assets/emoji-shortcodes/shortcode_demo.gif"/>
+</p>
 
 > Thanks to the power of WebAssembly, you can play with the final result right
 > from your browser!
@@ -40,7 +44,7 @@ UTF-8 emoji as output:
 fn shortcode_to_emoji(input: &str) -> Option<&str>
 ```
 
-At first glance, this doesn't seem to difficult: just find a free, open source
+At first glance, this doesn't seem too difficult: just find a free, open source
 dataset of emoji shortcodes, load that data into memory, construct a hashmap,
 and start querying it - easy peasy!
 
@@ -51,12 +55,11 @@ Linux/Windows/macOS/TempleOS powered desktop computer, what if we wanted to run
 this lookup function on something a little bit more... embedded? If we tried to
 dynamically construct a hashmap at runtime on a tiny, resource-constrained
 ARM/AVR microcontroller, we'd very quickly run out of dynamic memory (assuming
-something like `malloc` is even _available_ on said platform)!
+something like `malloc` is even _available_ on said platform).
 
 Indeed, therein lies the need for a "Highly Compressed" lookup function - if we
-want to run this code on an embedded MCU, the lookup function lookup function
-will have to occupy as little static storage (code _and_ read-only data) as
-possible.
+want to run this code on an embedded system, the lookup function will have to
+occupy as little static storage (code _and_ read-only data) as possible.
 
 > At this point, you might be thinking to yourself "who in their right mind
 > would want to map emoji shortcodes on embedded hardware?" Fair enough! I've
@@ -108,17 +111,35 @@ it's the one I'm most familiar with, and it's also readily available as a big
 [JSON blob](https://raw.githubusercontent.com/github/gemoji/master/db/emoji.json).
 The particular dataset exhibits the following properties:
 
-|                                |                |
-| ------------------------------ | -------------- |
-| total shortcode, emoji pairs   | 1848           |
-| raw shortcode character data   | 18715 bytes    |
-| raw emoji UTF-8 character data | 11096 bytes    |
-| average shortcode length       | 10.12716 bytes |
-| average emoji length           | 6.004329 bytes |
+<!-- Markdown doesn't support tables without a header smh -->
+<table>
+    <tbody>
+        <tr>
+            <td>total shortcode, emoji pairs</td>
+            <td>1848</td>
+        </tr>
+        <tr>
+            <td>raw shortcode character data</td>
+            <td>18715 bytes</td>
+        </tr>
+        <tr>
+            <td>raw emoji UTF-8 character data</td>
+            <td>11096 bytes</td>
+        </tr>
+        <tr>
+            <td>average shortcode length</td>
+            <td>10.12716 bytes</td>
+        </tr>
+        <tr>
+            <td>average emoji length</td>
+            <td>6.004329 bytes</td>
+        </tr>
+    </tbody>
+</table>
 
 Converting this data set into a CSV file of raw `shortcode,emoji` pairs would
 result in roughly **\~34kb** file. Aside from being a totally impractical data
-structure for querying on a embedded MCU, 34kb is quite a bit of data in an
+structure for querying on an embedded system, 34kb is quite a bit of data in an
 embedded context! Let's see if we can do any better...
 
 ## 🛠️ Implementation 🛠️
@@ -143,7 +164,7 @@ I'm targeting have at most \~256kb of flash ROM, it's should be obvious that
 there's plenty of room for improvement.
 
 Not to spoil the ending, but by using the host of optimizations and data
-layout/representation tricks outlined in the next couple sections, that 100kb of
+layout/representation tricks outlined in the next couple sections, that 100kb
 number ends up shrinking down to a measly **\~20kb!**
 
 ### Trick 1 - Storing hashes of 🔑 keys 🔑 instead of the keys themselves
@@ -168,10 +189,7 @@ hash tables need to employ some sort of
 > trying to input `:smile:`, compounded with some spectacularly bad statistical
 > chance, somehow results in `:eggplant:` instead!
 >
-> I can see it now: one second you're having a friendly chat with a co-worker,
-> when all of a sudden \*WHABAM\* you're in a meeting with HR frantically trying
-> to explain how hashing works, and that this is all just one big
-> misunderstanding! Yikes :scream:
+> Unlikely? Sure. But why even take the chance?
 
 In our case, since we happen to be using a _perfect_ hash function, the conflict
 resolution strategy happens to be incredibly simple: just include an
@@ -191,7 +209,7 @@ This begs the question: **Is there any way we could somehow _avoid_ storing all
 the keys in their entirety?**
 
 At last, we arrive at our first trick: Instead of storing each shortcode key in
-it's entirety as a raw string (which would take up a _lot_ of space, around
+its entirety as a raw string (which would take up a _lot_ of space, around
 `size_of(char*) + 10` bytes on average), just store a **small _secondary hash_
 of the key!**
 
@@ -221,7 +239,7 @@ space, **even a single byte hash works great!**
 
 And don't just take my word for it - go and play around with the
 [online demo](https://prilik.com/compressed-emoji-shortcodes) and see how well
-this "imperfect" collision resolution algorithm actually works - it aught to be
+this "imperfect" collision resolution algorithm actually works - it ought to be
 pretty difficult to find any "reasonable" false positive inputs.
 
 ---
@@ -282,7 +300,7 @@ _Content Warning: \*Spicy\* 2D Dynamic Programming Algorithms Ahead_
 Before covering the last major trick, I should mention an interesting
 optimization opportunity related to generating multiple tables:
 
-For our particular emoji shortcode dataset, the following tables gets generated:
+For our particular emoji shortcode dataset, the following tables get generated:
 
 <div id="emoji-table">
 <style>
@@ -326,10 +344,9 @@ whopping 28 bytes!
 This is quite unfortunate, as it requires generating whole new tables just for
 these occasional odd-sized emoji. This is undesirable for several reasons:
 
-1.  Each table has an overhead associated with it, namely, the `size_of(Table)`
-    itself + the various bits of data it maintains internal pointers. For
-    certain smaller tables, this overhead can be greater than the size of the
-    data stored within the table itself!
+1.  Each table has some overhead associated with it, roughly `size_of(Table)`,
+    which is \~64 bytes. For certain smaller tables, this overhead can be
+    greater than the size of the data stored within the table itself!
 2.  The more tables there are, the more likely a hash-collision occurs while
     looking up entries deeper into the list. This will be covered in more detail
     in the Trick 3 section later on.
@@ -386,7 +403,7 @@ Since I'm more of a "maker"-type software engineer rather than a "computer
 scientist"-type software engineer, I asked Ethan to describe the algorithm in
 his own words:
 
-> To full optimize our space usage with these tables, we can employ the use of
+> To fully optimize our space usage with these tables, we can employ the use of
 > some dynamic programming techniques.
 >
 > In a nutshell, we can iterate through a DP table storing solutions to
@@ -462,6 +479,12 @@ This project has been a real hodgepodge of hacks on top of hacks, but
 nevertheless, the end result is a lookup function that crunches \~34kb of raw,
 un-queryable data into a miniscule \~20kb of code + data that can be queried in
 constant time without requiring any dynamic allocation at runtime. Neato!
+
+> Thanks to the power of WebAssembly, you can play with the final result right
+> from your browser!
+>
+> ----> Check out the
+> [online demo](https://prilik.com/compressed-emoji-shortcodes)! <-----
 
 I'm pretty much done with this project for now, but there are still a few ideas
 that might be worth exploring to compress things down even more:

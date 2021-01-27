@@ -19,11 +19,14 @@ data) needed to map emoji :shortcodes: to emoji?&lt;/p&gt;
 &lt;p&gt;Probably not&amp;hellip; but now that I&amp;rsquo;ve posed the question, aren&amp;rsquo;t you at least a
 little curious what the answer might be?&lt;/p&gt;
 &lt;p&gt;So hey, if you&amp;rsquo;ve got some time to spare, why not stick around a while and learn
-a bit about cool topics such as perfect hashing, probabalistic data structures,
+a bit about cool topics such as perfect hashing, probabilistic data structures,
 and 2D dynamic programming algorithms?&lt;/p&gt;
 &lt;p&gt;Take a break from solving whatever &amp;ldquo;important problem&amp;rdquo; you&amp;rsquo;re working on, kick
 back, relax, and join me on my [somewhat useless] quest to find a highly
 compressed emoji :shortcode: lookup function!&lt;/p&gt;
+&lt;p align=&#34;center&#34;&gt;
+  &lt;img alt=&#34;A GIF of the online demo&#34; align=&#34;center&#34; src=&#34;https://prilik.com/blog/blog/assets/emoji-shortcodes/shortcode_demo.gif&#34;/&gt;
+&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;Thanks to the power of WebAssembly, you can play with the final result right
 from your browser!&lt;/p&gt;
