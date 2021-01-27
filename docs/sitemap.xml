@@ -8,12 +8,12 @@
   </url>
   
   <url>
-    <loc>https://prilik.com/blog/tags/hacks/</loc>
+    <loc>https://prilik.com/blog/tags/embedded/</loc>
     <lastmod>2021-01-24T00:00:00-05:00</lastmod>
   </url>
   
   <url>
-    <loc>https://prilik.com/blog/tags/no_std/</loc>
+    <loc>https://prilik.com/blog/tags/experiments/</loc>
     <lastmod>2021-01-24T00:00:00-05:00</lastmod>
   </url>
   
@@ -24,6 +24,11 @@
   
   <url>
     <loc>https://prilik.com/blog/</loc>
+    <lastmod>2021-01-24T00:00:00-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://prilik.com/blog/tags/research/</loc>
     <lastmod>2021-01-24T00:00:00-05:00</lastmod>
   </url>
   
@@ -49,6 +54,11 @@
   
   <url>
     <loc>https://prilik.com/blog/tags/c&#43;&#43;/</loc>
+    <lastmod>2020-11-16T00:00:00-05:00</lastmod>
+  </url>
+  
+  <url>
+    <loc>https://prilik.com/blog/tags/no_std/</loc>
     <lastmod>2020-11-16T00:00:00-05:00</lastmod>
   </url>
   

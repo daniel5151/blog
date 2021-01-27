@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>embedded on prilik&#39;s blog</title>
+    <link>https://prilik.com/blog/tags/embedded/</link>
+    <description>Recent content in embedded on prilik&#39;s blog</description>
+    <generator>Hugo -- gohugo.io</generator>
+    <language>en</language>
+    <copyright>Copyright &amp;copy; Daniel Prilik :: Licensed under &lt;a target=&#34;_blank&#34; rel=&#34;external noopener license&#34; href=&#34;https://creativecommons.org/licenses/by-nd/4.0/&#34;&gt;CC-BY-ND-4.0&lt;/a&gt;.</copyright>
+    <lastBuildDate>Sun, 24 Jan 2021 00:00:00 -0500</lastBuildDate><atom:link href="https://prilik.com/blog/tags/embedded/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>A Quest to Find a Highly Compressed Emoji :shortcode: Lookup Function</title>
+      <link>https://prilik.com/blog/post/emoji-shortcodes/</link>
+      <pubDate>Sun, 24 Jan 2021 00:00:00 -0500</pubDate>
+      
+      <guid>https://prilik.com/blog/post/emoji-shortcodes/</guid>
+      <description>&lt;p&gt;Have you ever wondered what&amp;rsquo;s the smallest amount of static storage (code +
+data) needed to map emoji :shortcodes: to emoji?&lt;/p&gt;
+&lt;p&gt;Probably not&amp;hellip; but now that I&amp;rsquo;ve posed the question, aren&amp;rsquo;t you at least a
+little curious what the answer might be?&lt;/p&gt;
+&lt;p&gt;So hey, if you&amp;rsquo;ve got some time to spare, why not stick around a while and learn
+a bit about cool topics such as perfect hashing, probabalistic data structures,
+and 2D dynamic programming algorithms?&lt;/p&gt;
+&lt;p&gt;Take a break from solving whatever &amp;ldquo;important problem&amp;rdquo; you&amp;rsquo;re working on, kick
+back, relax, and join me on my [somewhat useless] quest to find a highly
+compressed emoji :shortcode: lookup function!&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;Thanks to the power of WebAssembly, you can play with the final result right
+from your browser!&lt;/p&gt;
+&lt;p&gt;&amp;mdash;-&amp;gt; Check out the
+&lt;a href=&#34;https://prilik.com/compressed-emoji-shortcodes&#34;&gt;online demo&lt;/a&gt;! &amp;lt;&amp;mdash;&amp;ndash;&lt;/p&gt;
+&lt;/blockquote&gt;</description>
+    </item>
+    
+  </channel>
+</rss>

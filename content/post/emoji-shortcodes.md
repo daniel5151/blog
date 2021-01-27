@@ -2,7 +2,7 @@
 title = "A Quest to Find a Highly Compressed Emoji :shortcode: Lookup Function"
 date = 2021-01-24
 draft = false
-tags = ["rust", "wasm", "no_std", "hacks"]
+tags = ["experiments", "research", "embedded", "rust", "wasm"]
 +++
 
 Have you ever wondered what's the smallest amount of static storage (code +

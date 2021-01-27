@@ -9,20 +9,29 @@
     <copyright>Copyright &amp;copy; Daniel Prilik :: Licensed under &lt;a target=&#34;_blank&#34; rel=&#34;external noopener license&#34; href=&#34;https://creativecommons.org/licenses/by-nd/4.0/&#34;&gt;CC-BY-ND-4.0&lt;/a&gt;.</copyright>
     <lastBuildDate>Sun, 24 Jan 2021 00:00:00 -0500</lastBuildDate><atom:link href="https://prilik.com/blog/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>hacks</title>
-      <link>https://prilik.com/blog/tags/hacks/</link>
+      <title>embedded</title>
+      <link>https://prilik.com/blog/tags/embedded/</link>
       <pubDate>Sun, 24 Jan 2021 00:00:00 -0500</pubDate>
       
-      <guid>https://prilik.com/blog/tags/hacks/</guid>
+      <guid>https://prilik.com/blog/tags/embedded/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>no_std</title>
-      <link>https://prilik.com/blog/tags/no_std/</link>
+      <title>experiments</title>
+      <link>https://prilik.com/blog/tags/experiments/</link>
       <pubDate>Sun, 24 Jan 2021 00:00:00 -0500</pubDate>
       
-      <guid>https://prilik.com/blog/tags/no_std/</guid>
+      <guid>https://prilik.com/blog/tags/experiments/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>research</title>
+      <link>https://prilik.com/blog/tags/research/</link>
+      <pubDate>Sun, 24 Jan 2021 00:00:00 -0500</pubDate>
+      
+      <guid>https://prilik.com/blog/tags/research/</guid>
       <description></description>
     </item>
     
@@ -59,6 +68,15 @@
       <pubDate>Mon, 16 Nov 2020 00:00:00 -0500</pubDate>
       
       <guid>https://prilik.com/blog/tags/c&#43;&#43;/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>no_std</title>
+      <link>https://prilik.com/blog/tags/no_std/</link>
+      <pubDate>Mon, 16 Nov 2020 00:00:00 -0500</pubDate>
+      
+      <guid>https://prilik.com/blog/tags/no_std/</guid>
       <description></description>
     </item>
     
