@@ -8,19 +8,16 @@ tags = ["rust", "wasm", "no_std", "hacks"]
 Have you ever wondered what's the smallest amount of static storage (code +
 data) needed to map emoji :shortcodes: to emoji?
 
-Probably not... but now that you've heard the question, aren't you at least a
+Probably not... but now that I've posed the question, aren't you at least a
 little curious what the answer might be?
 
-After all, it can be fun to take a break from solving "important problems" and
-occasionally spend some time working on something entertaining (albeit kinda
-useless).
+So hey, if you've got some time to spare, why not stick around a while and learn
+a bit about cool topics such as perfect hashing, probabalistic data structures,
+and 2D dynamic programming algorithms?
 
-So hey, if you've got some time to spare, and you're interested in learning a
-bit about cool topics such as perfect hashing, probabalistic data structures,
-and 2D dynamic programming algorithms, why not stick around a little while?
-
-Join me on a [somewhat useless] quest to find a highly compressed emoji
-:shortcode: lookup function!
+Take a break from solving whatever "important problem" you're working on, kick
+back, relax, and join me on my [somewhat useless] quest to find a highly
+compressed emoji :shortcode: lookup function!
 
 > Thanks to the power of WebAssembly, you can play with the final result right
 > from your browser!
@@ -114,8 +111,8 @@ The particular dataset exhibits the following properties:
 |                                |                |
 | ------------------------------ | -------------- |
 | total shortcode, emoji pairs   | 1848           |
-| raw emoji UTF-8 character data | 11096 bytes    |
 | raw shortcode character data   | 18715 bytes    |
+| raw emoji UTF-8 character data | 11096 bytes    |
 | average shortcode length       | 10.12716 bytes |
 | average emoji length           | 6.004329 bytes |
 
@@ -126,66 +123,106 @@ embedded context! Let's see if we can do any better...
 
 ## 🛠️ Implementation 🛠️
 
-The foundation of my lookup function is a heavily modified version of the
-incredible [rust-phf](https://github.com/sfackler/rust-phf) crate to generate a
-set of [perfect hash maps](https://en.wikipedia.org/wiki/Perfect_hash_function)
-mapping shortcodes to emoji at compile time.
+Since we know all the key-value pairs ahead of time, a good place to start is to
+generate a
+[perfect hash map](https://en.wikipedia.org/wiki/Perfect_hash_function) of
+shortcodes to emoji at compile time. Unlike typical hash-table hash functions,
+perfect hash functions guarantee that each individual valid input is mapped to a
+_distinct_ index, which means that there is _zero wasted space_ in the
+underlying hash table.
 
-Indeed, if we weren't looking for a "highly" compressed mapping, and were find
-with one that was simply allocation-free, then we could have simply used the
-unmodified `rust-phf` crate, which would result in **\~100kb** of code + data
-overhead. Unfortunately, 100kb blows waaaaay past the flash ROM budget of the
-embedded hardware we are targeting, so we need to get a bit more clever...
+In fact, the foundation of this entire project is the incredible
+[`rust-phf`](https://github.com/sfackler/rust-phf), which I've heavy modified
+and optimized for this particular use-case. Without doing any modifications, the
+base `rust-phf` crate results in **\~100kb** of code + data overhead.
 
-Spoiler alert: By employing a whole host of optimizations and data
-layout/representation tricks, I was able to crunch that 100kb down to a measly
-**\~20kb of `.text` + `.rodata`**!
+100kb doesn't _seem_ that bad, but when you consider that the raw data set is
+only \~34kb, and the target platform only has (at most) \~256kb of flash ROM,
+it's clear that there's plenty of room for improvement.
 
-### Trick 1 - Storing hashes of 🔑 keys 🔑 (instead of keys themselves)
+Not to spoil the ending, but by employing a whole host of optimizations and data
+layout/representation tricks outlined below, I was able to crunch that 100kb of
+code + data down to a measly **\~20kb!**
 
-Instead of naively storing the keys as raw strings (which would take up a _lot_
-of space, around `size_of(char*) + 10` bytes on average), the hash map only
-stores the _hashes_ of keys.
+### Trick 1 - Storing hashes of 🔑 keys 🔑 instead of the keys themselves
 
-While this trick can result in some absolutely _monstrous_ space savings, it
-does so at the expense of a property most folks take for granted when using a
-hash-map: 100% accuracy in rejecting invalid inputs. Indeed, using this
-approach, the lookup function will actually have an infinite number of "false
-positive" inputs that return nonsense outputs.
+Let's start off with a guiding question:
 
-Now, I'm no statistician, so I really can't comment to the theoretical accuracy
-of this approach, but empirical testing using some automated stress-testing +
-human trials (i.e: slamming the keys on my keyboard) seems to suggest that a **2
-byte hash works almost perfectly**. Heck, if you're really worried about space,
-**even single byte hashes works great!**
+> Why do hash tables need to store both values _and_ keys, even in situations
+> where there's never a need to iterate over key-value pairs in the map?
 
-And don't just take my word for it - check out the
-[online demo](https://prilik.com/compressed-emoji-shortcodes) and play around
-with the lookup function directly. It's should be pretty difficult to find any
-"reasonable" false positive inputs (i.e: one that's only a misspelling or two
-away from a valid input).
+There are a few reasons, but the one most relevant to this discussion is that
+hash tables need a copy of the original key to prevent _false positive lookups_,
+whereby an invalid key returns an unrelated value.
+
+A fundamental property of hash tables is that given a unlimited set of inputs
+(i.e: all possible strings), and a limited set of outputs (i.e: the \~2000 emoji
+in our data set), a hash collision is essentially guaranteed to happen. As such,
+hash tables need to employ some sort of
+[collision resolution algorithm](https://en.wikipedia.org/wiki/Hash_table#Collision_resolution).
+
+> If hash tables didn't have any collision resolution, just imagine what sort of
+> chaos simple input errors might result in! A harmless spelling mistake while
+> trying to input `:smile:`, compounded with some spectacularly bad statistical
+> chance, somehow results in `:eggplant:` instead!
+>
+> I can see it now: one second you're having a friendly chat with a co-worker,
+> when all of a sudden \*WHABAM\* you're in a meeting with HR frantically trying
+> to explain how hashing works, and that this is all just one big
+> misunderstanding! Yikes :scream:
+
+In our case, since we are using a _perfect_ hash function, the conflict
+resolution strategy happens to be incredibly simple: just include an
+[additional check](https://github.com/sfackler/rust-phf/blob/9b70bd9/phf/src/map.rs#L88)
+that compares the input key against the expected key at that particular index.
+With this one simple trick, the hash table can ensure that invalid inputs are
+rejected with 100% certainty!
+
+**But enough about how hash functions work in general, we have a problem we want
+to solve!**
+
+One key insight about our problem is that we are only even interested in
+_looking up_ values, and don't actually care about what the set of valid keys
+is.
+
+This begs the question: **Is there any way we could somehow _avoid_ storing all
+the keys in their entirety?**
+
+At last, we arrive at our first trick: Instead of storing each shortcode key in
+it's entirety as a raw string (which would take up a _lot_ of space, around
+`size_of(char*) + 10` bytes on average), **only store a compressed _secondary
+hash_ of the key!**
+
+This trick results in some absolutely _monstrous_ space savings, cutting the
+\~18kb shortcode string data down to only
+`size_of(hash("input")) * num_shortcodes`, or just **\~4kb** (if using a 16-bit
+hash).
 
 ---
 
-**_Side Note:_ Why does a _perfect_ hash function even need to store the keys in
-the first place?**
+Unfortunately, this trick doesn't come for free: by only storing a hash of the
+key instead of the entire key, **our collision resolution algorithm stops having
+100% accuracy.** Indeed, using this approach, the lookup function will ends up
+having an _infinite_ number of "false positive" inputs that return nonsense
+outputs :scream:
 
-i.e: won't every input just automagically mapped to the correct value?
+Fortunately, it turns out that it's possible to greatly reduce the number of
+"reasonable" false positives ("reasonable" as in an input that isn't comprised
+on random gibberish characters) simply by increasing the number of bits used for
+the secondary hash.
 
-Well, while that may be true for _valid_ inputs, plugging an _invalid_ input
-into a PHF will simply return some arbitrary index. To reject invalid inputs,
-most perfect hash maps will include an
-[additional check](https://github.com/sfackler/rust-phf/blob/9b70bd9/phf/src/map.rs#L88)
-that compares the input key against the expected key at that particular index.
-This ensure that invalid inputs are rejected with 100% certainty.
+Now, I'm no statistician, so I really can't comment to the theoretical impact of
+using more/less bits to reduce false positives, but I can say that though some
+extensive empirical testing - both via
+[automated stress-testing](https://github.com/daniel5151/compressed-emoji-shortcodes/tree/main/kowalski-analysis)
+and human trials (read: mashing random keys on my keyboard) - it seems that a
+**16-bit hash works almost perfectly**. Heck, if you're really worried about
+space, **even a single byte hash works great!**
 
-If this extra check wasn't in place, just imagine what sort of chaos simple
-input errors might result in! A harmless spelling mistake while typing
-`:smile:`, compounded with some spectacularly bad statistical chance, could
-somehow result in typing `:eggplant:` instead. One second you're having a
-friendly chat with a co-worker, when all of a sudden \*WHABAM\* you're in a
-meeting with HR frantically trying to explain how perfect hash functions work.
-Yikes :eggplant:
+And don't just take my word for it - go and play around with the
+[online demo](https://prilik.com/compressed-emoji-shortcodes) and see how well
+this "imperfect" collision resolution algorithm actually works - it aught to be
+pretty difficult to find any "reasonable" false positive inputs.
 
 ---
 
@@ -289,10 +326,10 @@ whopping 28 bytes!
 This is quite unfortunate, as it requires generating whole new tables just for
 these occasional odd-sized emoji. This is undesirable for several reasons:
 
-1.  Each table has an overhead associated with it, namely, the `size_of` the
-    `phf::Map` structure + the various bits of data it maintains internal
-    pointers. For certain smaller tables, this overhead can be greater than the
-    size of the data stored within the table itself!
+1.  Each table has an overhead associated with it, namely, the `size_of(Table)`
+    itself + the various bits of data it maintains internal pointers. For
+    certain smaller tables, this overhead can be greater than the size of the
+    data stored within the table itself!
 2.  The more tables there are, the more likely a hash-collision occurs while
     looking up entries deeper into the list. This will be covered in more detail
     in the Trick 3 section later on.
@@ -364,7 +401,7 @@ his own words:
 > paper" that dives into the details of the algorithm.
 >
 > You can read the full writeup by clicking on
-> [this link here](https://github.com/ethan-hardy/emoji_algorithm).
+> [this link here](https://github.com/ethan-hardy/emoji_algorithm/blob/main/emoji_algo.pdf).
 >
 > -   _Ethan Hardy_
 
@@ -419,7 +456,7 @@ hash.
 
 ---
 
-## Future Work?
+## Conclusion
 
 This project has been a real hodgepodge of hacks on top of hacks, but
 nevertheless, the end result is a lookup function that crunches \~34kb of raw,

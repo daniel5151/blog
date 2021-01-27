@@ -16,16 +16,14 @@
       <guid>https://prilik.com/blog/post/emoji-shortcodes/</guid>
       <description>&lt;p&gt;Have you ever wondered what&amp;rsquo;s the smallest amount of static storage (code +
 data) needed to map emoji :shortcodes: to emoji?&lt;/p&gt;
-&lt;p&gt;Probably not&amp;hellip; but now that you&amp;rsquo;ve heard the question, aren&amp;rsquo;t you at least a
+&lt;p&gt;Probably not&amp;hellip; but now that I&amp;rsquo;ve posed the question, aren&amp;rsquo;t you at least a
 little curious what the answer might be?&lt;/p&gt;
-&lt;p&gt;After all, it can be fun to take a break from solving &amp;ldquo;important problems&amp;rdquo; and
-occasionally spend some time working on something entertaining (albeit kinda
-useless).&lt;/p&gt;
-&lt;p&gt;So hey, if you&amp;rsquo;ve got some time to spare, and you&amp;rsquo;re interested in learning a
-bit about cool topics such as perfect hashing, probabalistic data structures,
-and 2D dynamic programming algorithms, why not stick around a little while?&lt;/p&gt;
-&lt;p&gt;Join me on a [somewhat useless] quest to find a highly compressed emoji
-:shortcode: lookup function!&lt;/p&gt;
+&lt;p&gt;So hey, if you&amp;rsquo;ve got some time to spare, why not stick around a while and learn
+a bit about cool topics such as perfect hashing, probabalistic data structures,
+and 2D dynamic programming algorithms?&lt;/p&gt;
+&lt;p&gt;Take a break from solving whatever &amp;ldquo;important problem&amp;rdquo; you&amp;rsquo;re working on, kick
+back, relax, and join me on my [somewhat useless] quest to find a highly
+compressed emoji :shortcode: lookup function!&lt;/p&gt;
 &lt;blockquote&gt;
 &lt;p&gt;Thanks to the power of WebAssembly, you can play with the final result right
 from your browser!&lt;/p&gt;
