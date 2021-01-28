@@ -33,9 +33,6 @@ enableEmoji = true
   # ["orange", "blue", "red", "green", "pink"]
   themeColor = "blue"
 
-  # if you set this to 0, only submenu trigger will be visible
-  showMenuItems = 3
-
   # show selector to switch language
   showLanguageSelector = false
 
@@ -81,6 +78,16 @@ enableEmoji = true
         identifier = "posts"
         name = "posts"
         url = "/"
+
+      [[languages.en.menu.main]]
+        identifier = "tags"
+        name = "tags"
+        url = "/tags/"
+
+      [[languages.en.menu.main]]
+        identifier = "rss"
+        name = "rss"
+        url = "/index.xml"
 
       [[languages.en.menu.main]]
         identifier = "github"
