@@ -34,7 +34,7 @@ A new way to experience NES classics.
 
 **wideNES** is a novel technique to _automatically_ and _interactively_ map-out NES games, _in real time_.
 
-As players move within a level, wideNES records the screen, gradually building-up a map of what's been explored. On subsequent playthroughs of the level, wideNES syncs the action on-screen to the generated map, effectively letting players see more of the level by "peeking" past the edge of the NES's screen! Best of all, wideNES's approach to mapping games is _totally generalized_, enabling a wide range of NES games to work with wideNES right out of the box!
+As players move within a level, wideNES records the screen, gradually building-up a map of what's been explored. On subsequent playthroughs of the level, wideNES syncs the action on-screen to the generated map, effectively letting players see more of the level by "peeking" past the edge of the NES's screen. Best of all, wideNES's approach to mapping games is _totally generalized_, enabling a wide range of NES games to work with wideNES right out of the box!
 
 But how does it work?
 
@@ -76,7 +76,7 @@ With that _incredibly_ brief overview out of the way, lets move on to the intere
 
 ### The Basic Idea
 
-At the end of each frame, the CPU updates the PPU on what has changed. This involves setting new sprite positions, new level data, and ---crucially for wideNES--- _new viewport offsets_. Since wideNES runs in an emulator, it's really easy to track the values written to the PPUSCROLL register, which means it's incredibly easy to calculate how much of the screen has scrolled between any two frames!
+At the end of each frame, the CPU updates the PPU on what has changed. This involves setting new sprite positions, new level data, and ---crucially for wideNES--- _new viewport offsets_. Since wideNES runs in an emulator, it's really easy to track the values written to the PPUSCROLL register, which means it's incredibly easy to calculate how much of the screen has scrolled between any two frames.
 
 Hmm, what would happen if instead of painting each new frame _directly over_ the old frame, new frames are instead painted _overlapping_ the previous frame, but offset by the current screen scroll? Well, over time, more and more of the level would be left on-screen, gradually building up a complete picture of the level!
 
@@ -94,7 +94,7 @@ Voila!
 
 It worked!
 
-Kinda...
+Well... Kinda.
 
 ---
 
@@ -102,16 +102,16 @@ Kinda...
 
 Without even going into the details of wideNES's implementation, it should be obvious that the technique has a major limitation: A complete map of the game is only possible if a player manually explores the entire game.
 
-What if there was some way to extract levels from _raw_ NES ROMs?!
-Could such a technique even exist??
+What if there was some way to extract levels from _raw_ NES ROMs?
+Could such a technique even exist?
 
 Nah, probably not.
 
-If you take any 2 NES games, there is only 1 thing they are guaranteed to have in common: they both run on an NES. Other than that, all bets are off! This inconsistency is a real pain, since there are essentially limitless ways for NES games to store level data!
+If you take any 2 NES games, there is only 1 thing they are guaranteed to have in common: they both run on an NES. Other than that, all bets are off! This inconsistency is a real pain, since there are essentially limitless ways for NES games to store level data.
 
 While some folks have extracted complete levels by reverse engineering how _a couple of_ games store level data (sometimes making full-fledged [level editors](https://www.romhacking.net/utilities/298/)!), doing so is far from simple, requiring plenty of hard work, dedication, and clever thinking.
 
-Trying to extract level data from a NES ROM would be equivalent to determining which sections of the ROM are code (as opposed to data), which is hard, since [finding all code in a given binary is equivalent to the Halting problem](https://stackoverflow.com/questions/5299576/finding-all-the-code-in-a-given-binary-is-equivalent-to-the-halting-problem-r)!
+Trying to extract level data from a NES ROM would be equivalent to determining which sections of the ROM are code (as opposed to data), which is hard, since [finding all code in a given binary is equivalent to the Halting problem](https://stackoverflow.com/questions/5299576/finding-all-the-code-in-a-given-binary-is-equivalent-to-the-halting-problem-r).
 
 wideNES takes a much simpler approach: Instead of guessing how games pack level data in ROM, wideNES will simply run the game and watch the output!
 
@@ -129,7 +129,7 @@ Next, to compensate for PPUSCROLL's 8-bit limitations, games will updates a diff
 
 But hold on a sec, isn't there only enough VRAM for 2 screens-worth of level? What happens when the viewport scrolls too far to the right and "overshoots" VRAM? To handle this case, the PPU implements wrapping behavior, so that any sections of the viewport outside of designated VRAM will simply wrap-around to the opposite-end of VRAM.
 
-This wrapping behavior, in conjunction with some clever PPUSCROLL and PPUCTRL manipulation, allows NES games to give the illusion of infinitely tall/wide worlds! By lazily-loading in more of the level ahead of the viewport, and gradually scrolling into it, players never realize that they are actually "running in circles" within VRAM!
+This wrapping behavior, in conjunction with some clever PPUSCROLL and PPUCTRL manipulation, allows NES games to give the illusion of infinitely tall/wide worlds. By lazily-loading in more of the level ahead of the viewport, and gradually scrolling into it, players never realize that they are actually just "running in circles" within VRAM!
 
 This excellent illustration from the nesdev wiki shows how _Super Mario Bros._ uses these features to have levels longer than 2 screens:
 
@@ -143,9 +143,9 @@ Well, to be perfectly honest, wideNES _completely ignores_ the PPUCTRL register,
 
 If PPUSCROLL unexpectedly jumps up to ~256, that typically indicates that the player character moved left/up a screen, whereas if it unexpectedly jumps down to ~0, that typically indicates that the player moved right/down a screen.
 
-While this heuristic might seem simple ---and it is--- it actually works great!
+While this heuristic might seem simple, it actually works great!
 
-After implementing the heuristic, _Super Mario Bros._, _Metroid_, and many other games worked near-perfectly!
+After implementing the heuristic, _Super Mario Bros._, _Metroid_, and many other games worked near-perfectly.
 
 I was excited, so I went ahead and loaded up another NES classic, _Super Mario Bros. 3_....
 
@@ -159,7 +159,7 @@ Hmm... That's not good.
 
 Many games have static-UI elements at the edges of the screen. In _SMB3_'s case, there is a blue column on the left-side of the screen, and a status-bar at the bottom of the screen.
 
-By default, wideNES samples in 16-pixel increments from the edges of the screen, which means any static elements at the edges are sampled! Not good!
+By default, wideNES samples in 16-pixel increments from the edges of the screen, which means any static elements at the edges are sampled. Not good!
 
 To work around this issue, wideNES implements several rules and heuristics that try to detect and mask-off static screen elements automatically.
 
@@ -175,7 +175,7 @@ Thankfully, these HUDs are a non-issue, as wideNES simply ignores the sprite lay
 
 The PPU has feature which allows games to mask-off the leftmost 8px of the background layer. It is activated by setting the 2nd bit of the PPUMASK register (address 0x2001). While many games use this feature, explaining _why_ they do so is outside of the scope of this article.
 
-Detecting if the mask is on is incredibly simple: wideNES simply watches the value of PPUMASK, and ignores the leftmost 8px whenever the 2nd bit of the register is set!
+Detecting if the mask is on is incredibly simple: wideNES simply watches the value of PPUMASK, and ignores the leftmost 8px whenever the 2nd bit of the register is set.
 
 Implementing this simple rule seemed to fix _SMB3_:
 
@@ -195,21 +195,21 @@ wideNES implements several different heuristics to detect different-types of sta
 
 ### Mid-Frame IRQ Tracking
 
-Unlike modern GPUs, which have large internal framebuffers, the PPU has _no frame-buffer whatsoever!_ To save on space, the PPU stores scenes as a grid of 64x32 8x8 pixel tiles. Instead of resolving the pixel data ahead of time, tiles are stored as _pointers_ into CHR Memory (Character Memory), which contains the actual pixel data.
+Unlike modern GPUs, which have large internal framebuffers, the PPU has _no frame-buffer whatsoever._ To save on space, the PPU stores scenes as a grid of 64x32 8x8 pixel tiles. Instead of resolving the pixel data ahead of time, tiles are stored as _pointers_ into CHR Memory (Character Memory), which contains the actual pixel data.
 
 Since the NES was developed in the 80s, the PPU was not built with modern display technology in mind. Instead of rendering full-frames at a time, the PPU outputs NTSC video designed to be displayed on a CRT, which outputs video _pixel by pixel_, _scanline by scanline_, top to bottom, left to right.
 
 Why is all this important?
 
-Well, since the PPU renders frames top-to-bottom, scanline-by-scanline, it is possible to send the PPU instructions _mid-frame_ to create otherwise impossible video effects! These effects could be as simple as changing the palette, or as advanced as, you guessed it, creating Status Bars!
+Well, since the PPU renders frames top-to-bottom, scanline-by-scanline, it is possible to send the PPU instructions _mid-frame_ to create otherwise "impossible" video effects. These effects could be as simple as changing the palette, or as advanced as --- you guessed it --- creating Status Bars!
 
-To explain how mid-frame PPU writes can generate Status Bars, I've captured a raw dump of a slice of the PPU's VRAM and CHR Memory at a particular frame _SMB3_:
+To explain how mid-frame PPU writes can generate Status Bars, I've captured a raw dump of a slice of the PPU's VRAM and CHR Memory at a scan-line 195 while playing _SMB3_ (as denoted by the red line in the graphic below):
 
 <p align="center">
   <img align="center" src="/blog/assets/wideNES/raw_vram_level.png"/>
 </p>
 
-Everything looks normal, nothing fancy... except look at the Status Bar! It's completely garbled!
+Everything looks normal, nothing fancy... except look at the Status Bar - It's completely garbled!
 
 Now, look at the same raw dump, but captured after scanline 196...
 
@@ -226,9 +226,9 @@ _SMB3_ sets a timer to fire an IRQ precisely after rendering scanline 195. It pu
 - Set PPUSCROLL to (0,0) (ensuring a fixed status bar)
 - Swap the tilemap in CHR Memory (un-garble the status-bar's graphics)
 
-Since the rest of the level has already been rendered, the PPU won't "retroactively" update the frame. Instead, it will keep-on rendering with these new parameters, outputting a nice, un-garbled status bar!
+Since the rest of the level has already been rendered, the PPU won't "retroactively" update the already rendered scan-lines. Instead, it will keep-on rendering with these new parameters, thereby outputting a nice, ungarbled status bar.
 
-To get back to wideNES, by listening for any mid-frame IRQs and noting the scanline at which they occurred at, wideNES can ignore any subsequent scanlines in the recording! Alternatively, if the IRQ occurs at a scanline less than 240 / 2, all _previous_ scanlines are ignored, as an early scanline IRQ implies there could be a status bar at the _top_ of the screen.
+To get back to wideNES - by listening for any mid-frame IRQs and noting the scanline at which they occurred at, wideNES can ignore any subsequent scan-lines in the recording. Alternatively, if the IRQ occurs at a scanline less than 240 / 2, all _previous_ scan-lines are ignored, as an early scanline IRQ implies there could be a status bar at the _top_ of the screen.
 
 Once this heuristic is in-place _Super Mario Bros. 3_ works perfectly!
 
@@ -254,15 +254,15 @@ For example, here is the first scene transition in _Castlevania_, where Simon Be
   <img align="center" src="/blog/assets/wideNES/castlevania_no_scene.gif"/>
 </p>
 
-Oh, that's not good! wideNES completely overwrote the last bit of the level with the first bit of the new level!
+Oh, that's not good. wideNES completely overwrote the last bit of the level with the first bit of the new level!
 
 Clearly, wideNES needed some way to detect when a scene changes. But how?
 
 _Perceptual Hashing!_
 
-Unlike _cryptographic_ hash functions, which seek to scatter similar inputs randomly across the output space, _perceptual_ hash functions strive to keep similar inputs "close" to one another in the output space. This makes perceptual hashes perfect for detecting similar images!
+Unlike _cryptographic_ hash functions, which seek to scatter similar inputs randomly across the output space, _perceptual_ hash functions strive to keep similar inputs "close" to one another in the output space. This makes perceptual hashes perfect for detecting similar images.
 
-Perceptual hash functions can get incredibly complex, with some being able to detect similar images even if one has been rotated, scaled, stretched, and color shifted. Fortunately, wideNES doesn't need a complex hash function, since each frame is guaranteed to be the exact same size. As such, wideNES makes use of probably the simplest perceptual hash out there: _summing up every pixel on-screen!_
+Perceptual hash functions can get incredibly complex, with some being able to detect similar images even if one has been rotated, scaled, stretched, and color shifted. Fortunately, wideNES doesn't need a complex hash function, since each frame is guaranteed to be the exact same size. As such, wideNES makes use of probably the simplest perceptual hash out there: _summing up every pixel on-screen._
 
 It's simple, but it works pretty well!
 
@@ -282,7 +282,7 @@ With this new heuristic in place, wideNES effectively detects Simon entering the
 
 And with that, the final big puzzle-piece of wideNES slid into place.
 
-After implementing some basic serialization, I was finally able to boot-up a NES game, play though some levels, and automatically generate maps of the levels!
+After implementing some basic serialization, I was finally able to boot-up a NES game, play though some levels, and automatically generate maps of various levels.
 
 ## What's next for wideNES?
 
@@ -302,18 +302,90 @@ Lastly, wideNES should keep-track of scene-transitions. With that data, it would
 
 ### Improving ANESE's wideNES implementation
 
-At the moment, wideNES's only implementation is within ANESE, a NES emulator I wrote myself. ANESE is a very, _very_ spartan emulator, with most options hidden behind CLI flags, and with the only UI implemented being a basic file-picker overlay! It is far, _far_ from "production ready."
+At the moment, wideNES's only implementation is within ANESE, a NES emulator I wrote myself. ANESE is a very, _very_ spartan emulator, with most options hidden behind CLI flags, and with the only UI implemented being a basic file-picker overlay. It is far, _far_ from "production ready."
 
 Aside from the UI though, ANESE and wideNES could both use some compatibility and performance improvements. ANESE was the first large emulator I've written, and it shows!
 
 There are quite a few compatibility issues, with several games playing incorrectly / not booting at all. Fortunately, just because ANESE isn't a great emulator, does not mean that wideNES is a bad technique. The principles wideNES relies on are solid, and should be easy to implement in other emulators!
 
-Performance wise, ANESE and wideNES are not the greatest, and even some relatively powerful PCs can sometimes dip below 60fps! There are many optimizations that should be implemented in ANESE and wideNES. Aside from general improvements in ANESE core, there are lots of improvements to how wideNES records frames, renders the map, and samples hashes.
+Performance wise, ANESE and wideNES are not the greatest, and even some relatively powerful PCs can sometimes dip below 60fps. There are many optimizations that should be implemented in ANESE and wideNES. Aside from general improvements in ANESE core, there are lots of improvements to how wideNES records frames, renders the map, and samples hashes.
 
 ## Conclusion
 
 While I've discussed the major aspects of how wideNES works, there many smaller techniques that I wasn't able to cover. For example, wideNES keeps a map of each frame's true-hash and it's scroll values, which are used to allow "reentrant" scenes. This feature, and many more, are described in the heavily-commented source for wideNES, available on the [wideNES project page](https://prilik.com/ANESE/wideNES).
 
-Working on wideNES has been a truly awesome experience, but with another semester at the University of Waterloo right around the corner, I doubt I'll get the chance to work on wideNES for a while. wideNES is at a point where it mostly works, and i'm glad I could write this post discussing some of the tech behind it!
+Working on wideNES has been a truly awesome experience, but with another semester at the University of Waterloo right around the corner, I doubt I'll get the chance to work on wideNES for a while. wideNES is at a point where it mostly works, and I'm glad I could write this post discussing some of the tech behind it.
 
 Try wideNES yourself, and tell me what you think! Download [ANESE](https://prilik.com/ANESE), boot up some _Super Mario Bros._, or _The Legend of Zelda_, or _Metroid_, and have some fun!
+
+* * *
+* * *
+
+## Updates (Dec 2024)
+
+Its been almost 7 years since I published this blog post about wideNES (wow, time flies!), and I thought it might be fun to revisit it - for old times sake.
+
+I've added this new 'Updates' section, where I discuss some of the interesting coverage that the project received after its release, as well as pointing out notable examples of follow-up work that was inspired by and/or leveraged wideNES.
+
+Alongside adding this new section, I did do some _minor_ editing to the contents of the main article - I reduced the number of exclamation-points in the blog post by nearly a factor of 2x. 2018 me was clearly _very_ excited to share this work, but in hindsight, all those exclamation-points made reading through this blog post _very tiring!_ Note that the actual content hasn't changed - just some of the punctuation.
+
+### 1. Initial Online Coverage / Discourse (August 2018)
+
+After publishing this blog post, I was thrilled to see the positive and insightful coverage and attention that wideNES received from the online community!
+
+wideNES reached the front-page of both [Hacker News](https://news.ycombinator.com/item?id=17856734) and [/r/programming](https://www.reddit.com/r/programming/comments/9aruas/widenes_peeking_past_the_edge_of_nes_games/), and was featured in publications like [Ars Technica](https://arstechnica.com/gaming/2018/08/widenes-emulation-expands-nes-scenes-past-the-usual-sd-screen-borders/) and [hackaday](https://hackaday.com/2018/08/30/metroid-zelda-and-castelvania-auto-mapped-with-nes-emulation-heuristics/) (the latter being particularly exciting for me, as I've been an avid reader of Hackaday since I was in my early teens!).
+
+It was awesome seeing the positive reactions from folks about this cool little hack!
+
+### 2. WideGB (April 2019)
+
+Shortly after I published my work on wideNES, Pierre de La Morinerie (kemenaran) applied the concepts from wideNES to another classic Nintendo system - the GameBoy (and GameBoy Color) - and released [WideGB](https://kemenaran.winosx.com/posts/widegb-playing-game-boy-games-on-wide-screens).
+
+I had a chance to send my kudos over to kemenaran in a [Reddit thread](https://www.reddit.com/r/emulation/comments/bg2tx2/widegb_playing_game_boy_games_on_wide_screens/eli9k0g/) announcing WideGB. I wholeheartedly recommend folks take a look through our exchange, as kemenaran touches on some of the interesting low-level technical details of how WideGB works that aren't discussed in depth in his announcement blog post.
+
+<div align="center">
+  <video width="500" controls="">
+      <source src="https://kemenaran.winosx.com/videos/widegb/WideGB - Pokemon Gold.mp4" type="video/mp4">
+  </video>
+  <p><em>Courtesy of kemenaran, via <a href="https://kemenaran.winosx.com/posts/widegb-playing-game-boy-games-on-wide-screens">WideGB: playing Game Boy games on wide screens</a> </em></p>
+</div>
+
+### 3. Mappyland (October 2021)
+
+In 2021, some researchers from the California State Polytechnic University, Pomona, published a paper called [MappyLand: Fast, Accurate Mapping for Console Games](https://cs.pomona.edu/classes/cs190/2024fa/readings/section5/mappy.pdf). In their words:
+
+> Some of the techniques used in MappyLand —-- in particular, parts of the in-game camera tracking algorithm —-- were pioneered in WideNES (Prilik 2020)
+
+Who would've thought that little 'ol me would be cited in an honest-to-goodness academic white-paper? That's pretty cool!
+
+If you finished reading my writeup on wideNES and were hoping for some more deeply technical content about automatically mapping out NES games, I strongly suggest you give this paper a read through. Its surprisingly digestible and easy reading - a great little whitepaper for anyone interested in the art of mapping out retro games!
+
+### 4. Linus Tech Tips (May 2024)
+
+The Linus Tech Tips YouTube channel recently did a video about an abnormally _wide_ widescreen monitor they managed to procure... and look what project made a surprise appearance mid-way through the video!
+
+<div align="center">
+  <iframe width="640" height="480" src="https://www.youtube.com/embed/TOlIvcmrUFc?start=467" title="The Wiiiiiiiiiiiiiiide Gaming Setup" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+</div>
+
+The cameo is pretty brief, but nonetheless quite nifty.
+
+That said - Linus did touch on a key aspect of the wideNES technique that I believe made it impractical for everyday use, and limited its broader adoption across the emulation community...
+
+### 5. Mainstream Support (or, the lack thereof)
+
+As cool as wideNES is from a technical perspective, it suffers from one major flaw that makes it quite annoying to actually _use_ as a player - it cannot handle off-screen sprites.
+
+This limitation makes actually _using_ wideNES to play games incredibly annoying, as enemies are only ever visible in the small part of the screen surrounding your character, and then simply vanish / appear out of thin-air as the viewport moves around the screen!
+
+My personal opinion is that this limitation is the primary reason no mainstream emulator - NES or otherwise - has invested significant resources into "productizing" wideNES for general use.
+
+Unfortunately, due to the nature of the problem, it seems unlikely any sort of "simple" heuristic in the vein of those employed by wideNES will be able to track off-screen sprites (at least, not in any reasonable way, that avoids having enemies "freeze in place" when off-screen). Who knows, maybe AI is the answer?
+
+### Next Steps?
+
+There's still a chance that I'll one-day find a nice chunk of free time to revisit wideNES. In-fact, I've already started [tinkering](https://github.com/daniel5151/wide-libretro) with a platform-agnostic wideNES-like layer on-top of [Libretro](https://emulation.gametechwiki.com/index.php/Libretro), which would make it a lot easier to port wideNES to any system with a Libretro core.
+
+My north-star is to eventually play the original GBA Advance Wars games in widescreen... but I guess we'll have to see if that ever ends up happening.
+
+Thanks for reading!
