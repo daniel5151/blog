@@ -2,117 +2,144 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
     <title>Tags on prilik&#39;s blog</title>
-    <link>https://prilik.com/blog/tags/</link>
+    <link>http://localhost:1313/blog/tags/</link>
     <description>Recent content in Tags on prilik&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>Copyright &amp;copy; Daniel Prilik :: Licensed under &lt;a target=&#34;_blank&#34; rel=&#34;external noopener license&#34; href=&#34;https://creativecommons.org/licenses/by-nd/4.0/&#34;&gt;CC-BY-ND-4.0&lt;/a&gt;.</copyright>
-    <lastBuildDate>Sun, 24 Jan 2021 00:00:00 -0800</lastBuildDate><atom:link href="https://prilik.com/blog/tags/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 28 Sep 2025 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/blog/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
-      <title>embedded</title>
-      <link>https://prilik.com/blog/tags/embedded/</link>
-      <pubDate>Sun, 24 Jan 2021 00:00:00 -0800</pubDate>
+      <title>Arduino</title>
+      <link>http://localhost:1313/blog/tags/arduino/</link>
+      <pubDate>Sun, 28 Sep 2025 00:00:00 +0000</pubDate>
       
-      <guid>https://prilik.com/blog/tags/embedded/</guid>
+      <guid>http://localhost:1313/blog/tags/arduino/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>experiments</title>
-      <link>https://prilik.com/blog/tags/experiments/</link>
-      <pubDate>Sun, 24 Jan 2021 00:00:00 -0800</pubDate>
+      <title>C&#43;&#43;</title>
+      <link>http://localhost:1313/blog/tags/c&#43;&#43;/</link>
+      <pubDate>Sun, 28 Sep 2025 00:00:00 +0000</pubDate>
       
-      <guid>https://prilik.com/blog/tags/experiments/</guid>
+      <guid>http://localhost:1313/blog/tags/c&#43;&#43;/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>research</title>
-      <link>https://prilik.com/blog/tags/research/</link>
-      <pubDate>Sun, 24 Jan 2021 00:00:00 -0800</pubDate>
+      <title>Esp32</title>
+      <link>http://localhost:1313/blog/tags/esp32/</link>
+      <pubDate>Sun, 28 Sep 2025 00:00:00 +0000</pubDate>
       
-      <guid>https://prilik.com/blog/tags/research/</guid>
+      <guid>http://localhost:1313/blog/tags/esp32/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>rust</title>
-      <link>https://prilik.com/blog/tags/rust/</link>
-      <pubDate>Sun, 24 Jan 2021 00:00:00 -0800</pubDate>
+      <title>Homeassistant</title>
+      <link>http://localhost:1313/blog/tags/homeassistant/</link>
+      <pubDate>Sun, 28 Sep 2025 00:00:00 +0000</pubDate>
       
-      <guid>https://prilik.com/blog/tags/rust/</guid>
+      <guid>http://localhost:1313/blog/tags/homeassistant/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>wasm</title>
-      <link>https://prilik.com/blog/tags/wasm/</link>
-      <pubDate>Sun, 24 Jan 2021 00:00:00 -0800</pubDate>
+      <title>Embedded</title>
+      <link>http://localhost:1313/blog/tags/embedded/</link>
+      <pubDate>Sun, 24 Jan 2021 00:00:00 +0000</pubDate>
       
-      <guid>https://prilik.com/blog/tags/wasm/</guid>
+      <guid>http://localhost:1313/blog/tags/embedded/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>c</title>
-      <link>https://prilik.com/blog/tags/c/</link>
-      <pubDate>Mon, 16 Nov 2020 00:00:00 -0800</pubDate>
+      <title>Experiments</title>
+      <link>http://localhost:1313/blog/tags/experiments/</link>
+      <pubDate>Sun, 24 Jan 2021 00:00:00 +0000</pubDate>
       
-      <guid>https://prilik.com/blog/tags/c/</guid>
+      <guid>http://localhost:1313/blog/tags/experiments/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>c&#43;&#43;</title>
-      <link>https://prilik.com/blog/tags/c&#43;&#43;/</link>
-      <pubDate>Mon, 16 Nov 2020 00:00:00 -0800</pubDate>
+      <title>Research</title>
+      <link>http://localhost:1313/blog/tags/research/</link>
+      <pubDate>Sun, 24 Jan 2021 00:00:00 +0000</pubDate>
       
-      <guid>https://prilik.com/blog/tags/c&#43;&#43;/</guid>
+      <guid>http://localhost:1313/blog/tags/research/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>no_std</title>
-      <link>https://prilik.com/blog/tags/no_std/</link>
-      <pubDate>Mon, 16 Nov 2020 00:00:00 -0800</pubDate>
+      <title>Rust</title>
+      <link>http://localhost:1313/blog/tags/rust/</link>
+      <pubDate>Sun, 24 Jan 2021 00:00:00 +0000</pubDate>
       
-      <guid>https://prilik.com/blog/tags/no_std/</guid>
+      <guid>http://localhost:1313/blog/tags/rust/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>os</title>
-      <link>https://prilik.com/blog/tags/os/</link>
-      <pubDate>Mon, 16 Nov 2020 00:00:00 -0800</pubDate>
+      <title>Wasm</title>
+      <link>http://localhost:1313/blog/tags/wasm/</link>
+      <pubDate>Sun, 24 Jan 2021 00:00:00 +0000</pubDate>
       
-      <guid>https://prilik.com/blog/tags/os/</guid>
+      <guid>http://localhost:1313/blog/tags/wasm/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>emulation</title>
-      <link>https://prilik.com/blog/tags/emulation/</link>
-      <pubDate>Thu, 16 May 2019 00:00:00 -0700</pubDate>
+      <title>C</title>
+      <link>http://localhost:1313/blog/tags/c/</link>
+      <pubDate>Mon, 16 Nov 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://prilik.com/blog/tags/emulation/</guid>
+      <guid>http://localhost:1313/blog/tags/c/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>virtualization</title>
-      <link>https://prilik.com/blog/tags/virtualization/</link>
-      <pubDate>Thu, 16 May 2019 00:00:00 -0700</pubDate>
+      <title>No_std</title>
+      <link>http://localhost:1313/blog/tags/no_std/</link>
+      <pubDate>Mon, 16 Nov 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://prilik.com/blog/tags/virtualization/</guid>
+      <guid>http://localhost:1313/blog/tags/no_std/</guid>
       <description></description>
     </item>
     
     <item>
-      <title>nes</title>
-      <link>https://prilik.com/blog/tags/nes/</link>
-      <pubDate>Fri, 24 Aug 2018 00:00:00 -0700</pubDate>
+      <title>Os</title>
+      <link>http://localhost:1313/blog/tags/os/</link>
+      <pubDate>Mon, 16 Nov 2020 00:00:00 +0000</pubDate>
       
-      <guid>https://prilik.com/blog/tags/nes/</guid>
+      <guid>http://localhost:1313/blog/tags/os/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Emulation</title>
+      <link>http://localhost:1313/blog/tags/emulation/</link>
+      <pubDate>Thu, 16 May 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/blog/tags/emulation/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Virtualization</title>
+      <link>http://localhost:1313/blog/tags/virtualization/</link>
+      <pubDate>Thu, 16 May 2019 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/blog/tags/virtualization/</guid>
+      <description></description>
+    </item>
+    
+    <item>
+      <title>Nes</title>
+      <link>http://localhost:1313/blog/tags/nes/</link>
+      <pubDate>Fri, 24 Aug 2018 00:00:00 +0000</pubDate>
+      
+      <guid>http://localhost:1313/blog/tags/nes/</guid>
       <description></description>
     </item>
     

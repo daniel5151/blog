@@ -1,104 +1,80 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
-  
   <url>
-    <loc>https://prilik.com/blog/post/emoji-shortcodes/</loc>
-    <lastmod>2021-01-24T00:00:00-08:00</lastmod>
+    <loc>http://localhost:1313/blog/tags/arduino/</loc>
+    <lastmod>2025-09-28T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/blog/tags/c&#43;&#43;/</loc>
+    <lastmod>2025-09-28T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/blog/tags/esp32/</loc>
+    <lastmod>2025-09-28T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/blog/tags/homeassistant/</loc>
+    <lastmod>2025-09-28T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/blog/post/</loc>
+    <lastmod>2025-09-28T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/blog/</loc>
+    <lastmod>2025-09-28T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/blog/tags/</loc>
+    <lastmod>2025-09-28T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/blog/post/automating-ac-nyc/</loc>
+    <lastmod>2025-09-28T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/blog/post/emoji-shortcodes/</loc>
+    <lastmod>2021-01-24T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/blog/tags/embedded/</loc>
+    <lastmod>2021-01-24T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/blog/tags/experiments/</loc>
+    <lastmod>2021-01-24T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/blog/tags/research/</loc>
+    <lastmod>2021-01-24T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/blog/tags/rust/</loc>
+    <lastmod>2021-01-24T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/blog/tags/wasm/</loc>
+    <lastmod>2021-01-24T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/blog/tags/c/</loc>
+    <lastmod>2020-11-16T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/blog/tags/no_std/</loc>
+    <lastmod>2020-11-16T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/blog/tags/os/</loc>
+    <lastmod>2020-11-16T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/blog/post/c-is-not-dependency-free/</loc>
+    <lastmod>2020-11-16T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/blog/tags/emulation/</loc>
+    <lastmod>2019-05-16T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/blog/post/crosvm-paravirt/</loc>
+    <lastmod>2019-05-16T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/blog/tags/virtualization/</loc>
+    <lastmod>2019-05-16T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/blog/tags/nes/</loc>
+    <lastmod>2018-08-24T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/blog/post/widenes/</loc>
+    <lastmod>2018-08-24T00:00:00+00:00</lastmod>
+  </url><url>
+    <loc>http://localhost:1313/blog/categories/</loc>
+  </url><url>
+    <loc>http://localhost:1313/blog/post/cs452-rust-os-intro/</loc>
+  </url><url>
+    <loc>http://localhost:1313/blog/post/rust-never/</loc>
   </url>
-  
-  <url>
-    <loc>https://prilik.com/blog/tags/embedded/</loc>
-    <lastmod>2021-01-24T00:00:00-08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://prilik.com/blog/tags/experiments/</loc>
-    <lastmod>2021-01-24T00:00:00-08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://prilik.com/blog/post/</loc>
-    <lastmod>2021-01-24T00:00:00-08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://prilik.com/blog/</loc>
-    <lastmod>2021-01-24T00:00:00-08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://prilik.com/blog/tags/research/</loc>
-    <lastmod>2021-01-24T00:00:00-08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://prilik.com/blog/tags/rust/</loc>
-    <lastmod>2021-01-24T00:00:00-08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://prilik.com/blog/tags/</loc>
-    <lastmod>2021-01-24T00:00:00-08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://prilik.com/blog/tags/wasm/</loc>
-    <lastmod>2021-01-24T00:00:00-08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://prilik.com/blog/tags/c/</loc>
-    <lastmod>2020-11-16T00:00:00-08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://prilik.com/blog/tags/c&#43;&#43;/</loc>
-    <lastmod>2020-11-16T00:00:00-08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://prilik.com/blog/tags/no_std/</loc>
-    <lastmod>2020-11-16T00:00:00-08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://prilik.com/blog/tags/os/</loc>
-    <lastmod>2020-11-16T00:00:00-08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://prilik.com/blog/post/c-is-not-dependency-free/</loc>
-    <lastmod>2020-11-16T00:00:00-08:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://prilik.com/blog/tags/emulation/</loc>
-    <lastmod>2019-05-16T00:00:00-07:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://prilik.com/blog/post/crosvm-paravirt/</loc>
-    <lastmod>2019-05-16T00:00:00-07:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://prilik.com/blog/tags/virtualization/</loc>
-    <lastmod>2019-05-16T00:00:00-07:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://prilik.com/blog/tags/nes/</loc>
-    <lastmod>2018-08-24T00:00:00-07:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://prilik.com/blog/post/widenes/</loc>
-    <lastmod>2018-08-24T00:00:00-07:00</lastmod>
-  </url>
-  
-  <url>
-    <loc>https://prilik.com/blog/categories/</loc>
-  </url>
-  
 </urlset>

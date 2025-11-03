@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><script src="/blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=blog/livereload" data-no-instant defer></script>
+  
+    <title>Turning a Dumb AC Unit Smart (Without Losing my Security Deposit) :: prilik&#39;s blog</title>
+  
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="TL;DR: You can do some really useful (albeit janky) stuff with just a servo motor, an esp32, and a dream.
+My rental apartment&rsquo;s AC unit can only be controlled using these retro analog knob-based controls, mounted right onto the unit. They work, but having to stand up and and fiddle with them all the time got annoying pretty quickly.
+Fortunately, there&rsquo;s an &lsquo;ol Prilik family saying that goes something like this: &ldquo;remember kids, there&rsquo;s no problem in life that a servo motor and an esp32 can&rsquo;t fix&rdquo;1
+And sure enough, after dropping ~$15 on parts, waiting for things to arrive from China, and spending a few hours iterating alongside my good friend Claude - I managed to hack together this beautiful mess:
+What you&rsquo;re looking at here is a jerry-rigged esp32-controlled servo motor, coupled to one of my AC unit&rsquo;s knobs using a shaft coupler, all affixed to the AC&rsquo;s back-plane using a cheap L-bracket and a binder clip (with some industrial-grade cardboard padding for good measure).
+This whole MacGyver&rsquo;d up contraption talks to my Home Assistant instance over MQTT, which turns the AC unit on/off based on the state of a temperature sensor located in the same the room.
+Et voila 🪄 ✨
+I&rsquo;ve managed to free myself from the schackles of having to get up off the couch just to tweak my AC!
+For all you professional embedded and mechatronics folks out there: I strongly suggest you stop reading here.
+The rest of this blog post is a walkthrough of a software engineer&rsquo;s approach to home automation and building custom hardware, and let me tell you: both the final product, and the journey to get there, are hella jank.
+That said&hellip; if you&rsquo;re not afraid of a bit of jank: read onwards, and join me on this fun foray into how I managed to hack together some totally bespoke home-automation hardware with almost no budget, or experience!
+" />
+<meta name="keywords" content="" />
+<meta name="robots" content="noodp" />
+<link rel="canonical" href="http://localhost:1313/blog/post/automating-ac-nyc/" />
+
+
+
+
+<link rel="stylesheet" href="http://localhost:1313/blog/assets/style.css">
+
+  <link rel="stylesheet" href="http://localhost:1313/blog/assets/blue.css">
+
+
+
+
+
+
+<link rel="apple-touch-icon" href="http://localhost:1313/blog/img/apple-touch-icon-192x192.png">
+
+  <link rel="shortcut icon" href="http://localhost:1313/blog/img/favicon/blue.png">
+
+
+
+<meta name="twitter:card" content="summary" />
+
+
+
+<meta property="og:locale" content="en" />
+<meta property="og:type" content="article" />
+<meta property="og:title" content="Turning a Dumb AC Unit Smart (Without Losing my Security Deposit)">
+<meta property="og:description" content="TL;DR: You can do some really useful (albeit janky) stuff with just a servo motor, an esp32, and a dream.
+My rental apartment&rsquo;s AC unit can only be controlled using these retro analog knob-based controls, mounted right onto the unit. They work, but having to stand up and and fiddle with them all the time got annoying pretty quickly.
+Fortunately, there&rsquo;s an &lsquo;ol Prilik family saying that goes something like this: &ldquo;remember kids, there&rsquo;s no problem in life that a servo motor and an esp32 can&rsquo;t fix&rdquo;1
+And sure enough, after dropping ~$15 on parts, waiting for things to arrive from China, and spending a few hours iterating alongside my good friend Claude - I managed to hack together this beautiful mess:
+What you&rsquo;re looking at here is a jerry-rigged esp32-controlled servo motor, coupled to one of my AC unit&rsquo;s knobs using a shaft coupler, all affixed to the AC&rsquo;s back-plane using a cheap L-bracket and a binder clip (with some industrial-grade cardboard padding for good measure).
+This whole MacGyver&rsquo;d up contraption talks to my Home Assistant instance over MQTT, which turns the AC unit on/off based on the state of a temperature sensor located in the same the room.
+Et voila 🪄 ✨
+I&rsquo;ve managed to free myself from the schackles of having to get up off the couch just to tweak my AC!
+For all you professional embedded and mechatronics folks out there: I strongly suggest you stop reading here.
+The rest of this blog post is a walkthrough of a software engineer&rsquo;s approach to home automation and building custom hardware, and let me tell you: both the final product, and the journey to get there, are hella jank.
+That said&hellip; if you&rsquo;re not afraid of a bit of jank: read onwards, and join me on this fun foray into how I managed to hack together some totally bespoke home-automation hardware with almost no budget, or experience!
+" />
+<meta property="og:url" content="http://localhost:1313/blog/post/automating-ac-nyc/" />
+<meta property="og:site_name" content="prilik&#39;s blog" />
+
+  
+    <meta property="og:image" content="http://localhost:1313/blog/img/favicon/blue.png">
+  
+
+<meta property="og:image:width" content="2048">
+<meta property="og:image:height" content="1024">
+
+
+  <meta property="article:published_time" content="2025-11-02 00:00:00 &#43;0000 UTC" />
+
+
+
+
+
+
+
+
+
+
+
+
+</head>
+<body class="blue">
+
+
+<div class="container center headings--one-size">
+
+  <header class="header">
+  <div class="header__inner">
+    <div class="header__logo">
+      <a href="/blog">
+  <div class="logo">
+    prilik&#39;s blog
+  </div>
+</a>
+
+    </div>
+    <div class="menu-trigger">menu</div>
+  </div>
+  
+    <nav class="menu">
+  <ul class="menu__inner menu__inner--desktop">
+    
+      
+        
+          <li><a href="https://github.com/daniel5151">github</a></li>
+        
+      
+        
+          <li><a href="/blog/">posts</a></li>
+        
+      
+        
+          <li><a href="/blog/index.xml">rss</a></li>
+        
+      
+        
+          <li><a href="/blog/tags/">tags</a></li>
+        
+      
+        
+          <li><a href="https://prilik.com">whoami</a></li>
+        
+      
+    
+
+    
+  </ul>
+
+  <ul class="menu__inner menu__inner--mobile">
+    
+      
+        <li><a href="https://github.com/daniel5151">github</a></li>
+      
+    
+      
+        <li><a href="/blog/">posts</a></li>
+      
+    
+      
+        <li><a href="/blog/index.xml">rss</a></li>
+      
+    
+      
+        <li><a href="/blog/tags/">tags</a></li>
+      
+    
+      
+        <li><a href="https://prilik.com">whoami</a></li>
+      
+    
+    
+  </ul>
+</nav>
+
+  
+</header>
+
+
+  <div class="content">
+    
+<div class="post">
+  <h1 class="post-title">
+    <a href="http://localhost:1313/blog/post/automating-ac-nyc/">Turning a Dumb AC Unit Smart (Without Losing my Security Deposit)</a></h1>
+  <div class="post-meta">
+    
+      <span class="post-date">
+        2025-11-02 
+      </span>
+      <span> - 11 minute read</span>
+    
+    
+  </div>
+
+  
+  <span class="post-tags">
+    
+    #<a href="http://localhost:1313/blog/tags/c&#43;&#43;/">c&#43;&#43;</a>&nbsp;
+    
+    #<a href="http://localhost:1313/blog/tags/arduino/">arduino</a>&nbsp;
+    
+    #<a href="http://localhost:1313/blog/tags/homeassistant/">homeassistant</a>&nbsp;
+    
+    #<a href="http://localhost:1313/blog/tags/esp32/">esp32</a>&nbsp;
+    
+  </span>
+  
+
+  
+
+  
+
+  <div class="post-content"><div>
+        <p><strong>TL;DR:</strong> You can do some really useful (albeit janky) stuff with just a servo motor, an esp32, and a dream.</p>
+<hr>
+<p>My rental apartment&rsquo;s AC unit can only be controlled using these retro <em>analog</em> knob-based controls, mounted right onto the unit. They work, but having to stand up and and fiddle with them all the time got annoying pretty quickly.</p>
+<p align="center">
+  <img src="/blog/assets/automating-ac-nyc/aircon-controls-crop.jpg" width="400px">
+</p>
+<p>Fortunately, there&rsquo;s an &lsquo;ol Prilik family saying that goes something like this: &ldquo;remember kids, there&rsquo;s no problem in life that a servo motor and an esp32 can&rsquo;t fix&rdquo;<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup></p>
+<p>And sure enough, after dropping ~$15 on parts, waiting for things to arrive from China, and spending a few hours iterating alongside my good friend Claude - I managed to hack together this beautiful mess:</p>
+<p align="center">
+<img src="/blog/assets/automating-ac-nyc/v1-final-working-crop.jpg" width="400px">
+</p>
+<p>What you&rsquo;re looking at here is a jerry-rigged <strong>esp32-controlled servo motor</strong>, coupled to one of my AC unit&rsquo;s knobs using a <strong>shaft coupler</strong>, all affixed to the AC&rsquo;s back-plane using a <strong>cheap L-bracket</strong> and a <strong>binder clip</strong> (with some industrial-grade <strong>cardboard padding</strong> for good measure).</p>
+<p>This whole MacGyver&rsquo;d up contraption talks to my <strong>Home Assistant</strong> instance over <strong>MQTT</strong>, which turns the AC unit on/off based on the state of a temperature sensor located in the same the room.</p>
+<p>Et voila 🪄 ✨</p>
+<p>I&rsquo;ve managed to free myself from the schackles of having to get up off the couch just to tweak my AC!</p>
+<blockquote>
+<p>For all you professional embedded and mechatronics folks out there: I <em>strongly</em> suggest you stop reading here.</p>
+<p>The rest of this blog post is a walkthrough of a <em>software</em> engineer&rsquo;s approach to home automation and building custom hardware, and let me tell you: both the final product, <em>and</em> the journey to get there, are <em>hella jank</em>.</p>
+<p>That said&hellip; if you&rsquo;re not afraid of a bit of jank: read onwards, and join me on this fun foray into how I managed to hack together some totally bespoke home-automation hardware with almost no budget, or experience!</p>
+</blockquote>
+<h2 id="setting-the-stage">Setting the stage<a href="#setting-the-stage" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
+<p>In April 2025, I (finally!) moved to New York City. After a brief apartment hunt, I managed to find a place I&rsquo;m pretty happy with: the location is convenient, the building is fairly modern, and best of all - my rent is stabilized and <em>way</em> below market value (woo!). There&rsquo;s not much to complain about!</p>
+<p>&hellip;well, except for the AC situation.</p>
+<p>See, for whatever reason, developers in NYC <em>really</em> like using these loud, power-hungry, wall-mounted <a href="https://en.wikipedia.org/wiki/Packaged_terminal_air_conditioner">PTAC units</a> in their apartment buildings. Some buildings might spend a bit extra in order to wire these unit up to wall-mounted thermostats&hellip; but often times, they&rsquo;ll just go with the cheapest option: completely <em>analog, unit-mounted knobs</em>.</p>
+<p>Here&rsquo;s a picture of what I&rsquo;m talking about:</p>
+<p align="center">
+<img src="/blog/assets/automating-ac-nyc/aircon-controls.jpg" width="400px">
+</p>
+<p>Yeah - guess which option <em>my</em> building went with 🙃</p>
+<h2 id="what-are-my-options-here">What are my options here?<a href="#what-are-my-options-here" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
+<p>Like any good renter, the first thing I did was gently ask my landlord if there was any way to &ldquo;upgrade&rdquo; the controls to something a bit more&hellip; modern. As expected, the response was roughly along the lines of &ldquo;lol no, why would we do that?&rdquo;, which, to be fair, was basically the response I expected.</p>
+<p>Well, no matter, like and good engineer - <em>surely</em> I can hack my way out of this pickle?</p>
+<p>After a bit of finessing, I managed to pop the cover off the unit, and expose its <del>soft underbelly</del> inner workings. Much to my surprise, not only did I find some info about the unit, but even a whole wiring diagram!</p>
+<p align="center">
+<img src="/blog/assets/automating-ac-nyc/ptac-controls-and-wiring-diagram-crop.jpg" width="600px">
+<img src="/blog/assets/automating-ac-nyc/ptac-serial-and-info.jpg" width="600px">
+</p>
+<p>Now, I&rsquo;m no expert when it comes to wiring diagrams, but by following the wiring, it certainly seems like this entire circuit is operating at <em>line voltage</em>, with nary a low-voltage digital signal I can hook into in sight.</p>
+<p>Ok, maybe I can just splice in a <a href="https://www.amazon.com/smart-relay/s?k=smart&#43;relay">smart relay</a> somewhere? I&rsquo;m no electrician, but it&rsquo;s probably not <em>that</em> hard, right?</p>
+<p>Well, maybe? But honestly, I didn&rsquo;t think this was gonna be a viable route for me.</p>
+<p>Setting aside the fact that working with line voltage and HVAC equipment is a bit &ldquo;spooky&rdquo; for someone with zero electrical wiring experience, the bigger issue was that all the juicy wires I&rsquo;d be interested in intercepting are stuffed <em>deep</em> inside the AC unit. As far as I could tell, the only way to access those wires would be to yank the whole unit out of the wall&hellip; something that I wasn&rsquo;t particularly interested in doing. <a href="https://www.doityourself.com/forum/air-conditioning-cooling-systems/577337-older-ice-cap-ptac-add-thermostat.html">This thread</a> from ~2017 reinforced my impressions that this would be far more trouble than its worth.</p>
+<p>Ok, another idea: what if I just cut power to the unit using a <a href="https://www.amazon.com/s?k=smart&#43;plug&amp;crid=2WEKKKT1D6E9M&amp;sprefix=smart&#43;pl%2Caps%2C142&amp;ref=nb_sb_noss_2">smart plug</a>?</p>
+<blockquote>
+<p>Note: The internet was quick to warn me that toggling power to a running AC unit could potentially cause damage to the unit. I&rsquo;m not an expert in these matters, but for the sake of science (and because I&rsquo;m a bit stubborn), I nonetheless kept looking into this option.</p>
+</blockquote>
+<p>Well, much to my chagrin, the unit plugs into the wall using one of those fancy NEMA 5-20P plugs, which is basically impossible to find a smart switch for!</p>
+<p align="center">
+<img src="/blog/assets/automating-ac-nyc/NEMA_5-20P.svg.png" style="background-color: white; padding: 4px">
+</p>
+<p>Well shoot!</p>
+<p>If hooking into the wiring is a non-starter, and putting the unit behind a smart plug is a non-trivial&hellip; am I just out of luck?</p>
+<p>Of course not!</p>
+<p>It was time to seriously consider the &ldquo;obvious&rdquo; solution: why not just make a little robot to turn the dials for me?</p>
+<h2 id="dialing-in-the-right-approach">Dialing in the right approach<a href="#dialing-in-the-right-approach" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
+<p>Looking at the unit, we find 2 dials:</p>
+<ol>
+<li><strong>Mode Control:</strong> A stiff, discrete dial, clicking between 6 &ldquo;modes&rdquo; of operation (Off, Lo-Cool, Hi-Cool<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>, Vent, Exhaust, and Heat)</li>
+<li><strong>Temp Control:</strong> A smooth, analog dial, connected to a simple bimetallic-strip based thermostat</li>
+</ol>
+<p>This gave me two options to toggle the AC unit on and off:</p>
+<p><strong>Option 1:</strong> If I hook into the Mode Control dial, I&rsquo;d need to:</p>
+<ul>
+<li>Leave the Temp Control dial set to &ldquo;max cold&rdquo;</li>
+<li>Buy a servo motor with enough torque to overcome the stiff action of the dial
+<ul>
+<li>&hellip;which would probably need a 12V DC (if not more) power source, requiring extra circuity to power</li>
+<li>&hellip;and require some more robust mounting hardware, to counteract the torque, and ensure the servo stays in the right place</li>
+</ul>
+</li>
+<li>Precisely calibrate the servo motor to rotate the dial the right number of degrees between the &ldquo;Off&rdquo; state and the &ldquo;Cool&rdquo; state</li>
+</ul>
+<p><strong>Option 2:</strong> If I hook into the Temp Control dial, I&rsquo;d need to:</p>
+<ul>
+<li>Leave the Mode Control dial on &ldquo;Lo-Cool&rdquo;<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup></li>
+<li>Buy a cheap, low-torque, low-power servo motor, <em>just</em> powerful enough to rotate the fairly loose dial
+<ul>
+<li>&hellip;that doesn&rsquo;t need a lot of mounting hardware to stay in the right place, given that the torque is fairly low</li>
+</ul>
+</li>
+<li>Imprecisely yeet the servo motor all the way left/right, toggling the target temp between &ldquo;really really hot&rdquo; or &ldquo;really really cold&rdquo;</li>
+</ul>
+<p>Based on how I just described these two options, guess which one I went with 🥰</p>
+<blockquote>
+<p>Option 2 certainly is the &ldquo;jankier&rdquo; of the two options, given that it relies on a second-order property (target temp) to power the unit on/off.</p>
+<p>But then again, I really wanted to sidestep a bunch of (slightly) tricky hardware engineering questions that my smooth-brained software-engineering self didn&rsquo;t want to figure out this time around.</p>
+<p>I think it was the right call!</p>
+</blockquote>
+<h2 id="the-road-to-v0">The road to V0<a href="#the-road-to-v0" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
+<p>I was <em>fairly</em> sure this was gonna work, but obviously, the only way to find our was to hack together a proof-of-concept (ideally - with the least number of new purchases as possible).</p>
+<p>To cut a long story short - here&rsquo;s what I came up with for V0:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Part</th>
+          <th>Cost</th>
+          <th>Source</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>ESP32 Dev Board</td>
+          <td>$6</td>
+          <td><a href="https://www.amazon.com/dp/B0DDPJQX3X">Amazon</a></td>
+      </tr>
+      <tr>
+          <td>Shaft Coupler</td>
+          <td>$6.69</td>
+          <td><a href="https://www.amazon.com/dp/B0D4YBM6HB">Amazon</a></td>
+      </tr>
+      <tr>
+          <td>Servo motor + controllers</td>
+          <td>$2.66 ($8 / 3 pack)</td>
+          <td><a href="https://www.amazon.com/dp/B0BG4ZCFLQ">Amazon</a></td>
+      </tr>
+      <tr>
+          <td>L Brackets</td>
+          <td>free</td>
+          <td>leftover ikea parts (from a LAIVA bookshelf)</td>
+      </tr>
+      <tr>
+          <td>screws</td>
+          <td>free</td>
+          <td>leftover monitor parts</td>
+      </tr>
+      <tr>
+          <td>USB Cable + charger</td>
+          <td>free</td>
+          <td>found in the &lsquo;ol junk drawer</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Total:</strong> ~$16</p>
+<p>And here&rsquo;s the result:</p>
+<p><em>(breadboard with the rest of the hardware out-of-frame)</em></p>
+<p align="center">
+  <img src="/blog/assets/automating-ac-nyc/v0-working-closeup.jpg" width="400px">
+</p>
+<p>If you look closely, you&rsquo;ll notice that there&rsquo;s no actual mounting mechanism that connects the servo motor assembly to the PTAC - it&rsquo;s literally just &ldquo;floating&rdquo; in mid-air!</p>
+<p>This is thanks to an <del>unintentional</del> ingenious part of this design: the L-brackets simply make the servo motor &ldquo;bigger&rdquo;, such that when it rotates, it ends up &ldquo;bumping&rdquo; against the back wall, which resists the torque, and ensuring the torque is transfered down into the dial to rotate it.</p>
+<p>But hardware is just one part of the story: how about the firmware?</p>
+<blockquote>
+<p>Sidenote: I&rsquo;m leaving out a few intermediate steps that I took to get to this design:</p>
+<ul>
+<li>I didn&rsquo;t get the right shaft-coupler the first time (or the second time (or the third time&hellip;)), so it took a few amazon returns until I found the right one.</li>
+<li>Before buying the ESP32 Dev Board, I validated the servo motor + shaft coupler worked using a (really, really) old Arduino Leonardo I had lying around, and controlling it manually over serial (using a really long USB cable extending to my PC)</li>
+<li>My first attempt at mounting this thing involved wooden skewers, a glue stick, and a cut up amazon box&hellip; a failed experiment, to say the least.</li>
+</ul>
+</blockquote>
+<h3 id="writing-the-firmware">Writing the Firmware<a href="#writing-the-firmware" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h3>
+<p>This firmware is <em>dead simple</em>.</p>
+<p>I mean, think about it: all it needs to do is glue together 3 Arduino APIs: WiFi (for connectivity), MQTT (for pub/sub communication with Home Asisstant), and Servo (to rotate the dial).</p>
+<p>And because this is a personal project, we can dispense with fancy features like OTA updates, dynamic configuration, nice UX, etc&hellip; Just hard-code creds/URLs/IPs in the firmware, manually re-flash it, and that&rsquo;s good enough!</p>
+<p><em>Obviously,</em> this was something that I could write myself in a weekend or two of tinkering. Heck, I&rsquo;d probably end up sidestepping the Arduino framework entirely, and end up writing a bare-metal firmware directly in Rust, just for kicks.</p>
+<p>&hellip;but the NYC summer was scorching, and I was actively annoyed constantly babysitting the AC all the time, so I figured I might as well try this &ldquo;vibe coding&rdquo; thing that all the kids are doing nowadays.</p>
+<p>And <em>hot damn!</em> LLMs can <em>cook</em> when it comes to writing one-off greenfield throwaway code!</p>
+<blockquote>
+<p>Ok, listen&hellip; before going any further - let me clarify that I&rsquo;m not really a fan on AI coding assistants in general.</p>
+<p>I&rsquo;m sure I could write a whole blog post about that topic alone&hellip; but if you&rsquo;re anything like me, the <em>last</em> thing you want to read is another pro/anti-AI blog post. So don&rsquo;t worry - I&rsquo;ll keep my thoughts brief here:</p>
+<p>LLMs might be able to &ldquo;code&rdquo;, but I&rsquo;ve yet to see one adequately &ldquo;Software Engineer&rdquo;. Using it to deliver large novel features in existing (non-AI) codebases is a sure-fire way to accumulate staggering amounts of architectural technical debt.</p>
+</blockquote>
+<p>And with that disclaimer out of the way&hellip; let me gush about Claude.</p>
+<p>&hellip;</p>
+<p>Outline:</p>
+<ul>
+<li>
+<p>building v0 hardware</p>
+<ul>
+<li>asked claude to make esp32 host a web-ui for controlling the motor</li>
+<li>first &ldquo;huzzah&rdquo; moment - holding the motor in one hand as I trigger esp32 motion from phone, and the knob rotated!</li>
+<li>big question: how to mount this thing??</li>
+<li>second &ldquo;huzzah&rdquo; moment - sitting on the couch, and using webui to turn knob back/forth</li>
+</ul>
+</li>
+<li>
+<p>making it useful with home assistant</p>
+<ul>
+<li>quick TL;DR on what is home assistant</li>
+<li>step 1: getting home assistant to control this thing
+<ul>
+<li>decided to do things &ldquo;right&rdquo;, and asked claude to write MQTT firmware</li>
+<li>took a few iterations, but servo shows up as a &ldquo;cover&rdquo; that can be &ldquo;opened&rdquo; or &ldquo;closed&rdquo; (rotate all the way left/right)</li>
+</ul>
+</li>
+<li>step 2: knowing when to turn it on / off (i.e: thermostat)
+<ul>
+<li>ezpz! just use <a href="https://www.home-assistant.io/integrations/generic_thermostat/">https://www.home-assistant.io/integrations/generic_thermostat/</a></li>
+<li>I already have a smart temp sensor (<a href="https://www.airgradient.com/indoor/">AirGradient ONE</a>)</li>
+</ul>
+</li>
+<li>&hellip;connect the two, and that&rsquo;s it - we&rsquo;re done!</li>
+</ul>
+</li>
+<li>
+<p>side-quest: making a second thermometer for my other room</p>
+<ul>
+<li>digging around through old junk, I found an <a href="https://microsoft.github.io/azure-iot-developer-kit/docs/serial-communications/">Azure IoT Developer Kit</a> (AKA: AZ3166)
+<ul>
+<li>from the time I did an internship on the Azure IoT team</li>
+</ul>
+</li>
+<li>of course, ~6 years later, and most cloud-based supporting infra is dead&hellip;</li>
+<li>thankfully, not <em>too</em> hard to sidestep all the cloud nonesense, and use as a programmable (arduino compatible!) microcontroller
+<ul>
+<li>actually getting the devkit working with the arduino IDE was a bit annoying <a href="https://github.com/microsoft/devkit-sdk">https://github.com/microsoft/devkit-sdk</a></li>
+</ul>
+</li>
+<li>asked claude to write a firmware that let clients fetch a JSON blob with the current temp data</li>
+<li>use RESTful Sensor integration in Home Assistant to make sensors from data (by polling device)
+<ul>
+<li><a href="https://www.home-assistant.io/integrations/sensor.rest">https://www.home-assistant.io/integrations/sensor.rest</a></li>
+</ul>
+</li>
+<li>end result: good enough! temp values are ~5 deg off&hellip; but for thermostat purposes - the trendlines are all that matter!
+<ul>
+<li>&hellip;but then, I decided to throw the data into colab, and asked gemini to futz with the numbers, and it did a damn fine job!</li>
+<li>easy to add a calibrated sensor to home assistant using a template-sensor: <code>{{ ((states('sensor.mxchip_temperature') | float) * 0.919 + 2.23) | round(2) }}</code></li>
+</ul>
+</li>
+</ul>
+</li>
+<li>
+<p>building v1 hardware</p>
+<ul>
+<li>the <em>unfathomable luxury</em> of having two rooms (living room + bedroom) also means that I have two aircons, and two rooms</li>
+<li>i.e: I need to build another unit</li>
+<li>i.e: I can&rsquo;t keep relying on one-off IKEA mounting brackets and monitor screws</li>
+<li>went on a temu / amazon shopping spree for some parts</li>
+<li><em>list prices here</em></li>
+</ul>
+</li>
+</ul>
+<p>&ldquo;Production&rdquo; v1:</p>
+<table>
+  <thead>
+      <tr>
+          <th>Part</th>
+          <th>Cost</th>
+          <th>Source</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>ESP32 Dev Board (but smaller)</td>
+          <td>$3.30</td>
+          <td><a href="https://www.temu.com/goods.html?_bg_fs=1&amp;goods_id=601100253124451">Temu</a></td>
+      </tr>
+      <tr>
+          <td>Shaft Coupler</td>
+          <td>$2.42</td>
+          <td><a href="https://www.temu.com/goods.html?_bg_fs=1&amp;goods_id=601099519071638&amp;sku_id=17592227065720">Temu</a></td>
+      </tr>
+      <tr>
+          <td>Servo motor + controllers</td>
+          <td>$2.66 ($8 / 3 pack)</td>
+          <td><a href="https://www.amazon.com/dp/B0BG4ZCFLQ">Amazon</a></td>
+      </tr>
+      <tr>
+          <td>L Bracket</td>
+          <td>$0.50 ($4 / 8 pack)</td>
+          <td><a href="https://www.amazon.com/dp/B0DBFX6HL6">Amazon</a></td>
+      </tr>
+      <tr>
+          <td>Nuts and bolts</td>
+          <td>negligible<sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref">4</a></sup></td>
+          <td><a href="https://www.amazon.com/dp/B09KS23KQ6">Amazon</a></td>
+      </tr>
+      <tr>
+          <td>USB cable + charger</td>
+          <td>$5</td>
+          <td>Temu (take your pick)</td>
+      </tr>
+      <tr>
+          <td>Binder Clip (bodge)</td>
+          <td>negligible</td>
+          <td>The Office 🤫</td>
+      </tr>
+  </tbody>
+</table>
+<p><strong>Total:</strong> ~$14</p>
+<div class="footnotes" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn:1">
+<p>Translated from the original Russian, of course&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:2">
+<p>The only real diff between these two modes is how fast the dispersion fan runs. Empirically, hi-cool <em>does</em> make the room cool a <em>bit</em> faster&hellip; at the expense of the fan being extra-loud. I usually stick to lo-cool.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:3">
+<p>This works thanks to a nice property my unit has: when the target temp has been hit, and no more cooling is needed - the unit goes totally silent and inert (until the temp goes back up, and the unit needs to kick back in)&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+<li id="fn:4">
+<p>It was ~$7 for a pack that&rsquo;ll last me for years to come&#160;<a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+</li>
+</ol>
+</div>
+      </div></div>
+
+  
+  
+<div class="pagination">
+    <div class="pagination__title">
+        <span class="pagination__title-h"></span>
+        <hr />
+    </div>
+    <div class="pagination__buttons">
+        
+        
+        <span class="button next">
+            <a href="http://localhost:1313/blog/post/emoji-shortcodes/">
+                <span class="button__text">A Quest to Find a Highly Compressed Emoji :shortcode: Lookup Function</span>
+                <span class="button__icon">→</span>
+            </a>
+        </span>
+        
+    </div>
+</div>
+
+  
+
+  
+
+</div>
+
+  </div>
+
+  
+    <footer class="footer">
+  <div class="footer__inner">
+    
+      <div class="copyright copyright--user">
+        <span>Copyright &copy; Daniel Prilik :: Licensed under <a target="_blank" rel="external noopener license" href="https://creativecommons.org/licenses/by-nd/4.0/">CC-BY-ND-4.0</a>.</span>
+    
+        <span>:: Theme made by <a href="https://twitter.com/panr">panr</a></span>
+      </div>
+  </div>
+</footer>
+
+<script src="http://localhost:1313/blog/assets/main.js"></script>
+
+
+
+
+
+
+
+  
+</div>
+
+</body>
+</html>

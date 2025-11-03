@@ -1,50 +1,37 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head><script src="/blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=blog/livereload" data-no-instant defer></script>
   
     <title>A Quest to Find a Highly Compressed Emoji :shortcode: Lookup Function :: prilik&#39;s blog</title>
   
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="Have you ever wondered what&amp;rsquo;s the smallest amount of static storage (code &#43; data) needed to map emoji :shortcodes: to emoji?
-Probably not&amp;hellip; but now that I&amp;rsquo;ve posed the question, aren&amp;rsquo;t you at least a little curious what the answer might be?
-So hey, if you&amp;rsquo;ve got some time to spare, why not stick around a while and learn a bit about cool topics such as perfect hashing, probabilistic data structures, and 2D dynamic programming algorithms?
-Take a break from solving whatever &amp;ldquo;important problem&amp;rdquo; you&amp;rsquo;re working on, kick back, relax, and join me on my [somewhat useless] quest to find a highly compressed emoji :shortcode: lookup function!
- Thanks to the power of WebAssembly, you can play with the final result right from your browser!
-&amp;mdash;-&amp;gt; Check out the online demo! &amp;lt;&amp;mdash;&amp;ndash;
+<meta name="description" content="Have you ever wondered what&rsquo;s the smallest amount of static storage (code &#43; data) needed to map emoji :shortcodes: to emoji?
+Probably not&hellip; but now that I&rsquo;ve posed the question, aren&rsquo;t you at least a little curious what the answer might be?
+So hey, if you&rsquo;ve got some time to spare, why not stick around a while and learn a bit about cool topics such as perfect hashing, probabilistic data structures, and 2D dynamic programming algorithms?
+Take a break from solving whatever &ldquo;important problem&rdquo; you&rsquo;re working on, kick back, relax, and join me on my [somewhat useless] quest to find a highly compressed emoji :shortcode: lookup function!
+Thanks to the power of WebAssembly, you can play with the final result right from your browser!
+&mdash;-&gt; Check out the online demo! &lt;&mdash;&ndash;
 " />
 <meta name="keywords" content="" />
 <meta name="robots" content="noodp" />
-<link rel="canonical" href="https://prilik.com/blog/post/emoji-shortcodes/" />
-
-
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-	ga('create', 'UA-58621690-1', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
+<link rel="canonical" href="http://localhost:1313/blog/post/emoji-shortcodes/" />
 
 
 
-<link rel="stylesheet" href="https://prilik.com/blog/assets/style.css">
 
-  <link rel="stylesheet" href="https://prilik.com/blog/assets/blue.css">
+<link rel="stylesheet" href="http://localhost:1313/blog/assets/style.css">
+
+  <link rel="stylesheet" href="http://localhost:1313/blog/assets/blue.css">
 
 
 
 
 
 
-<link rel="apple-touch-icon" href="https://prilik.com/blog/img/apple-touch-icon-192x192.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/blog/img/apple-touch-icon-192x192.png">
 
-  <link rel="shortcut icon" href="https://prilik.com/blog/img/favicon/blue.png">
+  <link rel="shortcut icon" href="http://localhost:1313/blog/img/favicon/blue.png">
 
 
 
@@ -55,25 +42,25 @@ if (!doNotTrack) {
 <meta property="og:locale" content="en" />
 <meta property="og:type" content="article" />
 <meta property="og:title" content="A Quest to Find a Highly Compressed Emoji :shortcode: Lookup Function">
-<meta property="og:description" content="Have you ever wondered what&amp;rsquo;s the smallest amount of static storage (code &#43; data) needed to map emoji :shortcodes: to emoji?
-Probably not&amp;hellip; but now that I&amp;rsquo;ve posed the question, aren&amp;rsquo;t you at least a little curious what the answer might be?
-So hey, if you&amp;rsquo;ve got some time to spare, why not stick around a while and learn a bit about cool topics such as perfect hashing, probabilistic data structures, and 2D dynamic programming algorithms?
-Take a break from solving whatever &amp;ldquo;important problem&amp;rdquo; you&amp;rsquo;re working on, kick back, relax, and join me on my [somewhat useless] quest to find a highly compressed emoji :shortcode: lookup function!
- Thanks to the power of WebAssembly, you can play with the final result right from your browser!
-&amp;mdash;-&amp;gt; Check out the online demo! &amp;lt;&amp;mdash;&amp;ndash;
+<meta property="og:description" content="Have you ever wondered what&rsquo;s the smallest amount of static storage (code &#43; data) needed to map emoji :shortcodes: to emoji?
+Probably not&hellip; but now that I&rsquo;ve posed the question, aren&rsquo;t you at least a little curious what the answer might be?
+So hey, if you&rsquo;ve got some time to spare, why not stick around a while and learn a bit about cool topics such as perfect hashing, probabilistic data structures, and 2D dynamic programming algorithms?
+Take a break from solving whatever &ldquo;important problem&rdquo; you&rsquo;re working on, kick back, relax, and join me on my [somewhat useless] quest to find a highly compressed emoji :shortcode: lookup function!
+Thanks to the power of WebAssembly, you can play with the final result right from your browser!
+&mdash;-&gt; Check out the online demo! &lt;&mdash;&ndash;
 " />
-<meta property="og:url" content="https://prilik.com/blog/post/emoji-shortcodes/" />
+<meta property="og:url" content="http://localhost:1313/blog/post/emoji-shortcodes/" />
 <meta property="og:site_name" content="prilik&#39;s blog" />
 
   
-    <meta property="og:image" content="https://prilik.com/blog/img/favicon/blue.png">
+    <meta property="og:image" content="http://localhost:1313/blog/img/favicon/blue.png">
   
 
 <meta property="og:image:width" content="2048">
 <meta property="og:image:height" content="1024">
 
 
-  <meta property="article:published_time" content="2021-01-24 00:00:00 -0800 PST" />
+  <meta property="article:published_time" content="2021-01-24 00:00:00 &#43;0000 UTC" />
 
 
 
@@ -168,7 +155,7 @@ Take a break from solving whatever &amp;ldquo;important problem&amp;rdquo; you&a
     
 <div class="post">
   <h1 class="post-title">
-    <a href="https://prilik.com/blog/post/emoji-shortcodes/">A Quest to Find a Highly Compressed Emoji :shortcode: Lookup Function</a></h1>
+    <a href="http://localhost:1313/blog/post/emoji-shortcodes/">A Quest to Find a Highly Compressed Emoji :shortcode: Lookup Function</a></h1>
   <div class="post-meta">
     
       <span class="post-date">
@@ -182,15 +169,15 @@ Take a break from solving whatever &amp;ldquo;important problem&amp;rdquo; you&a
   
   <span class="post-tags">
     
-    #<a href="https://prilik.com/blog/tags/experiments/">experiments</a>&nbsp;
+    #<a href="http://localhost:1313/blog/tags/experiments/">experiments</a>&nbsp;
     
-    #<a href="https://prilik.com/blog/tags/research/">research</a>&nbsp;
+    #<a href="http://localhost:1313/blog/tags/research/">research</a>&nbsp;
     
-    #<a href="https://prilik.com/blog/tags/embedded/">embedded</a>&nbsp;
+    #<a href="http://localhost:1313/blog/tags/embedded/">embedded</a>&nbsp;
     
-    #<a href="https://prilik.com/blog/tags/rust/">rust</a>&nbsp;
+    #<a href="http://localhost:1313/blog/tags/rust/">rust</a>&nbsp;
     
-    #<a href="https://prilik.com/blog/tags/wasm/">wasm</a>&nbsp;
+    #<a href="http://localhost:1313/blog/tags/wasm/">wasm</a>&nbsp;
     
   </span>
   
@@ -224,9 +211,9 @@ from your browser!</p>
 looking for exactly exactly.</p>
 <p>We want to write a function that accepts shortcode strings as input, and outputs
 UTF-8 emoji as output:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-rust" data-lang="rust"><span style="color:#75715e">// e.g: shortcode_to_emoji(&#34;flamingo&#34;) -&gt; Some(&#34;🦩&#34;)
-</span><span style="color:#75715e"></span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">shortcode_to_emoji</span>(input: <span style="color:#66d9ef">&amp;</span><span style="color:#66d9ef">str</span>) -&gt; Option<span style="color:#f92672">&lt;&amp;</span><span style="color:#66d9ef">str</span><span style="color:#f92672">&gt;</span>
-</code></pre></div><p>At first glance, this doesn&rsquo;t seem too difficult: just find a free, open source
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-rust" data-lang="rust"><span style="display:flex;"><span><span style="color:#75715e">// e.g: shortcode_to_emoji(&#34;flamingo&#34;) -&gt; Some(&#34;🦩&#34;)
+</span></span></span><span style="display:flex;"><span><span style="color:#75715e"></span><span style="color:#66d9ef">fn</span> <span style="color:#a6e22e">shortcode_to_emoji</span>(input: <span style="color:#66d9ef">&amp;</span><span style="color:#66d9ef">str</span>) -&gt; Option<span style="color:#f92672">&lt;&amp;</span><span style="color:#66d9ef">str</span><span style="color:#f92672">&gt;</span>
+</span></span></code></pre></div><p>At first glance, this doesn&rsquo;t seem too difficult: just find a free, open source
 dataset of emoji shortcodes, load that data into memory, construct a hashmap,
 and start querying it - easy peasy!</p>
 <p>Not so fast.</p>
@@ -244,7 +231,7 @@ occupy as little static storage (code <em>and</em> read-only data) as possible.<
 would want to map emoji shortcodes on embedded hardware?&rdquo; Fair enough! I&rsquo;ve
 included my inspiration behind this wild endeavor in the next section.</p>
 <p>Then again, if you&rsquo;re mostly interested in the problem itself, feel free to
-skip ahead to <a href="#-getting-a-feel-for-the-data-">Getting a feel for the Data</a>.</p>
+skip ahead to <a href="/blog/post/emoji-shortcodes/#-getting-a-feel-for-the-data-">Getting a feel for the Data</a>.</p>
 </blockquote>
 <h2 id="-inspiration-">💡 Inspiration 💡<a href="#-inspiration-" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
 <p>I&rsquo;m a big fan of
@@ -347,8 +334,8 @@ hash tables need to employ some sort of
 <blockquote>
 <p>If hash tables didn&rsquo;t have any collision resolution, just imagine what sort of
 chaos simple input errors might result in! A harmless spelling mistake while
-trying to input <code>😄</code>, compounded with some spectacularly bad statistical
-chance, somehow results in <code>🍆</code> instead!</p>
+trying to input <code>:smile:</code>, compounded with some spectacularly bad statistical
+chance, somehow results in <code>:eggplant:</code> instead!</p>
 <p>Unlikely? Sure. But why even take the chance?</p>
 </blockquote>
 <p>In our case, since we happen to be using a <em>perfect</em> hash function, the conflict
@@ -375,7 +362,7 @@ of the key!</strong></p>
 <p>Unfortunately, this trick doesn&rsquo;t come for free, and brings with it a nasty
 side-effect: since the hash function only stores a <em>hash</em> of the key, <strong>the
 collision resolution algorithm stops being 100% accurate.</strong> Indeed, the lookup
-function ends up having an <em>infinite</em> number of &ldquo;false positive&rdquo; inputs 😱</p>
+function ends up having an <em>infinite</em> number of &ldquo;false positive&rdquo; inputs &#x1f631;</p>
 <p>Fortunately, it turns out that it&rsquo;s possible to greatly reduce the number of
 &ldquo;reasonable&rdquo; false positives (&ldquo;reasonable&rdquo; in the sense that the input isn&rsquo;t
 comprised on random gibberish characters) simply by increasing the number of
@@ -446,86 +433,86 @@ optimization opportunity related to generating multiple tables:</p>
 }
 </style>
 <table>
-<thead>
-<tr>
-<th>emoji len</th>
-<th>entries</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>3</td>
-<td>64</td>
-</tr>
-<tr>
-<td>4</td>
-<td>1081</td>
-</tr>
-<tr>
-<td>5</td>
-<td>2</td>
-</tr>
-<tr>
-<td>6</td>
-<td>109</td>
-</tr>
-<tr>
-<td>7</td>
-<td>109</td>
-</tr>
-<tr>
-<td>8</td>
-<td>260</td>
-</tr>
-<tr>
-<td>10</td>
-<td>1</td>
-</tr>
-<tr>
-<td>11</td>
-<td>69</td>
-</tr>
-<tr>
-<td>13</td>
-<td>109</td>
-</tr>
-<tr>
-<td>14</td>
-<td>1</td>
-</tr>
-<tr>
-<td>15</td>
-<td>4</td>
-</tr>
-<tr>
-<td>16</td>
-<td>7</td>
-</tr>
-<tr>
-<td>17</td>
-<td>1</td>
-</tr>
-<tr>
-<td>18</td>
-<td>13</td>
-</tr>
-<tr>
-<td>20</td>
-<td>3</td>
-</tr>
-<tr>
-<td>25</td>
-<td>9</td>
-</tr>
-<tr>
-<td>27</td>
-<td>3</td>
-</tr>
-<tr>
-<td>28</td>
-<td>3</td>
-</tr>
-</tbody>
+  <thead>
+      <tr>
+          <th>emoji len</th>
+          <th>entries</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td>3</td>
+          <td>64</td>
+      </tr>
+      <tr>
+          <td>4</td>
+          <td>1081</td>
+      </tr>
+      <tr>
+          <td>5</td>
+          <td>2</td>
+      </tr>
+      <tr>
+          <td>6</td>
+          <td>109</td>
+      </tr>
+      <tr>
+          <td>7</td>
+          <td>109</td>
+      </tr>
+      <tr>
+          <td>8</td>
+          <td>260</td>
+      </tr>
+      <tr>
+          <td>10</td>
+          <td>1</td>
+      </tr>
+      <tr>
+          <td>11</td>
+          <td>69</td>
+      </tr>
+      <tr>
+          <td>13</td>
+          <td>109</td>
+      </tr>
+      <tr>
+          <td>14</td>
+          <td>1</td>
+      </tr>
+      <tr>
+          <td>15</td>
+          <td>4</td>
+      </tr>
+      <tr>
+          <td>16</td>
+          <td>7</td>
+      </tr>
+      <tr>
+          <td>17</td>
+          <td>1</td>
+      </tr>
+      <tr>
+          <td>18</td>
+          <td>13</td>
+      </tr>
+      <tr>
+          <td>20</td>
+          <td>3</td>
+      </tr>
+      <tr>
+          <td>25</td>
+          <td>9</td>
+      </tr>
+      <tr>
+          <td>27</td>
+          <td>3</td>
+      </tr>
+      <tr>
+          <td>28</td>
+          <td>3</td>
+      </tr>
+  </tbody>
 </table>
 </div>
 <p>As it turns out, there are plenty of awkwardly-sized emoji in this data set.
@@ -681,7 +668,7 @@ that was the whole inspiration for this endeavor!</p>
 <p>Terrible source code is
 <a href="https://github.com/daniel5151/compressed-emoji-shortcodes">available on GitHub</a>.
 The disclaimer at the top of the README file should tell you all you need to
-know about the quality of the codebase 😬</p>
+know about the quality of the codebase &#x1f62c;</p>
 <h2 id="acknowledgements">Acknowledgements<a href="#acknowledgements" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
 <p>This project wouldn&rsquo;t have been possible without the incredible
 <a href="https://github.com/sfackler/rust-phf">rust-phf</a> library. The in-tree version of
@@ -700,14 +687,21 @@ with this funky little project.</p>
   
 <div class="pagination">
     <div class="pagination__title">
-        <span class="pagination__title-h">Read other posts</span>
+        <span class="pagination__title-h"></span>
         <hr />
     </div>
     <div class="pagination__buttons">
         
+        <span class="button previous">
+            <a href="http://localhost:1313/blog/post/automating-ac-nyc/">
+                <span class="button__icon">←</span>
+                <span class="button__text">Turning a Dumb AC Unit Smart (Without Losing my Security Deposit)</span>
+            </a>
+        </span>
+        
         
         <span class="button next">
-            <a href="https://prilik.com/blog/post/c-is-not-dependency-free/">
+            <a href="http://localhost:1313/blog/post/c-is-not-dependency-free/">
                 <span class="button__text">The C Standard Library Is Not Dependency Free</span>
                 <span class="button__icon">→</span>
             </a>
@@ -736,7 +730,7 @@ with this funky little project.</p>
   </div>
 </footer>
 
-<script src="https://prilik.com/blog/assets/main.js"></script>
+<script src="http://localhost:1313/blog/assets/main.js"></script>
 
 
 

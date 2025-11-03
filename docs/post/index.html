@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+<head><script src="/blog/livereload.js?mindelay=10&amp;v=2&amp;port=1313&amp;path=blog/livereload" data-no-instant defer></script>
   
     <title>Posts :: prilik&#39;s blog</title>
   
@@ -9,36 +9,23 @@
 <meta name="description" content="" />
 <meta name="keywords" content="" />
 <meta name="robots" content="noodp" />
-<link rel="canonical" href="https://prilik.com/blog/post/" />
-
-
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-	ga('create', 'UA-58621690-1', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
+<link rel="canonical" href="http://localhost:1313/blog/post/" />
 
 
 
-<link rel="stylesheet" href="https://prilik.com/blog/assets/style.css">
 
-  <link rel="stylesheet" href="https://prilik.com/blog/assets/blue.css">
+<link rel="stylesheet" href="http://localhost:1313/blog/assets/style.css">
+
+  <link rel="stylesheet" href="http://localhost:1313/blog/assets/blue.css">
 
 
 
 
 
 
-<link rel="apple-touch-icon" href="https://prilik.com/blog/img/apple-touch-icon-192x192.png">
+<link rel="apple-touch-icon" href="http://localhost:1313/blog/img/apple-touch-icon-192x192.png">
 
-  <link rel="shortcut icon" href="https://prilik.com/blog/img/favicon/blue.png">
+  <link rel="shortcut icon" href="http://localhost:1313/blog/img/favicon/blue.png">
 
 
 
@@ -50,11 +37,11 @@ if (!doNotTrack) {
 <meta property="og:type" content="website" />
 <meta property="og:title" content="Posts">
 <meta property="og:description" content="" />
-<meta property="og:url" content="https://prilik.com/blog/post/" />
+<meta property="og:url" content="http://localhost:1313/blog/post/" />
 <meta property="og:site_name" content="prilik&#39;s blog" />
 
   
-    <meta property="og:image" content="https://prilik.com/blog/img/favicon/blue.png">
+    <meta property="og:image" content="http://localhost:1313/blog/img/favicon/blue.png">
   
 
 <meta property="og:image:width" content="2048">
@@ -159,7 +146,69 @@ if (!doNotTrack) {
     
       <div class="post on-list">
         <h1 class="post-title">
-          <a href="https://prilik.com/blog/post/emoji-shortcodes/">A Quest to Find a Highly Compressed Emoji :shortcode: Lookup Function</a>
+          <a href="http://localhost:1313/blog/post/automating-ac-nyc/">Turning a Dumb AC Unit Smart (Without Losing my Security Deposit)</a>
+        </h1>
+        <div class="post-meta">
+          <span class="post-date">
+            2025-09-28
+          </span>
+          <span> - 11 minute read</span>
+          
+        </div>
+
+        
+          <span class="post-tags">
+            
+            #<a href="http://localhost:1313/blog/tags/c&#43;&#43;/">c&#43;&#43;</a>&nbsp;
+            
+            #<a href="http://localhost:1313/blog/tags/arduino/">arduino</a>&nbsp;
+            
+            #<a href="http://localhost:1313/blog/tags/homeassistant/">homeassistant</a>&nbsp;
+            
+            #<a href="http://localhost:1313/blog/tags/esp32/">esp32</a>&nbsp;
+            
+          </span>
+        
+
+        
+
+        <div class="post-content">
+          
+          
+          <p><strong>TL;DR:</strong> You can do some really useful, albeit janky stuff with a servo motor, an esp32, and a dream.</p>
+<hr>
+<p>My rental apartment&rsquo;s AC unit can only be controlled using these retro <em>analog</em> knob-based controls, mounted right onto the unit. They work, but having to stand up and and fiddle with them all the time got annoying pretty quickly.</p>
+<p align="center">
+  <img src="/blog/assets/automating-ac-nyc/aircon-controls-crop.jpg" width="400px">
+</p>
+<p>Fortunately, there&rsquo;s an &lsquo;ol Prilik family saying that goes something like this: &ldquo;there&rsquo;s no problem in life that a servo motor and an esp32 can&rsquo;t fix&rdquo;<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup></p>
+<p>And sure enough, after dropping ~$15 on parts, waiting a couple weeks for things to arrive from China, and spending a few hours iterating alongside my good friend Claude - I managed to hack together this beautiful mess:</p>
+<p align="center">
+<img src="/blog/assets/automating-ac-nyc/v1-final-working-crop.jpg" width="400px">
+</p>
+<p>What you&rsquo;re looking at here is a beautifully jerry-rigged <strong>esp32-controlled servo motor</strong>, coupled to one of my AC unit&rsquo;s knobs using a <strong>shaft coupler</strong>, all affixed to the AC&rsquo;s back-plane using a <strong>cheap L-bracket</strong> and a <strong>binder clip</strong> (and a bit of industrial-grade <strong>cardboard padding</strong>).</p>
+<p>This whole MacGyver&rsquo;d up contraption then talks to my personal <strong>Home Assistant</strong> instance over <strong>MQTT</strong>, which turns the AC unit on/off based on the state of a temperature sensor located in the same the room.</p>
+<p>Et voila! No longer must I get off the couch to tweak the AC anymore!</p>
+<p>Very magical 🪄</p>
+<hr>
+<p>For all you professional embedded and mechatronics folks out there: I <em>strongly</em> suggest you stop reading here.</p>
+<p>The rest of this blog post is a walkthrough of a <em>software</em> engineer&rsquo;s approach to home automation and building custom hardware, and let me tell you: both the final product, <em>and</em> the journey to get there, are <em>hella jank</em>.</p>
+<p>That said&hellip; if you&rsquo;re not afraid of a bit of jank: read onwardsm and join me on this fun foray into how I managed to hack together some totally bespoke home-automation hardware with almost no experience (or budget)!</p>
+          
+          
+        </div>
+
+        
+        <div>
+          <a class="read-more button"
+            href="/blog/post/automating-ac-nyc/"> →</a>
+        </div>
+        
+      </div>
+    
+      <div class="post on-list">
+        <h1 class="post-title">
+          <a href="http://localhost:1313/blog/post/emoji-shortcodes/">A Quest to Find a Highly Compressed Emoji :shortcode: Lookup Function</a>
         </h1>
         <div class="post-meta">
           <span class="post-date">
@@ -172,15 +221,15 @@ if (!doNotTrack) {
         
           <span class="post-tags">
             
-            #<a href="https://prilik.com/blog/tags/experiments/">experiments</a>&nbsp;
+            #<a href="http://localhost:1313/blog/tags/experiments/">experiments</a>&nbsp;
             
-            #<a href="https://prilik.com/blog/tags/research/">research</a>&nbsp;
+            #<a href="http://localhost:1313/blog/tags/research/">research</a>&nbsp;
             
-            #<a href="https://prilik.com/blog/tags/embedded/">embedded</a>&nbsp;
+            #<a href="http://localhost:1313/blog/tags/embedded/">embedded</a>&nbsp;
             
-            #<a href="https://prilik.com/blog/tags/rust/">rust</a>&nbsp;
+            #<a href="http://localhost:1313/blog/tags/rust/">rust</a>&nbsp;
             
-            #<a href="https://prilik.com/blog/tags/wasm/">wasm</a>&nbsp;
+            #<a href="http://localhost:1313/blog/tags/wasm/">wasm</a>&nbsp;
             
           </span>
         
@@ -216,14 +265,14 @@ from your browser!</p>
         
         <div>
           <a class="read-more button"
-            href="/blog/post/emoji-shortcodes/">Read more →</a>
+            href="/blog/post/emoji-shortcodes/"> →</a>
         </div>
         
       </div>
     
       <div class="post on-list">
         <h1 class="post-title">
-          <a href="https://prilik.com/blog/post/c-is-not-dependency-free/">The C Standard Library Is Not Dependency Free</a>
+          <a href="http://localhost:1313/blog/post/c-is-not-dependency-free/">The C Standard Library Is Not Dependency Free</a>
         </h1>
         <div class="post-meta">
           <span class="post-date">
@@ -236,15 +285,15 @@ from your browser!</p>
         
           <span class="post-tags">
             
-            #<a href="https://prilik.com/blog/tags/c/">c</a>&nbsp;
+            #<a href="http://localhost:1313/blog/tags/c/">c</a>&nbsp;
             
-            #<a href="https://prilik.com/blog/tags/c&#43;&#43;/">c&#43;&#43;</a>&nbsp;
+            #<a href="http://localhost:1313/blog/tags/c&#43;&#43;/">c&#43;&#43;</a>&nbsp;
             
-            #<a href="https://prilik.com/blog/tags/rust/">rust</a>&nbsp;
+            #<a href="http://localhost:1313/blog/tags/rust/">rust</a>&nbsp;
             
-            #<a href="https://prilik.com/blog/tags/os/">os</a>&nbsp;
+            #<a href="http://localhost:1313/blog/tags/os/">os</a>&nbsp;
             
-            #<a href="https://prilik.com/blog/tags/no_std/">no_std</a>&nbsp;
+            #<a href="http://localhost:1313/blog/tags/no_std/">no_std</a>&nbsp;
             
           </span>
         
@@ -273,14 +322,14 @@ the same can&rsquo;t be said about its <em>standard library</em>.</p>
         
         <div>
           <a class="read-more button"
-            href="/blog/post/c-is-not-dependency-free/">Read more →</a>
+            href="/blog/post/c-is-not-dependency-free/"> →</a>
         </div>
         
       </div>
     
       <div class="post on-list">
         <h1 class="post-title">
-          <a href="https://prilik.com/blog/post/crosvm-paravirt/">Paravirtualized Devices in crosvm - a Performance Panacea for Modern VMs</a>
+          <a href="http://localhost:1313/blog/post/crosvm-paravirt/">Paravirtualized Devices in crosvm - a Performance Panacea for Modern VMs</a>
         </h1>
         <div class="post-meta">
           <span class="post-date">
@@ -293,11 +342,11 @@ the same can&rsquo;t be said about its <em>standard library</em>.</p>
         
           <span class="post-tags">
             
-            #<a href="https://prilik.com/blog/tags/virtualization/">virtualization</a>&nbsp;
+            #<a href="http://localhost:1313/blog/tags/virtualization/">virtualization</a>&nbsp;
             
-            #<a href="https://prilik.com/blog/tags/emulation/">emulation</a>&nbsp;
+            #<a href="http://localhost:1313/blog/tags/emulation/">emulation</a>&nbsp;
             
-            #<a href="https://prilik.com/blog/tags/rust/">rust</a>&nbsp;
+            #<a href="http://localhost:1313/blog/tags/rust/">rust</a>&nbsp;
             
           </span>
         
@@ -313,14 +362,14 @@ the same can&rsquo;t be said about its <em>standard library</em>.</p>
         
         <div>
           <a class="read-more button"
-            href="/blog/post/crosvm-paravirt/">Read more →</a>
+            href="/blog/post/crosvm-paravirt/"> →</a>
         </div>
         
       </div>
     
       <div class="post on-list">
         <h1 class="post-title">
-          <a href="https://prilik.com/blog/post/widenes/">wideNES - Peeking Past the Edge of NES Games</a>
+          <a href="http://localhost:1313/blog/post/widenes/">wideNES - Peeking Past the Edge of NES Games</a>
         </h1>
         <div class="post-meta">
           <span class="post-date">
@@ -333,11 +382,11 @@ the same can&rsquo;t be said about its <em>standard library</em>.</p>
         
           <span class="post-tags">
             
-            #<a href="https://prilik.com/blog/tags/emulation/">emulation</a>&nbsp;
+            #<a href="http://localhost:1313/blog/tags/emulation/">emulation</a>&nbsp;
             
-            #<a href="https://prilik.com/blog/tags/nes/">nes</a>&nbsp;
+            #<a href="http://localhost:1313/blog/tags/nes/">nes</a>&nbsp;
             
-            #<a href="https://prilik.com/blog/tags/c&#43;&#43;/">c&#43;&#43;</a>&nbsp;
+            #<a href="http://localhost:1313/blog/tags/c&#43;&#43;/">c&#43;&#43;</a>&nbsp;
             
           </span>
         
@@ -353,7 +402,97 @@ the same can&rsquo;t be said about its <em>standard library</em>.</p>
         
         <div>
           <a class="read-more button"
-            href="/blog/post/widenes/">Read more →</a>
+            href="/blog/post/widenes/"> →</a>
+        </div>
+        
+      </div>
+    
+      <div class="post on-list">
+        <h1 class="post-title">
+          <a href="http://localhost:1313/blog/post/cs452-rust-os-intro/">CS 452 OS in Rust</a>
+        </h1>
+        <div class="post-meta">
+          <span class="post-date">
+            0001-01-01
+          </span>
+          <span> - 3 minute read</span>
+          
+        </div>
+
+        
+          <span class="post-tags">
+            
+            #<a href="http://localhost:1313/blog/tags/os/">os</a>&nbsp;
+            
+            #<a href="http://localhost:1313/blog/tags/no_std/">no_std</a>&nbsp;
+            
+            #<a href="http://localhost:1313/blog/tags/rust/">rust</a>&nbsp;
+            
+            #<a href="http://localhost:1313/blog/tags/c/">c</a>&nbsp;
+            
+            #<a href="http://localhost:1313/blog/tags/c&#43;&#43;/">c&#43;&#43;</a>&nbsp;
+            
+          </span>
+        
+
+        
+
+        <div class="post-content">
+          
+          todo
+          
+        </div>
+
+        
+        <div>
+          <a class="read-more button"
+            href="/blog/post/cs452-rust-os-intro/"> →</a>
+        </div>
+        
+      </div>
+    
+      <div class="post on-list">
+        <h1 class="post-title">
+          <a href="http://localhost:1313/blog/post/rust-never/">Functions that never return should return <code>never</code></a>
+        </h1>
+        <div class="post-meta">
+          <span class="post-date">
+            0001-01-01
+          </span>
+          <span> - 5 minute read</span>
+          
+        </div>
+
+        
+          <span class="post-tags">
+            
+            #<a href="http://localhost:1313/blog/tags/os/">os</a>&nbsp;
+            
+            #<a href="http://localhost:1313/blog/tags/no_std/">no_std</a>&nbsp;
+            
+            #<a href="http://localhost:1313/blog/tags/rust/">rust</a>&nbsp;
+            
+            #<a href="http://localhost:1313/blog/tags/c/">c</a>&nbsp;
+            
+            #<a href="http://localhost:1313/blog/tags/c&#43;&#43;/">c&#43;&#43;</a>&nbsp;
+            
+          </span>
+        
+
+        
+
+        <div class="post-content">
+          
+          
+          
+          
+          
+        </div>
+
+        
+        <div>
+          <a class="read-more button"
+            href="/blog/post/rust-never/"> →</a>
         </div>
         
       </div>
@@ -381,7 +520,7 @@ the same can&rsquo;t be said about its <em>standard library</em>.</p>
   </div>
 </footer>
 
-<script src="https://prilik.com/blog/assets/main.js"></script>
+<script src="http://localhost:1313/blog/assets/main.js"></script>
 
 
 
