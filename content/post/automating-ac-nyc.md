@@ -5,7 +5,7 @@ draft = true
 tags = ["c++", "arduino", "homeassistant", "esp32"]
 +++
 
-**TL;DR:** You can do some really useful (albeit janky) stuff with just a servo motor, an esp32, and a dream.
+**TL;DR:** Janky DIY home automation is ezpz, with nothing more than a servo motor, an esp32, and a dream.
 
 * * *
 
@@ -15,9 +15,11 @@ My rental apartment's AC unit can only be controlled using these retro _analog_ 
   <img src="/blog/assets/automating-ac-nyc/aircon-controls-crop.jpg" width="400px">
 </p>
 
-Fortunately, there's an 'ol Prilik family saying that goes something like this: "remember kids, there's no problem in life that a servo motor and an esp32 can't fix"[^1]
+Fortunately, there's an 'ol Prilik family saying that goes something like this: "remember son - there's not a single problem in life that a servo motor and an esp32 can't fix"[^1]
 
-And sure enough, after dropping ~$15 on parts, waiting for things to arrive from China, and spending a few hours iterating alongside my good friend Claude - I managed to hack together this beautiful mess:
+[^1]: it sounds better in the original Russian, but hopefully you get the gist
+
+And sure enough, after dropping ~$15 on parts, waiting for things to arrive from China, and spending a few hours iterating on the hardware assembly and firmware - I hacked together this beautiful mess:
 
 <p align="center">
 <img src="/blog/assets/automating-ac-nyc/v1-final-working-crop.jpg" width="400px">
@@ -29,7 +31,7 @@ This whole MacGyver'd up contraption talks to my **Home Assistant** instance ove
 
 Et voila 🪄 ✨
 
-I've managed to free myself from the schackles of having to get up off the couch just to tweak my AC!
+Just like that - I've managed to free myself from the schackles of having to get up off the couch just to tweak my AC!
 
 > For all you professional embedded and mechatronics folks out there: I _strongly_ suggest you stop reading here.
 >
@@ -39,9 +41,9 @@ I've managed to free myself from the schackles of having to get up off the couch
 
 <!--more-->
 
-## Setting the stage
+## 🗽 Setting the stage
 
-In April 2025, I (finally!) moved to New York City. After a brief apartment hunt, I managed to find a place I'm pretty happy with: the location is convenient, the building is fairly modern, and best of all - my rent is stabilized and _way_ below market value (woo!). There's not much to complain about!
+In April 2025, I moved to New York City. After a brief apartment hunt, I managed to find a place I'm pretty happy with: the location is convenient, the building is fairly modern, and best of all - my rent is stabilized and _way_ below market value (woo!). There's not much to complain about!
 
 ...well, except for the AC situation.
 
@@ -55,7 +57,7 @@ Here's a picture of what I'm talking about:
 
 Yeah - guess which option _my_ building went with 🙃
 
-## What are my options here?
+## 🤔 What are my options here?
 
 Like any good renter, the first thing I did was gently ask my landlord if there was any way to "upgrade" the controls to something a bit more... modern. As expected, the response was roughly along the lines of "lol no, why would we do that?", which, to be fair, was basically the response I expected.
 
@@ -70,17 +72,29 @@ After a bit of finessing, I managed to pop the cover off the unit, and expose it
 
 Now, I'm no expert when it comes to wiring diagrams, but by following the wiring, it certainly seems like this entire circuit is operating at _line voltage_, with nary a low-voltage digital signal I can hook into in sight.
 
+## ⏺️ Smart Relays?
+
 Ok, maybe I can just splice in a [smart relay](https://www.amazon.com/smart-relay/s?k=smart+relay) somewhere? I'm no electrician, but it's probably not _that_ hard, right?
 
-Well, maybe? But honestly, I didn't think this was gonna be a viable route for me.
+Well, maybe?
 
-Setting aside the fact that working with line voltage and HVAC equipment is a bit "spooky" for someone with zero electrical wiring experience, the bigger issue was that all the juicy wires I'd be interested in intercepting are stuffed _deep_ inside the AC unit. As far as I could tell, the only way to access those wires would be to yank the whole unit out of the wall... something that I wasn't particularly interested in doing. [This thread](https://www.doityourself.com/forum/air-conditioning-cooling-systems/577337-older-ice-cap-ptac-add-thermostat.html) from ~2017 reinforced my impressions that this would be far more trouble than its worth.
+But honestly, I didn't think this was gonna be a viable route for me.
 
-Ok, another idea: what if I just cut power to the unit using a [smart plug](https://www.amazon.com/s?k=smart+plug&crid=2WEKKKT1D6E9M&sprefix=smart+pl%2Caps%2C142&ref=nb_sb_noss_2)?
+Setting aside the fact that working with line voltage and HVAC equipment is a bit "spooky" for someone with zero electrical wiring experience (and that my landlord probably wouldn't be _thrilled_ with me messing about with these sorts of things), the bigger issue was that all the juicy wires I'd be interested in intercepting are stuffed _deep_ inside the AC unit.
 
-> Note: The internet was quick to warn me that toggling power to a running AC unit could potentially cause damage to the unit. I'm not an expert in these matters, but for the sake of science (and because I'm a bit stubborn), I nonetheless kept looking into this option.
+As far as I could tell, the only way to access those wires would be to yank the whole unit out of the wall... something that I wasn't particularly interested in doing. [This thread](https://www.doityourself.com/forum/air-conditioning-cooling-systems/577337-older-ice-cap-ptac-add-thermostat.html) from ~2017 reinforced my impressions that this would be far more trouble than its worth.
 
-Well, much to my chagrin, the unit plugs into the wall using one of those fancy NEMA 5-20P plugs, which is basically impossible to find a smart switch for!
+So... what now?
+
+## 🔌 Smart Plugs?
+
+Ok, here's an idea: what if I just cut power to the unit using a [smart plug](https://www.amazon.com/s?k=smart+plug&crid=2WEKKKT1D6E9M&sprefix=smart+pl%2Caps%2C142&ref=nb_sb_noss_2)?
+
+> Note: The internet was quick to warn me that toggling power to a running AC unit could potentially cause damage to the unit, especially if something goes wrong and you start rapidly cycling it on/off.
+>
+> While I'm no expert in these sorts of things... for the sake of science (and because I'm a bit stubborn), I nonetheless kept looking into this option.
+
+Alas, much to my chagrin - the unit plugs into the wall using one of those fancy NEMA 5-20P plugs, which is basically impossible to find a smart switch for!
 
 <p align="center">
 <img src="/blog/assets/automating-ac-nyc/NEMA_5-20P.svg.png" style="background-color: white; padding: 4px">
@@ -92,9 +106,9 @@ If hooking into the wiring is a non-starter, and putting the unit behind a smart
 
 Of course not!
 
-It was time to seriously consider the "obvious" solution: why not just make a little robot to turn the dials for me?
+Clearly it was time to put my engineering hat on and _jank_ together a solution: why not just make a little robot to turn the dials for me?
 
-## Dialing in the right approach
+## 🎛️ _Dialing_ in the right approach
 
 Looking at the unit, we find 2 dials:
 
@@ -103,7 +117,7 @@ Looking at the unit, we find 2 dials:
 
 This gave me two options to toggle the AC unit on and off:
 
-**Option 1:** If I hook into the Mode Control dial, I'd need to:
+**Option 1:** hooking into the **Mode Control** dial
 
 - Leave the Temp Control dial set to "max cold"
 - Buy a servo motor with enough torque to overcome the stiff action of the dial
@@ -111,18 +125,18 @@ This gave me two options to toggle the AC unit on and off:
   - ...and require some more robust mounting hardware, to counteract the torque, and ensure the servo stays in the right place
 - Precisely calibrate the servo motor to rotate the dial the right number of degrees between the "Off" state and the "Cool" state
 
-**Option 2:** If I hook into the Temp Control dial, I'd need to:
+**Option 2:** hooking into the **Temp Control** dial
 
 - Leave the Mode Control dial on "Lo-Cool"[^3]
 - Buy a cheap, low-torque, low-power servo motor, _just_ powerful enough to rotate the fairly loose dial
   - ...that doesn't need a lot of mounting hardware to stay in the right place, given that the torque is fairly low
 - Imprecisely yeet the servo motor all the way left/right, toggling the target temp between "really really hot" or "really really cold"
 
-Based on how I just described these two options, guess which one I went with 🥰
+Hopefully you can guess which one I went with 🥰
 
 > Option 2 certainly is the "jankier" of the two options, given that it relies on a second-order property (target temp) to power the unit on/off.
 >
-> But then again, I really wanted to sidestep a bunch of (slightly) tricky hardware engineering questions that my smooth-brained software-engineering self didn't want to figure out this time around.
+> There's a world where I used this project as an excuse to finally buy a 3D printer and dip my feet into the world of more "serious" hardware engineering... but truth be told - I just wanted to solve my problem ASAP, so my smooth-brained software-engineering brain decided to KISS for now.
 >
 > I think it was the right call!
 
@@ -137,7 +151,7 @@ To cut a long story short - here's what I came up with for V0:
 | ESP32 Dev Board           | $6                  | [Amazon](https://www.amazon.com/dp/B0DDPJQX3X) |
 | Shaft Coupler             | $6.69               | [Amazon](https://www.amazon.com/dp/B0D4YBM6HB) |
 | Servo motor + controllers | $2.66 ($8 / 3 pack) | [Amazon](https://www.amazon.com/dp/B0BG4ZCFLQ) |
-| L Brackets                | free                | leftover ikea parts (from a LAIVA bookshelf)                            |
+| L Brackets                | free                | leftover ikea parts (from a LAIVA bookshelf)   |
 | screws                    | free                | leftover monitor parts                         |
 | USB Cable + charger       | free                | found in the 'ol junk drawer                   |
 
@@ -163,37 +177,27 @@ But hardware is just one part of the story: how about the firmware?
 > - Before buying the ESP32 Dev Board, I validated the servo motor + shaft coupler worked using a (really, really) old Arduino Leonardo I had lying around, and controlling it manually over serial (using a really long USB cable extending to my PC)
 > - My first attempt at mounting this thing involved wooden skewers, a glue stick, and a cut up amazon box... a failed experiment, to say the least.
 
-### Writing the Firmware
+### 💻 Writing the Firmware
 
 This firmware is _dead simple_.
 
-I mean, think about it: all it needs to do is glue together 3 Arduino APIs: WiFi (for connectivity), MQTT (for pub/sub communication with Home Asisstant), and Servo (to rotate the dial).
+There's _zero_ non-trivial logic here - it simply needs to glue together 3 off-the-shelf Arduino APIs: WiFi (for connectivity), MQTT (for pub/sub communication with Home Asisstant), and Servo Control (to rotate the dial).
 
-And because this is a personal project, we can dispense with fancy features like OTA updates, dynamic configuration, nice UX, etc... Just hard-code creds/URLs/IPs in the firmware, manually re-flash it, and that's good enough!
+While I certainly miss the Good Old Days where I'd spend a couple weekends hacking together this sort of one-off firmware... truth be told, I'm kinda glad that LLMs can one-shot code for these sorts of projects. I ended up using Gemini 3.5 Flash, and it did a Totally Fine™️ job hacking together something that works.
 
-_Obviously,_ this was something that I could write myself in a weekend or two of tinkering. Heck, I'd probably end up sidestepping the Arduino framework entirely, and end up writing a bare-metal firmware directly in Rust, just for kicks.
+It even generated a little Web UI I could use to dynamically configure various settings, rather than hard-coding creds and constants in the firmware itself!
 
-...but the NYC summer was scorching, and I was actively annoyed constantly babysitting the AC all the time, so I figured I might as well try this "vibe coding" thing that all the kids are doing nowadays.
+<p align="center">
+  <img src="/blog/assets/automating-ac-nyc/fw_webui.png" width="360px">
+</p>
 
-And _hot damn!_ LLMs can _cook_ when it comes to writing one-off greenfield throwaway code!
-
-> Ok, listen... before going any further - let me clarify that I'm not really a fan on AI coding assistants in general.
->
-> I'm sure I could write a whole blog post about that topic alone... but if you're anything like me, the _last_ thing you want to read is another pro/anti-AI blog post. So don't worry - I'll keep my thoughts brief here:
->
-> LLMs might be able to "code", but I've yet to see one adequately "Software Engineer". Using it to deliver large novel features in existing (non-AI) codebases is a sure-fire way to accumulate staggering amounts of architectural technical debt.
-
-And with that disclaimer out of the way... let me gush about Claude.
-
-...
-
+The code isn't particularly interesting... but if you're interested: https://gist.github.com/daniel5151/2d9950a27119e7e481db4446f2abcf13
 
 Outline:
 
 - building v0 hardware
-  - asked claude to make esp32 host a web-ui for controlling the motor
   - first "huzzah" moment - holding the motor in one hand as I trigger esp32 motion from phone, and the knob rotated!
-  - big question: how to mount this thing??
+  - big question: how to mount this thing?? not much to say except for "trial and error, and using whatever parts I had lying around"
   - second "huzzah" moment - sitting on the couch, and using webui to turn knob back/forth
 - making it useful with home assistant
   - quick TL;DR on what is home assistant
@@ -241,7 +245,6 @@ Outline:
 
 **Total:** ~$14
 
-[^1]: Translated from the original Russian, of course
 [^2]: The only real diff between these two modes is how fast the dispersion fan runs. Empirically, hi-cool _does_ make the room cool a _bit_ faster... at the expense of the fan being extra-loud. I usually stick to lo-cool.
 
 [^3]: This works thanks to a nice property my unit has: when the target temp has been hit, and no more cooling is needed - the unit goes totally silent and inert (until the temp goes back up, and the unit needs to kick back in)
