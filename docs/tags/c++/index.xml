@@ -1,46 +1,47 @@
 <?xml version="1.0" encoding="utf-8" standalone="yes"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
   <channel>
-    <title>C&#43;&#43; on prilik&#39;s blog</title>
-    <link>http://localhost:1313/blog/tags/c&#43;&#43;/</link>
-    <description>Recent content in C&#43;&#43; on prilik&#39;s blog</description>
+    <title>c&#43;&#43; on prilik&#39;s blog</title>
+    <link>https://prilik.com/blog/tags/c&#43;&#43;/</link>
+    <description>Recent content in c&#43;&#43; on prilik&#39;s blog</description>
     <generator>Hugo -- gohugo.io</generator>
     <language>en</language>
     <copyright>Copyright &amp;copy; Daniel Prilik :: Licensed under &lt;a target=&#34;_blank&#34; rel=&#34;external noopener license&#34; href=&#34;https://creativecommons.org/licenses/by-nd/4.0/&#34;&gt;CC-BY-ND-4.0&lt;/a&gt;.</copyright>
-    <lastBuildDate>Sun, 28 Sep 2025 00:00:00 +0000</lastBuildDate><atom:link href="http://localhost:1313/blog/tags/c++/index.xml" rel="self" type="application/rss+xml" />
+    <lastBuildDate>Sun, 02 Nov 2025 00:00:00 -0400</lastBuildDate><atom:link href="https://prilik.com/blog/tags/c++/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Turning a Dumb AC Unit Smart (Without Losing my Security Deposit)</title>
-      <link>http://localhost:1313/blog/post/automating-ac-nyc/</link>
-      <pubDate>Sun, 28 Sep 2025 00:00:00 +0000</pubDate>
+      <link>https://prilik.com/blog/post/automating-ac-nyc/</link>
+      <pubDate>Sun, 02 Nov 2025 00:00:00 -0400</pubDate>
       
-      <guid>http://localhost:1313/blog/post/automating-ac-nyc/</guid>
-      <description>&lt;p&gt;&lt;strong&gt;TL;DR:&lt;/strong&gt; You can do some really useful, albeit janky stuff with a servo motor, an esp32, and a dream.&lt;/p&gt;
+      <guid>https://prilik.com/blog/post/automating-ac-nyc/</guid>
+      <description>&lt;p&gt;&lt;strong&gt;TL;DR:&lt;/strong&gt; Janky DIY home automation is ezpz, with nothing more than a servo motor, an esp32, and a dream.&lt;/p&gt;
 &lt;hr&gt;
-&lt;p&gt;My rental apartment&amp;rsquo;s AC unit can only be controlled using these retro &lt;em&gt;analog&lt;/em&gt; knob-based controls, mounted right onto the unit. They work, but having to stand up and and fiddle with them all the time got annoying pretty quickly.&lt;/p&gt;
+&lt;p&gt;My rental apartment&amp;rsquo;s AC unit can only be controlled using these retro &lt;em&gt;analog&lt;/em&gt; knob-based controls, mounted right onto the unit. They work&amp;hellip; but having to stand up and and fiddle with them all the time was getting pretty annoying.&lt;/p&gt;
 &lt;p align=&#34;center&#34;&gt;
-  &lt;img src=&#34;http://localhost:1313/blog/assets/automating-ac-nyc/aircon-controls-crop.jpg&#34; width=&#34;400px&#34;&gt;
+  &lt;img src=&#34;https://prilik.com/blog/blog/assets/automating-ac-nyc/aircon-controls-crop.jpg&#34; width=&#34;400px&#34;&gt;
 &lt;/p&gt;
-&lt;p&gt;Fortunately, there&amp;rsquo;s an &amp;lsquo;ol Prilik family saying that goes something like this: &amp;ldquo;there&amp;rsquo;s no problem in life that a servo motor and an esp32 can&amp;rsquo;t fix&amp;rdquo;&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
-&lt;p&gt;And sure enough, after dropping ~$15 on parts, waiting a couple weeks for things to arrive from China, and spending a few hours iterating alongside my good friend Claude - I managed to hack together this beautiful mess:&lt;/p&gt;
+&lt;p&gt;Fortunately, there&amp;rsquo;s an &amp;lsquo;ol Prilik family saying that goes something like this: &amp;ldquo;remember son - there&amp;rsquo;s not a single problem in life that can&amp;rsquo;t be solved with a servo motor, an esp32, and a dream&amp;rdquo;&lt;sup id=&#34;fnref:1&#34;&gt;&lt;a href=&#34;#fn:1&#34; class=&#34;footnote-ref&#34; role=&#34;doc-noteref&#34;&gt;1&lt;/a&gt;&lt;/sup&gt;&lt;/p&gt;
+&lt;p&gt;And sure enough, after dropping ~$15 on parts, waiting for things to arrive from China, and spending a few hours iterating on the hardware assembly and firmware - I hacked together this beautiful mess:&lt;/p&gt;
 &lt;p align=&#34;center&#34;&gt;
-&lt;img src=&#34;http://localhost:1313/blog/assets/automating-ac-nyc/v1-final-working-crop.jpg&#34; width=&#34;400px&#34;&gt;
+&lt;img src=&#34;https://prilik.com/blog/blog/assets/automating-ac-nyc/v1-final-working-crop.jpg&#34; width=&#34;400px&#34;&gt;
 &lt;/p&gt;
-&lt;p&gt;What you&amp;rsquo;re looking at here is a beautifully jerry-rigged &lt;strong&gt;esp32-controlled servo motor&lt;/strong&gt;, coupled to one of my AC unit&amp;rsquo;s knobs using a &lt;strong&gt;shaft coupler&lt;/strong&gt;, all affixed to the AC&amp;rsquo;s back-plane using a &lt;strong&gt;cheap L-bracket&lt;/strong&gt; and a &lt;strong&gt;binder clip&lt;/strong&gt; (and a bit of industrial-grade &lt;strong&gt;cardboard padding&lt;/strong&gt;).&lt;/p&gt;
-&lt;p&gt;This whole MacGyver&amp;rsquo;d up contraption then talks to my personal &lt;strong&gt;Home Assistant&lt;/strong&gt; instance over &lt;strong&gt;MQTT&lt;/strong&gt;, which turns the AC unit on/off based on the state of a temperature sensor located in the same the room.&lt;/p&gt;
-&lt;p&gt;Et voila! No longer must I get off the couch to tweak the AC anymore!&lt;/p&gt;
-&lt;p&gt;Very magical 🪄&lt;/p&gt;
-&lt;hr&gt;
+&lt;p&gt;What you&amp;rsquo;re looking at here is a jerry-rigged &lt;strong&gt;esp32-controlled servo motor&lt;/strong&gt;, coupled to one of my AC unit&amp;rsquo;s knobs using a &lt;strong&gt;shaft coupler&lt;/strong&gt;, all affixed to the AC&amp;rsquo;s back-plane using a &lt;strong&gt;cheap L-bracket&lt;/strong&gt; and a &lt;strong&gt;binder clip&lt;/strong&gt; (with some industrial-grade &lt;strong&gt;cardboard padding&lt;/strong&gt; for good measure).&lt;/p&gt;
+&lt;p&gt;This whole MacGyver&amp;rsquo;d up contraption talks to my &lt;strong&gt;Home Assistant&lt;/strong&gt; instance over &lt;strong&gt;MQTT&lt;/strong&gt;, which turns the AC unit on/off based on the state of a temperature sensor located in the same the room.&lt;/p&gt;
+&lt;p&gt;Et voila 🪄 ✨&lt;/p&gt;
+&lt;p&gt;Just like that - I&amp;rsquo;ve managed to free myself from the schackles of having to get up off the couch just to tweak my AC!&lt;/p&gt;
+&lt;blockquote&gt;
 &lt;p&gt;For all you professional embedded and mechatronics folks out there: I &lt;em&gt;strongly&lt;/em&gt; suggest you stop reading here.&lt;/p&gt;
 &lt;p&gt;The rest of this blog post is a walkthrough of a &lt;em&gt;software&lt;/em&gt; engineer&amp;rsquo;s approach to home automation and building custom hardware, and let me tell you: both the final product, &lt;em&gt;and&lt;/em&gt; the journey to get there, are &lt;em&gt;hella jank&lt;/em&gt;.&lt;/p&gt;
-&lt;p&gt;That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwardsm and join me on this fun foray into how I managed to hack together some totally bespoke home-automation hardware with almost no experience (or budget)!&lt;/p&gt;</description>
+&lt;p&gt;That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwards, and join me on this fun foray into how I managed to hack together some totally bespoke home-automation hardware with almost no budget, or experience!&lt;/p&gt;
+&lt;/blockquote&gt;</description>
     </item>
     
     <item>
       <title>The C Standard Library Is Not Dependency Free</title>
-      <link>http://localhost:1313/blog/post/c-is-not-dependency-free/</link>
-      <pubDate>Mon, 16 Nov 2020 00:00:00 +0000</pubDate>
+      <link>https://prilik.com/blog/post/c-is-not-dependency-free/</link>
+      <pubDate>Mon, 16 Nov 2020 00:00:00 -0500</pubDate>
       
-      <guid>http://localhost:1313/blog/post/c-is-not-dependency-free/</guid>
+      <guid>https://prilik.com/blog/post/c-is-not-dependency-free/</guid>
       <description>&lt;p&gt;Like any great systems programming language, it doesn&amp;rsquo;t take much of anything to
 get C up and running on a new platform.&lt;/p&gt;
 &lt;p&gt;In fact, a minimal C &amp;ldquo;runtime&amp;rdquo; (typically called
@@ -57,28 +58,10 @@ the same can&amp;rsquo;t be said about its &lt;em&gt;standard library&lt;/em&gt;
     
     <item>
       <title>wideNES - Peeking Past the Edge of NES Games</title>
-      <link>http://localhost:1313/blog/post/widenes/</link>
-      <pubDate>Fri, 24 Aug 2018 00:00:00 +0000</pubDate>
+      <link>https://prilik.com/blog/post/widenes/</link>
+      <pubDate>Fri, 24 Aug 2018 00:00:00 -0400</pubDate>
       
-      <guid>http://localhost:1313/blog/post/widenes/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>CS 452 OS in Rust</title>
-      <link>http://localhost:1313/blog/post/cs452-rust-os-intro/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>http://localhost:1313/blog/post/cs452-rust-os-intro/</guid>
-      <description></description>
-    </item>
-    
-    <item>
-      <title>Functions that never return should return `never`</title>
-      <link>http://localhost:1313/blog/post/rust-never/</link>
-      <pubDate>Mon, 01 Jan 0001 00:00:00 +0000</pubDate>
-      
-      <guid>http://localhost:1313/blog/post/rust-never/</guid>
+      <guid>https://prilik.com/blog/post/widenes/</guid>
       <description></description>
     </item>
     

@@ -1,25 +1,27 @@
 +++
 title = "Turning a Dumb AC Unit Smart (Without Losing my Security Deposit)"
 date = 2025-11-02
-draft = true
+draft = false
 tags = ["c++", "arduino", "homeassistant", "esp32"]
 +++
 
-**TL;DR:** Janky DIY home automation is ezpz, with nothing more than a servo motor, an esp32, and a dream.
+**TL;DR:** DIY home automation is ezpz with nothing more than a servo motor, an esp32, and a high tolerance for Jank.
 
 * * *
 
-My rental apartment's AC unit can only be controlled using these retro _analog_ knob-based controls, mounted right onto the unit. They work, but having to stand up and and fiddle with them all the time got annoying pretty quickly.
+My rental apartment's AC unit can only be controlled using these retro-looking _analog_ knob-based controls, mounted right onto the unit. No separate wall-mounted thermostat, no remote control... nothin' fancy whatsoever.
+
+These knobs work... but having to constantly stand up and and fiddle with them gets annoying pretty quick.
 
 <p align="center">
   <img src="/blog/assets/automating-ac-nyc/aircon-controls-crop.jpg" width="400px">
 </p>
 
-Fortunately, there's an 'ol Prilik family saying that goes something like this: "remember son - there's not a single problem in life that a servo motor and an esp32 can't fix"[^1]
+Fortunately, there's an 'ol Prilik family saying that goes something like this: "remember son - the hardest problems in life can usually be solved with nothing more than a servo motor, an esp32, and a dream"[^1]
 
-[^1]: it sounds better in the original Russian, but hopefully you get the gist
+[^1]: oddly specific, I know
 
-And sure enough, after dropping ~$15 on parts, waiting for things to arrive from China, and spending a few hours iterating on the hardware assembly and firmware - I hacked together this beautiful mess:
+And sure enough, after dropping ~$15 on parts, waiting for things to arrive from China, and spending a few hours iterating on the hardware assembly and firmware... I hacked together this beautiful mess:
 
 <p align="center">
 <img src="/blog/assets/automating-ac-nyc/v1-final-working-crop.jpg" width="400px">
@@ -115,6 +117,12 @@ Looking at the unit, we find 2 dials:
 1. **Mode Control:** A stiff, discrete dial, clicking between 6 "modes" of operation (Off, Lo-Cool, Hi-Cool[^2], Vent, Exhaust, and Heat)
 2. **Temp Control:** A smooth, analog dial, connected to a simple bimetallic-strip based thermostat
 
+And fortunately - both plastic knobs pop right off, exposing a shaft that should be _too_ hard to mechanically couple with:
+
+<p align="center">
+<img src="/blog/assets/automating-ac-nyc/aircon-controls-noknob.jpg" width="400px">
+</p>
+
 This gave me two options to toggle the AC unit on and off:
 
 **Option 1:** hooking into the **Mode Control** dial
@@ -134,13 +142,14 @@ This gave me two options to toggle the AC unit on and off:
 
 Hopefully you can guess which one I went with 🥰
 
-> Option 2 certainly is the "jankier" of the two options, given that it relies on a second-order property (target temp) to power the unit on/off.
->
-> There's a world where I used this project as an excuse to finally buy a 3D printer and dip my feet into the world of more "serious" hardware engineering... but truth be told - I just wanted to solve my problem ASAP, so my smooth-brained software-engineering brain decided to KISS for now.
->
-> I think it was the right call!
+> Option 2 certainly is the "jankier" of the two options, given that it relies on a second-order property (target temp) to power the unit on/off... but hey - whatever's easier, right?
 
-## The road to V0
+
+[^2]: The only real diff between these two modes is how fast the dispersion fan runs. Empirically, hi-cool _does_ make the room cool a _bit_ faster... at the expense of the fan being extra-loud. I usually stick to lo-cool.
+
+[^3]: This works thanks to a nice property my unit has: when the target temp has been hit, and no more cooling is needed - the unit goes totally silent and inert (until the temp goes back up, and the unit needs to kick back in)
+
+## 🔨 The road to V0
 
 I was _fairly_ sure this was gonna work, but obviously, the only way to find our was to hack together a proof-of-concept (ideally - with the least number of new purchases as possible).
 
@@ -165,73 +174,159 @@ _(breadboard with the rest of the hardware out-of-frame)_
   <img src="/blog/assets/automating-ac-nyc/v0-working-closeup.jpg" width="400px">
 </p>
 
-If you look closely, you'll notice that there's no actual mounting mechanism that connects the servo motor assembly to the PTAC - it's literally just "floating" in mid-air!
+<p align="center">
+  <img src="/blog/assets/automating-ac-nyc/v0-working-poc.jpg" width="400px">
+</p>
 
-This is thanks to an ~~unintentional~~ ingenious part of this design: the L-brackets simply make the servo motor "bigger", such that when it rotates, it ends up "bumping" against the back wall, which resists the torque, and ensuring the torque is transfered down into the dial to rotate it.
+Since I couldn't screw anything into the AC chassis (remember: security deposit!), I had to get creative. I ended up grabbing a couple of metal L-brackets left over from an IKEA LAIVA bookshelf, and some spare screws from a monitor VESA mount.
 
-But hardware is just one part of the story: how about the firmware?
+By bolting these to the servo, it made the motor assembly physically "wider". When the motor rotates, the brackets bump against the back wall of the control cavity, which resists the torque and forces the rotational energy down into the shaft coupler and turns the dial. Truly ~~unintentional~~ ingenious design!
+
 
 > Sidenote: I'm leaving out a few intermediate steps that I took to get to this design:
 >
-> - I didn't get the right shaft-coupler the first time (or the second time (or the third time...)), so it took a few amazon returns until I found the right one.
+> - I didn't get the right shaft-coupler the first time (or the second time (or the third time...)), so it took a few Amazon returns until I found the right one.
 > - Before buying the ESP32 Dev Board, I validated the servo motor + shaft coupler worked using a (really, really) old Arduino Leonardo I had lying around, and controlling it manually over serial (using a really long USB cable extending to my PC)
-> - My first attempt at mounting this thing involved wooden skewers, a glue stick, and a cut up amazon box... a failed experiment, to say the least.
+> - My first attempt at mounting this thing involved wooden skewers, a glue stick, and a cut up Amazon box... a failed experiment, to say the least.
+
+Of course, what good is some hardware without some software?
 
 ### 💻 Writing the Firmware
 
-This firmware is _dead simple_.
+The firmware here is _dead simple_: it connects to Wi-Fi, hosts a local web server, and listen for HTTP/MQTT commands to spin the motor.
 
-There's _zero_ non-trivial logic here - it simply needs to glue together 3 off-the-shelf Arduino APIs: WiFi (for connectivity), MQTT (for pub/sub communication with Home Asisstant), and Servo Control (to rotate the dial).
+While I do somewhat miss the Good Old Days where I'd spend a couple weekends hacking together this sort of one-off firmware... truth be told, I'm kinda glad that LLMs can one-shot code for these sorts of projects. I ended up using a combo of Claude and Gemini, and they did a Totally Fine™️ job hacking together something that works.
 
-While I certainly miss the Good Old Days where I'd spend a couple weekends hacking together this sort of one-off firmware... truth be told, I'm kinda glad that LLMs can one-shot code for these sorts of projects. I ended up using Gemini 3.5 Flash, and it did a Totally Fine™️ job hacking together something that works.
+<p align="center">
+  <img src="/blog/assets/automating-ac-nyc/bereal-claude-code.jpg" width="500px">
+</p>
 
-It even generated a little Web UI I could use to dynamically configure various settings, rather than hard-coding creds and constants in the firmware itself!
+It even generated a little Web UI I could use to configure my Wi-Fi credentials and adjust settings dynamically:
 
 <p align="center">
   <img src="/blog/assets/automating-ac-nyc/fw_webui.png" width="360px">
 </p>
 
-The code isn't particularly interesting... but if you're interested: https://gist.github.com/daniel5151/2d9950a27119e7e481db4446f2abcf13
+Code is available here, but honestly - it's not all that interesting: https://gist.github.com/daniel5151/2d9950a27119e7e481db4446f2abcf13
 
-Outline:
+## 🏠 Making it Useful with Home Assistant
 
-- building v0 hardware
-  - first "huzzah" moment - holding the motor in one hand as I trigger esp32 motion from phone, and the knob rotated!
-  - big question: how to mount this thing?? not much to say except for "trial and error, and using whatever parts I had lying around"
-  - second "huzzah" moment - sitting on the couch, and using webui to turn knob back/forth
-- making it useful with home assistant
-  - quick TL;DR on what is home assistant
-  - step 1: getting home assistant to control this thing
-    - decided to do things "right", and asked claude to write MQTT firmware
-    - took a few iterations, but servo shows up as a "cover" that can be "opened" or "closed" (rotate all the way left/right)
-  - step 2: knowing when to turn it on / off (i.e: thermostat)
-    - ezpz! just use https://www.home-assistant.io/integrations/generic_thermostat/
-    - I already have a smart temp sensor ([AirGradient ONE](https://www.airgradient.com/indoor/))
-  - ...connect the two, and that's it - we're done!
+With the firmware flashed, the hardware jankily mounted in place, I decided to kick the tires on this thing by sitting comfortably on the couch, pulling up the web UI on my phone, and hitting the button to turn the motor.
 
-- side-quest: making a second thermometer for my other room
-  - digging around through old junk, I found an [Azure IoT Developer Kit](https://microsoft.github.io/azure-iot-developer-kit/docs/serial-communications/) (AKA: AZ3166)
-    - from the time I did an internship on the Azure IoT team
-  - of course, \~6 years later, and most cloud-based supporting infra is dead...
-  - thankfully, not _too_ hard to sidestep all the cloud nonesense, and use as a programmable (arduino compatible!) microcontroller
-    - actually getting the devkit working with the arduino IDE was a bit annoying https://github.com/microsoft/devkit-sdk
-  - asked claude to write a firmware that let clients fetch a JSON blob with the current temp data
-  - use RESTful Sensor integration in Home Assistant to make sensors from data (by polling device)
-    - https://www.home-assistant.io/integrations/sensor.rest
-  - end result: good enough! temp values are ~5 deg off... but for thermostat purposes - the trendlines are all that matter!
-    - ...but then, I decided to throw the data into colab, and asked gemini to futz with the numbers, and it did a damn fine job!
-    - easy to add a calibrated sensor to home assistant using a template-sensor: `{{ ((states('sensor.mxchip_temperature') | float) * 0.919 + 2.23) | round(2) }}`
+Lemme tell you - seeing the AC kick on/off without me leaving the couch?
 
-- building v1 hardware
-  - the _unfathomable luxury_ of having two rooms (living room + bedroom) also means that I have two aircons, and two rooms
-  - i.e: I need to build another unit
-  - i.e: I can't keep relying on one-off IKEA mounting brackets and monitor screws
-  - went on a temu / amazon shopping spree for some parts
-  - _list prices here_
+Absolute Cinema.
 
+That said, while it _was_ cool to see it working from the web UI... for this to be truly useful, I'd need to get it integrated with Home Assistant.
 
+If you're not familiar, [Home Assistant](https://www.home-assistant.io/) is an open-source home automation platform that acts as a local brain for all your smart devices. It is absolutely fantastic, and if you do _any_ remotely non-trivial smart home stuff - you should _absolutely_ set it up.
 
-"Production" v1:
+### Step 1: Exposing the Servo as an MQTT Cover
+
+Instead of writing some kind of custom API integration script, I took advantage of Home Assistant's excellent support for **MQTT Discovery**.
+
+> If you're not familiar with MQTT, think of it as a super lightweight pub/sub messaging protocol designed for resource-constrained IoT devices.
+>
+> Devices can "publish" messages to specific paths (called topics, like `living_room/ac/state`), and other devices (like Home Assistant) can "subscribe" to those topics to listen for updates or send commands.
+
+If you configure a device to publish a specific configuration JSON payload to a standardized discovery topic (e.g., `homeassistant/cover/ac_stepper_cover/config`), Home Assistant will *automatically* discover the device and configure all of its entities, sensors, and controllers - all without you having to write a single line of YAML config!
+
+For a dial controller like this, I decided to expose it as a [MQTT Cover](https://www.home-assistant.io/integrations/cover.mqtt/) integration. While "covers" are typically used for things like window blinds, motorized curtains, or garage doors... its schema supports opening, closing, stopping, which maps pretty well to our rotating dial.
+
+When the ESP32 boots up, it automatically connects to the MQTT broker and fires off this discovery JSON payload:
+
+```json
+{
+  "name": "AC Stepper Cover",
+  "unique_id": "ac_stepper_esp32_01",
+  "object_id": "ac_stepper_cover",
+  "command_topic": "homeassistant/cover/ac_stepper_cover/set",
+  "state_topic": "homeassistant/cover/ac_stepper_cover/state",
+  "position_topic": "homeassistant/cover/ac_stepper_cover/position",
+  "set_position_topic": "homeassistant/cover/ac_stepper_cover/position/set",
+  "payload_open": "OPEN",
+  "payload_close": "CLOSE",
+  "payload_stop": "STOP",
+  "device_class": "damper",
+  "device": {
+    "identifiers": "ac_stepper_esp32",
+    "name": "AC Control Stepper"
+  }
+}
+```
+
+Once Home Assistant registers the cover, it listens for user interaction on the UI and publishes corresponding commands to the `command_topic`. On the ESP32, the MQTT callback parses the message and drives the stepper motor:
+
+```cpp
+void mqttCallback(char* topic, byte* payload, unsigned int length) {
+  String message = extractMessageFromPayload(payload, length);
+  if (String(topic) == COMMAND_TOPIC) {
+    handleCoverCommand(message);
+  }
+}
+
+void handleCoverCommand(const String& command) {
+  if (command == "OPEN") {
+    motorState.isOpening = true;
+    moveMotor(STEPS_PER_REVOLUTION, motorState.currentSpeed);
+  } else if (command == "CLOSE") {
+    motorState.isOpening = false;
+    moveMotor(-STEPS_PER_REVOLUTION, motorState.currentSpeed);
+  } else if (command == "STOP") {
+    stopMotor();
+  }
+}
+```
+
+Sending an `OPEN` payload makes the stepper motor rotate forward by a full revolution, wrapping the dial to "Coldest", while `CLOSE` spins the stepper backward to turn it off.
+
+And just like that - Home Assistant can control the motor!
+
+<p align="center">
+  <img src="/blog/assets/automating-ac-nyc/ha-servo-as-cover.png" width="400px">
+</p>
+
+### Step 2: Adding a Thermostat
+
+With the dial controllable via Home Assistant, the final step was telling it *when* to turn on and off.
+
+Fortunately, Home Assistant has a built-in integration called [Generic Thermostat](https://www.home-assistant.io/integrations/generic_thermostat/). It's dead simple - point it at a switch/cover to toggle + a temperature sensor to monitor, and it handles all the hysteresis logic for you!
+
+For the temperature sensor, I'm using an [AirGradient ONE](https://www.airgradient.com/indoor/), a high-quality smart air quality monitor that happens to live in the same room as the AC unit.
+
+Hooking the two together is as simple as this adding this to my `configuration.yaml`:
+
+```yaml
+climate:
+  - platform: generic_thermostat
+    name: Living Room AC
+    heater: cover.ac_servo_cover
+    target_sensor: sensor.airgradient_temperature
+    min_temp: 65
+    max_temp: 80
+    ac_mode: true
+    target_temp: 72
+    cold_tolerance: 0.5
+    hot_tolerance: 0.5
+```
+
+And just like that, I had a fully automated smart thermostat running my AC unit!
+
+<p align="center">
+  <img src="/blog/assets/automating-ac-nyc/ha-thermostat.png" width="400px">
+</p>
+
+* * *
+
+## 🛌 Building a Second Unit, Upgrading to V1
+
+Having the living room AC automated was awesome, but as someone who lives in an NYC apartment with the *unfathomable luxury* of having both a living room *and* a bedroom - I realized that I'd need to build a second contraption to automate the second, identical AC unit in my bedroom.
+
+Unfortunately, I was fresh out of leftover IKEA brackets and VESA screws... so it was time to find some "real" components I could use to build a more "production-ready" V1 version.
+
+> There's definitely a world where I decided to used this project as an excuse to finally buy a 3D printer and dip my feet into the world of more "serious" hardware engineering... but truth be told - I just wanted to solve my problem ASAP, so my smooth software-engineering brain decided to just KISS.
+
+So I went on a little Temu and Amazon shopping spree, and sourced new parts. Here is the bill of materials for the V1 build:
 
 | Part                          | Cost                | Source                                                                                          |
 | ----------------------------- | ------------------- | ----------------------------------------------------------------------------------------------- |
@@ -242,11 +337,52 @@ Outline:
 | Nuts and bolts                | negligible[^4]      | [Amazon](https://www.amazon.com/dp/B09KS23KQ6)                                                  |
 | USB cable + charger           | $5                  | Temu (take your pick)                                                                           |
 | Binder Clip (bodge)           | negligible          | The Office 🤫                                                                                    |
+[^4]: It was ~$7 for a pack that'll last me for years to come
 
 **Total:** ~$14
 
-[^2]: The only real diff between these two modes is how fast the dispersion fan runs. Empirically, hi-cool _does_ make the room cool a _bit_ faster... at the expense of the fan being extra-loud. I usually stick to lo-cool.
+For V1, I swapped out the bulky ESP32 dev board for a much smaller dev board, and used adjustable metal L-brackets that had slots. This allowed me to bolt the stepper motor directly to the bracket with actual nuts and bolts, making the motor-to-bracket connection rock-solid.
 
-[^3]: This works thanks to a nice property my unit has: when the target temp has been hit, and no more cooling is needed - the unit goes totally silent and inert (until the temp goes back up, and the unit needs to kick back in)
+Here is what the finished V1 bracket assembly looks like from various angles:
 
-[^4]: It was ~$7 for a pack that'll last me for years to come
+<p align="center">
+  <img src="/blog/assets/automating-ac-nyc/v1-assembly-front.jpg" width="30%">&nbsp;
+  <img src="/blog/assets/automating-ac-nyc/v1-assembly-back.jpg" width="30%">&nbsp;
+  <img src="/blog/assets/automating-ac-nyc/v1-assembly-side.jpg" width="30%">
+</p>
+
+Instead of letting the brackets float and bump against the back wall, I decided to "super securely mount" the assembly to the vertical sheet metal inside the AC's control compartment using a large binder clip and some "industrial grade" cardboard (to get the spacing just right).
+
+<p align="center">
+  <img src="/blog/assets/automating-ac-nyc/v1-final-working.jpg" width="400px">
+</p>
+
+I plugged the small ESP32 board in, tucked it neatly into the compartment, and closed the lid. And thanks to some clever USB cable routing - if you look at the AC unit from the outside, you would never even know it was smart!
+
+## 📝 Real World Feedback
+
+So funny enough, I actually built this entire assembly _last_ summer, and even wrote ~80% of this blog post shortly after deploying the project... but then I got sidetracked with other stuff, lol.
+
+On the bright side, this means that I've had ample time to actually put this project through its paces, and with 1-and-a-half summers under it's belt so far, I can safely report the following:
+
+It works _okay?_
+
+Definitely not great... but maybe _~80% okay?_
+
+Ultimately, the biggest issue is that binder clips and cardboard aren't quite as robust of a mounting mechanism as I'd hoped they'd be... and over time, the servo tends to "sag" a bit, resulting in a bit too much friction between the motor, the coupler, and the underlying knob, causing the mechanism to stall-out until someone manually goes and re-seats it...
+
+Is this annoying? Yeah.
+
+Is this less annoying than having to _constantly_ adjust the AC manually? Absolutely.
+
+Who knows though? If i'm still in this apartment next summer - maybe I'll actually invest in a 3D printed mounting solution to bring the reliability up to 100%?
+
+## 🤔 Final Thoughts
+
+Is it the most elegant piece of mechatronics engineering? Absolutely not.
+
+It's jank as hell, held together with binder clips, cardboard padding, running slopcode firmware, and built entirely out of cheap parts from China.
+
+But who cared! It solves my hyper-niche problem Well Enough™️, cost me less than $15, and has provably saved me a non-trivial amount of money on my electricity bill.
+
+So at the end of the day, I'm pretty happy with how it all turned out :)
