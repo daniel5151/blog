@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  
+    <title>esp32 :: prilik&#39;s blog</title>
+  
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="description" content="" />
+<meta name="keywords" content="" />
+<meta name="robots" content="noodp" />
+<link rel="canonical" href="https://prilik.com/blog/tags/esp32/" />
+
+
+<script type="application/javascript">
+var doNotTrack = false;
+if (!doNotTrack) {
+	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+	ga('create', 'UA-58621690-1', 'auto');
+	
+	ga('send', 'pageview');
+}
+</script>
+
+
+
+<link rel="stylesheet" href="https://prilik.com/blog/assets/style.css">
+
+  <link rel="stylesheet" href="https://prilik.com/blog/assets/blue.css">
+
+
+
+
+
+
+<link rel="apple-touch-icon" href="https://prilik.com/blog/img/apple-touch-icon-192x192.png">
+
+  <link rel="shortcut icon" href="https://prilik.com/blog/img/favicon/blue.png">
+
+
+
+<meta name="twitter:card" content="summary" />
+
+
+
+<meta property="og:locale" content="en" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="esp32">
+<meta property="og:description" content="" />
+<meta property="og:url" content="https://prilik.com/blog/tags/esp32/" />
+<meta property="og:site_name" content="prilik&#39;s blog" />
+
+  
+    <meta property="og:image" content="https://prilik.com/blog/img/favicon/blue.png">
+  
+
+<meta property="og:image:width" content="2048">
+<meta property="og:image:height" content="1024">
+
+
+
+
+
+  <link href="/blog/tags/esp32/index.xml" rel="alternate" type="application/rss+xml" title="prilik&#39;s blog" />
+
+
+
+
+
+
+
+
+
+</head>
+<body class="blue">
+
+
+<div class="container center headings--one-size">
+
+  <header class="header">
+  <div class="header__inner">
+    <div class="header__logo">
+      <a href="/blog">
+  <div class="logo">
+    prilik&#39;s blog
+  </div>
+</a>
+
+    </div>
+    <div class="menu-trigger">menu</div>
+  </div>
+  
+    <nav class="menu">
+  <ul class="menu__inner menu__inner--desktop">
+    
+      
+        
+          <li><a href="https://github.com/daniel5151">github</a></li>
+        
+      
+        
+          <li><a href="/blog/">posts</a></li>
+        
+      
+        
+          <li><a href="/blog/index.xml">rss</a></li>
+        
+      
+        
+          <li><a href="/blog/tags/">tags</a></li>
+        
+      
+        
+          <li><a href="https://prilik.com">whoami</a></li>
+        
+      
+    
+
+    
+  </ul>
+
+  <ul class="menu__inner menu__inner--mobile">
+    
+      
+        <li><a href="https://github.com/daniel5151">github</a></li>
+      
+    
+      
+        <li><a href="/blog/">posts</a></li>
+      
+    
+      
+        <li><a href="/blog/index.xml">rss</a></li>
+      
+    
+      
+        <li><a href="/blog/tags/">tags</a></li>
+      
+    
+      
+        <li><a href="https://prilik.com">whoami</a></li>
+      
+    
+    
+  </ul>
+</nav>
+
+  
+</header>
+
+
+  <div class="content">
+    
+  
+  <div class="posts">
+    
+      <div class="post on-list">
+        <h1 class="post-title">
+          <a href="https://prilik.com/blog/post/automating-ac-nyc/">Turning a Dumb AC Unit Smart (Without Losing my Security Deposit)</a>
+        </h1>
+        <div class="post-meta">
+          <span class="post-date">
+            2025-11-02
+          </span>
+          <span> - 15 minute read</span>
+          
+        </div>
+
+        
+          <span class="post-tags">
+            
+            #<a href="https://prilik.com/blog/tags/c&#43;&#43;/">c&#43;&#43;</a>&nbsp;
+            
+            #<a href="https://prilik.com/blog/tags/arduino/">arduino</a>&nbsp;
+            
+            #<a href="https://prilik.com/blog/tags/homeassistant/">homeassistant</a>&nbsp;
+            
+            #<a href="https://prilik.com/blog/tags/esp32/">esp32</a>&nbsp;
+            
+          </span>
+        
+
+        
+
+        <div class="post-content">
+          
+          
+          <p><strong>TL;DR:</strong> DIY home automation is ezpz with nothing more than a servo motor, an esp32, and a high tolerance for Jank.</p>
+<hr>
+<p>My rental apartment&rsquo;s AC unit can only be controlled using these retro-looking <em>analog</em> knob-based controls, mounted right onto the unit. No separate wall-mounted thermostat, no remote control&hellip; nothin&rsquo; fancy whatsoever.</p>
+<p>These knobs work&hellip; but having to constantly stand up and fiddle with them gets annoying pretty quick.</p>
+<p align="center">
+  <img src="/blog/assets/automating-ac-nyc/aircon-controls-crop.jpg" width="400px">
+</p>
+<p>Fortunately, there&rsquo;s an &lsquo;ol Prilik family saying that goes something like this: &ldquo;remember son - the hardest problems in life can usually be solved with nothing more than a servo motor, an esp32, and a dream&rdquo;<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup></p>
+<p>And sure enough, after dropping ~$15 on parts, waiting for things to arrive from China, and spending a few hours iterating on the hardware assembly and firmware&hellip; I hacked together this beautiful mess:</p>
+<p align="center">
+<img src="/blog/assets/automating-ac-nyc/v1-final-working-crop.jpg" width="400px">
+</p>
+<p>What you&rsquo;re looking at here is a jerry-rigged <strong>esp32-controlled servo motor</strong>, coupled to one of my AC unit&rsquo;s knobs using a <strong>shaft coupler</strong>, all affixed to the AC&rsquo;s back-plane using a <strong>cheap L-bracket</strong> and a <strong>binder clip</strong> (with some industrial-grade <strong>cardboard padding</strong> for good measure).</p>
+<p>This whole MacGyver&rsquo;d up contraption talks to my <strong>Home Assistant</strong> instance over <strong>MQTT</strong>, which turns the AC unit on/off based on the state of a temperature sensor located in the same room.</p>
+<p>Et voila 🪄 ✨</p>
+<p>Just like that - I&rsquo;ve managed to free myself from the shackles of having to get up off the couch just to tweak my AC!</p>
+<blockquote>
+<p>For all you professional embedded and mechatronics folks out there: I <em>strongly</em> suggest you stop reading here.</p>
+<p>The rest of this blog post is a walkthrough of a <em>software</em> engineer&rsquo;s approach to home automation and building custom hardware, and let me tell you: both the final product, <em>and</em> the journey to get there, are <em>hella jank</em>.</p>
+<p>That said&hellip; if you&rsquo;re not afraid of a bit of jank: read onwards, and join me on this fun foray into how I managed to hack together some totally bespoke home-automation hardware with almost no budget, or experience!</p>
+</blockquote>
+          
+          
+        </div>
+
+        
+        <div>
+          <a class="read-more button"
+            href="/blog/post/automating-ac-nyc/">Read more →</a>
+        </div>
+        
+      </div>
+    
+    <div class="pagination">
+  <div class="pagination__buttons">
+    
+    
+  </div>
+</div>
+
+  </div>
+
+  </div>
+
+  
+    <footer class="footer">
+  <div class="footer__inner">
+    
+      <div class="copyright copyright--user">
+        <span>Copyright &copy; Daniel Prilik :: Licensed under <a target="_blank" rel="external noopener license" href="https://creativecommons.org/licenses/by-nd/4.0/">CC-BY-ND-4.0</a>.</span>
+    
+        <span>:: Theme made by <a href="https://twitter.com/panr">panr</a></span>
+      </div>
+  </div>
+</footer>
+
+<script src="https://prilik.com/blog/assets/main.js"></script>
+
+
+
+
+
+
+
+  
+</div>
+
+</body>
+</html>

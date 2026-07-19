@@ -1,6 +1,6 @@
 baseurl = "https://prilik.com/blog"
 languageCode = "en"
-paginate = 11
+#paginate = 11
 googleAnalytics = "UA-58621690-1"
 publishDir = "docs"
 
