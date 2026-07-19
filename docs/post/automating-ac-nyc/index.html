@@ -6,14 +6,15 @@
   
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="TL;DR: Janky DIY home automation is ezpz, with nothing more than a servo motor, an esp32, and a dream.
- My rental apartment&amp;rsquo;s AC unit can only be controlled using these retro analog knob-based controls, mounted right onto the unit. They work&amp;hellip; but having to stand up and and fiddle with them all the time was getting pretty annoying.
-Fortunately, there&amp;rsquo;s an &amp;lsquo;ol Prilik family saying that goes something like this: &amp;ldquo;remember son - there&amp;rsquo;s not a single problem in life that can&amp;rsquo;t be solved with a servo motor, an esp32, and a dream&amp;rdquo;1
-And sure enough, after dropping ~$15 on parts, waiting for things to arrive from China, and spending a few hours iterating on the hardware assembly and firmware - I hacked together this beautiful mess:
+<meta name="description" content="TL;DR: DIY home automation is ezpz with nothing more than a servo motor, an esp32, and a high tolerance for Jank.
+ My rental apartment&amp;rsquo;s AC unit can only be controlled using these retro-looking analog knob-based controls, mounted right onto the unit. No separate wall-mounted thermostat, no remote control&amp;hellip; nothin&amp;rsquo; fancy whatsoever.
+These knobs work&amp;hellip; but having to constantly stand up and fiddle with them gets annoying pretty quick.
+Fortunately, there&amp;rsquo;s an &amp;lsquo;ol Prilik family saying that goes something like this: &amp;ldquo;remember son - the hardest problems in life can usually be solved with nothing more than a servo motor, an esp32, and a dream&amp;rdquo;1
+And sure enough, after dropping ~$15 on parts, waiting for things to arrive from China, and spending a few hours iterating on the hardware assembly and firmware&amp;hellip; I hacked together this beautiful mess:
 What you&amp;rsquo;re looking at here is a jerry-rigged esp32-controlled servo motor, coupled to one of my AC unit&amp;rsquo;s knobs using a shaft coupler, all affixed to the AC&amp;rsquo;s back-plane using a cheap L-bracket and a binder clip (with some industrial-grade cardboard padding for good measure).
-This whole MacGyver&amp;rsquo;d up contraption talks to my Home Assistant instance over MQTT, which turns the AC unit on/off based on the state of a temperature sensor located in the same the room.
+This whole MacGyver&amp;rsquo;d up contraption talks to my Home Assistant instance over MQTT, which turns the AC unit on/off based on the state of a temperature sensor located in the same room.
 Et voila 🪄 ✨
-Just like that - I&amp;rsquo;ve managed to free myself from the schackles of having to get up off the couch just to tweak my AC!
+Just like that - I&amp;rsquo;ve managed to free myself from the shackles of having to get up off the couch just to tweak my AC!
  For all you professional embedded and mechatronics folks out there: I strongly suggest you stop reading here.
 The rest of this blog post is a walkthrough of a software engineer&amp;rsquo;s approach to home automation and building custom hardware, and let me tell you: both the final product, and the journey to get there, are hella jank.
 That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwards, and join me on this fun foray into how I managed to hack together some totally bespoke home-automation hardware with almost no budget, or experience!
@@ -60,14 +61,15 @@ if (!doNotTrack) {
 <meta property="og:locale" content="en" />
 <meta property="og:type" content="article" />
 <meta property="og:title" content="Turning a Dumb AC Unit Smart (Without Losing my Security Deposit)">
-<meta property="og:description" content="TL;DR: Janky DIY home automation is ezpz, with nothing more than a servo motor, an esp32, and a dream.
- My rental apartment&amp;rsquo;s AC unit can only be controlled using these retro analog knob-based controls, mounted right onto the unit. They work&amp;hellip; but having to stand up and and fiddle with them all the time was getting pretty annoying.
-Fortunately, there&amp;rsquo;s an &amp;lsquo;ol Prilik family saying that goes something like this: &amp;ldquo;remember son - there&amp;rsquo;s not a single problem in life that can&amp;rsquo;t be solved with a servo motor, an esp32, and a dream&amp;rdquo;1
-And sure enough, after dropping ~$15 on parts, waiting for things to arrive from China, and spending a few hours iterating on the hardware assembly and firmware - I hacked together this beautiful mess:
+<meta property="og:description" content="TL;DR: DIY home automation is ezpz with nothing more than a servo motor, an esp32, and a high tolerance for Jank.
+ My rental apartment&amp;rsquo;s AC unit can only be controlled using these retro-looking analog knob-based controls, mounted right onto the unit. No separate wall-mounted thermostat, no remote control&amp;hellip; nothin&amp;rsquo; fancy whatsoever.
+These knobs work&amp;hellip; but having to constantly stand up and fiddle with them gets annoying pretty quick.
+Fortunately, there&amp;rsquo;s an &amp;lsquo;ol Prilik family saying that goes something like this: &amp;ldquo;remember son - the hardest problems in life can usually be solved with nothing more than a servo motor, an esp32, and a dream&amp;rdquo;1
+And sure enough, after dropping ~$15 on parts, waiting for things to arrive from China, and spending a few hours iterating on the hardware assembly and firmware&amp;hellip; I hacked together this beautiful mess:
 What you&amp;rsquo;re looking at here is a jerry-rigged esp32-controlled servo motor, coupled to one of my AC unit&amp;rsquo;s knobs using a shaft coupler, all affixed to the AC&amp;rsquo;s back-plane using a cheap L-bracket and a binder clip (with some industrial-grade cardboard padding for good measure).
-This whole MacGyver&amp;rsquo;d up contraption talks to my Home Assistant instance over MQTT, which turns the AC unit on/off based on the state of a temperature sensor located in the same the room.
+This whole MacGyver&amp;rsquo;d up contraption talks to my Home Assistant instance over MQTT, which turns the AC unit on/off based on the state of a temperature sensor located in the same room.
 Et voila 🪄 ✨
-Just like that - I&amp;rsquo;ve managed to free myself from the schackles of having to get up off the couch just to tweak my AC!
+Just like that - I&amp;rsquo;ve managed to free myself from the shackles of having to get up off the couch just to tweak my AC!
  For all you professional embedded and mechatronics folks out there: I strongly suggest you stop reading here.
 The rest of this blog post is a walkthrough of a software engineer&amp;rsquo;s approach to home automation and building custom hardware, and let me tell you: both the final product, and the journey to get there, are hella jank.
 That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwards, and join me on this fun foray into how I managed to hack together some totally bespoke home-automation hardware with almost no budget, or experience!
@@ -208,21 +210,22 @@ That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwa
   
 
   <div class="post-content"><div>
-        <p><strong>TL;DR:</strong> Janky DIY home automation is ezpz, with nothing more than a servo motor, an esp32, and a dream.</p>
+        <p><strong>TL;DR:</strong> DIY home automation is ezpz with nothing more than a servo motor, an esp32, and a high tolerance for Jank.</p>
 <hr>
-<p>My rental apartment&rsquo;s AC unit can only be controlled using these retro <em>analog</em> knob-based controls, mounted right onto the unit. They work&hellip; but having to stand up and and fiddle with them all the time was getting pretty annoying.</p>
+<p>My rental apartment&rsquo;s AC unit can only be controlled using these retro-looking <em>analog</em> knob-based controls, mounted right onto the unit. No separate wall-mounted thermostat, no remote control&hellip; nothin&rsquo; fancy whatsoever.</p>
+<p>These knobs work&hellip; but having to constantly stand up and fiddle with them gets annoying pretty quick.</p>
 <p align="center">
   <img src="/blog/assets/automating-ac-nyc/aircon-controls-crop.jpg" width="400px">
 </p>
-<p>Fortunately, there&rsquo;s an &lsquo;ol Prilik family saying that goes something like this: &ldquo;remember son - there&rsquo;s not a single problem in life that can&rsquo;t be solved with a servo motor, an esp32, and a dream&rdquo;<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup></p>
-<p>And sure enough, after dropping ~$15 on parts, waiting for things to arrive from China, and spending a few hours iterating on the hardware assembly and firmware - I hacked together this beautiful mess:</p>
+<p>Fortunately, there&rsquo;s an &lsquo;ol Prilik family saying that goes something like this: &ldquo;remember son - the hardest problems in life can usually be solved with nothing more than a servo motor, an esp32, and a dream&rdquo;<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup></p>
+<p>And sure enough, after dropping ~$15 on parts, waiting for things to arrive from China, and spending a few hours iterating on the hardware assembly and firmware&hellip; I hacked together this beautiful mess:</p>
 <p align="center">
 <img src="/blog/assets/automating-ac-nyc/v1-final-working-crop.jpg" width="400px">
 </p>
 <p>What you&rsquo;re looking at here is a jerry-rigged <strong>esp32-controlled servo motor</strong>, coupled to one of my AC unit&rsquo;s knobs using a <strong>shaft coupler</strong>, all affixed to the AC&rsquo;s back-plane using a <strong>cheap L-bracket</strong> and a <strong>binder clip</strong> (with some industrial-grade <strong>cardboard padding</strong> for good measure).</p>
-<p>This whole MacGyver&rsquo;d up contraption talks to my <strong>Home Assistant</strong> instance over <strong>MQTT</strong>, which turns the AC unit on/off based on the state of a temperature sensor located in the same the room.</p>
+<p>This whole MacGyver&rsquo;d up contraption talks to my <strong>Home Assistant</strong> instance over <strong>MQTT</strong>, which turns the AC unit on/off based on the state of a temperature sensor located in the same room.</p>
 <p>Et voila 🪄 ✨</p>
-<p>Just like that - I&rsquo;ve managed to free myself from the schackles of having to get up off the couch just to tweak my AC!</p>
+<p>Just like that - I&rsquo;ve managed to free myself from the shackles of having to get up off the couch just to tweak my AC!</p>
 <blockquote>
 <p>For all you professional embedded and mechatronics folks out there: I <em>strongly</em> suggest you stop reading here.</p>
 <p>The rest of this blog post is a walkthrough of a <em>software</em> engineer&rsquo;s approach to home automation and building custom hardware, and let me tell you: both the final product, <em>and</em> the journey to get there, are <em>hella jank</em>.</p>
@@ -231,7 +234,7 @@ That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwa
 <h2 id="-setting-the-stage">🗽 Setting the stage<a href="#-setting-the-stage" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
 <p>In April 2025, I moved to New York City. After a brief apartment hunt, I managed to find a place I&rsquo;m pretty happy with: the location is convenient, the building is fairly modern, and best of all - my rent is stabilized and <em>way</em> below market value (woo!). There&rsquo;s not much to complain about!</p>
 <p>&hellip;well, except for the AC situation.</p>
-<p>See, for whatever reason, developers in NYC <em>really</em> like using these loud, power-hungry, wall-mounted <a href="https://en.wikipedia.org/wiki/Packaged_terminal_air_conditioner">PTAC units</a> in their apartment buildings. Some buildings might spend a bit extra in order to wire these unit up to wall-mounted thermostats&hellip; but often times, they&rsquo;ll just go with the cheapest option: completely <em>analog, unit-mounted knobs</em>.</p>
+<p>See, for whatever reason, developers in NYC <em>really</em> like using these loud, power-hungry, wall-mounted <a href="https://en.wikipedia.org/wiki/Packaged_terminal_air_conditioner">PTAC units</a> in their apartment buildings. Some buildings might spend a bit extra in order to wire these units up to wall-mounted thermostats&hellip; but oftentimes, they&rsquo;ll just go with the cheapest option: completely <em>analog, unit-mounted knobs</em>.</p>
 <p>Here&rsquo;s a picture of what I&rsquo;m talking about:</p>
 <p align="center">
 <img src="/blog/assets/automating-ac-nyc/aircon-controls.jpg" width="400px">
@@ -239,7 +242,7 @@ That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwa
 <p>Yeah - guess which option <em>my</em> building went with 🙃</p>
 <h2 id="-what-are-my-options-here">🤔 What are my options here?<a href="#-what-are-my-options-here" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
 <p>Like any good renter, the first thing I did was gently ask my landlord if there was any way to &ldquo;upgrade&rdquo; the controls to something a bit more&hellip; modern. As expected, the response was roughly along the lines of &ldquo;lol no, why would we do that?&quot;, which, to be fair, was basically the response I expected.</p>
-<p>Well, no matter, like and good engineer - <em>surely</em> I can hack my way out of this pickle?</p>
+<p>Well, no matter, like any good engineer - <em>surely</em> I can hack my way out of this pickle?</p>
 <p>After a bit of finessing, I managed to pop the cover off the unit, and expose its <del>soft underbelly</del> inner workings. Much to my surprise, not only did I find some info about the unit, but even a whole wiring diagram!</p>
 <p align="center">
 <img src="/blog/assets/automating-ac-nyc/ptac-controls-and-wiring-diagram-crop.jpg" width="600px">
@@ -264,7 +267,7 @@ That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwa
 <img src="/blog/assets/automating-ac-nyc/NEMA_5-20P.svg.png" style="background-color: white; padding: 4px">
 </p>
 <p>Well shoot!</p>
-<p>If hooking into the wiring is a non-starter, and putting the unit behind a smart plug is a non-trivial&hellip; am I just out of luck?</p>
+<p>If hooking into the wiring is a non-starter, and putting the unit behind a smart plug is non-trivial&hellip; am I just out of luck?</p>
 <p>Of course not!</p>
 <p>Clearly it was time to put my engineering hat on and <em>jank</em> together a solution: why not just make a little robot to turn the dials for me?</p>
 <h2 id="-_dialing_-in-the-right-approach">🎛️ <em>Dialing</em> in the right approach<a href="#-_dialing_-in-the-right-approach" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
@@ -273,13 +276,17 @@ That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwa
 <li><strong>Mode Control:</strong> A stiff, discrete dial, clicking between 6 &ldquo;modes&rdquo; of operation (Off, Lo-Cool, Hi-Cool<sup id="fnref:2"><a href="#fn:2" class="footnote-ref" role="doc-noteref">2</a></sup>, Vent, Exhaust, and Heat)</li>
 <li><strong>Temp Control:</strong> A smooth, analog dial, connected to a simple bimetallic-strip based thermostat</li>
 </ol>
+<p>And fortunately - both plastic knobs pop right off, exposing a shaft that shouldn&rsquo;t be <em>too</em> hard to mechanically couple with:</p>
+<p align="center">
+<img src="/blog/assets/automating-ac-nyc/aircon-controls-noknob.jpg" width="400px">
+</p>
 <p>This gave me two options to toggle the AC unit on and off:</p>
 <p><strong>Option 1:</strong> hooking into the <strong>Mode Control</strong> dial</p>
 <ul>
 <li>Leave the Temp Control dial set to &ldquo;max cold&rdquo;</li>
 <li>Buy a servo motor with enough torque to overcome the stiff action of the dial
 <ul>
-<li>&hellip;which would probably need a 12V DC (if not more) power source, requiring extra circuity to power</li>
+<li>&hellip;which would probably need a 12V DC (if not more) power source, requiring extra circuitry to power</li>
 <li>&hellip;and require some more robust mounting hardware, to counteract the torque, and ensure the servo stays in the right place</li>
 </ul>
 </li>
@@ -300,7 +307,7 @@ That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwa
 <p>Option 2 certainly is the &ldquo;jankier&rdquo; of the two options, given that it relies on a second-order property (target temp) to power the unit on/off&hellip; but hey - whatever&rsquo;s easier, right?</p>
 </blockquote>
 <h2 id="-the-road-to-v0">🔨 The road to V0<a href="#-the-road-to-v0" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
-<p>I was <em>fairly</em> sure this was gonna work, but obviously, the only way to find our was to hack together a proof-of-concept (ideally - with the least number of new purchases as possible).</p>
+<p>I was <em>fairly</em> sure this was gonna work, but obviously, the only way to find out was to hack together a proof-of-concept (ideally - with the least number of new purchases as possible).</p>
 <p>To cut a long story short - here&rsquo;s what I came up with for V0:</p>
 <table>
 <thead>
@@ -359,12 +366,12 @@ That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwa
 <ul>
 <li>I didn&rsquo;t get the right shaft-coupler the first time (or the second time (or the third time&hellip;)), so it took a few Amazon returns until I found the right one.</li>
 <li>Before buying the ESP32 Dev Board, I validated the servo motor + shaft coupler worked using a (really, really) old Arduino Leonardo I had lying around, and controlling it manually over serial (using a really long USB cable extending to my PC)</li>
-<li>My first attempt at mounting this thing involved wooden skewers, a glue stick, and a cut up Amazon box&hellip; a failed experiment, to say the least.</li>
+<li>My first attempt at mounting this thing involved wooden skewers, a glue stick, and a cut-up Amazon box&hellip; a failed experiment, to say the least.</li>
 </ul>
 </blockquote>
 <p>Of course, what good is some hardware without some software?</p>
 <h3 id="-writing-the-firmware">💻 Writing the Firmware<a href="#-writing-the-firmware" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h3>
-<p>The firmware here is <em>dead simple</em>: it connects to Wi-Fi, hosts a local web server, and listen for HTTP/MQTT commands to spin the motor.</p>
+<p>The firmware here is <em>dead simple</em>: it connects to Wi-Fi, hosts a local web server, and listens for HTTP/MQTT commands to spin the motor.</p>
 <p>While I do somewhat miss the Good Old Days where I&rsquo;d spend a couple weekends hacking together this sort of one-off firmware&hellip; truth be told, I&rsquo;m kinda glad that LLMs can one-shot code for these sorts of projects. I ended up using a combo of Claude and Gemini, and they did a Totally Fine™️ job hacking together something that works.</p>
 <p align="center">
   <img src="/blog/assets/automating-ac-nyc/bereal-claude-code.jpg" width="500px">
@@ -375,7 +382,7 @@ That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwa
 </p>
 <p>Code is available here, but honestly - it&rsquo;s not all that interesting: <a href="https://gist.github.com/daniel5151/2d9950a27119e7e481db4446f2abcf13">https://gist.github.com/daniel5151/2d9950a27119e7e481db4446f2abcf13</a></p>
 <h2 id="-making-it-useful-with-home-assistant">🏠 Making it Useful with Home Assistant<a href="#-making-it-useful-with-home-assistant" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
-<p>With the firmware flashed, the hardware jankily mounted in place, I decided to kick the tires on this thing by sitting comfortably on the couch, pulling up the web UI on my phone, and hitting the button to turn the motor.</p>
+<p>With the firmware flashed and the hardware jankily mounted in place, I decided to kick the tires on this thing by sitting comfortably on the couch, pulling up the web UI on my phone, and hitting the button to turn the motor.</p>
 <p>Lemme tell you - seeing the AC kick on/off without me leaving the couch?</p>
 <p>Absolute Cinema.</p>
 <p>That said, while it <em>was</em> cool to see it working from the web UI&hellip; for this to be truly useful, I&rsquo;d need to get it integrated with Home Assistant.</p>
@@ -383,11 +390,11 @@ That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwa
 <h3 id="step-1-exposing-the-servo-as-an-mqtt-cover">Step 1: Exposing the Servo as an MQTT Cover<a href="#step-1-exposing-the-servo-as-an-mqtt-cover" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h3>
 <p>Instead of writing some kind of custom API integration script, I took advantage of Home Assistant&rsquo;s excellent support for <strong>MQTT Discovery</strong>.</p>
 <blockquote>
-<p>If you&rsquo;re not familiar with MQTT (Message Queuing Telemetry Transport), think of it as a super lightweight pub/sub messaging protocol designed for resource-constrained IoT devices. It runs on a central broker (most self-hosters run the excellent, open-source <a href="https://mosquitto.org/">Mosquitto</a>), where devices can &ldquo;publish&rdquo; messages to specific paths (called topics, like <code>living_room/ac/state</code>), and other devices (like Home Assistant) can &ldquo;subscribe&rdquo; to those topics to listen for updates or send commands. It&rsquo;s incredibly fast, has negligible overhead, and is the gold-standard for DIY home automation.</p>
-<p>For a good primer, Steve&rsquo;s Internet Guide has an excellent <a href="http://www.steves-internet-guide.com/mqtt-basics-course/">MQTT Guide for Beginners</a>, and HiveMQ&rsquo;s <a href="https://www.hivemq.com/mqtt-essentials/">MQTT Essentials</a> series is a fantastic deep-dive.</p>
+<p>If you&rsquo;re not familiar with MQTT, think of it as a super lightweight pub/sub messaging protocol designed for resource-constrained IoT devices.</p>
+<p>Devices can &ldquo;publish&rdquo; messages to specific paths (called topics, like <code>living_room/ac/state</code>), and other devices (like Home Assistant) can &ldquo;subscribe&rdquo; to those topics to listen for updates or send commands.</p>
 </blockquote>
-<p>If you configure a device to publish a specific configuration JSON to a standardized discovery topic (e.g., <code>homeassistant/cover/ac_stepper_cover/config</code>), Home Assistant will automatically discover the device and configure all of its entities, sensors, and controllers without you having to write a single line of YAML config!</p>
-<p>For a dial controller like this, the most natural fit is the <a href="https://www.home-assistant.io/integrations/cover.mqtt/">MQTT Cover</a> integration. While a &ldquo;cover&rdquo; is typically used for window blinds, motorized curtains, or garage doors, its schema supports opening, closing, stopping, and setting absolute positions—which maps perfectly to rotating our dial to &ldquo;max cold&rdquo; (open), &ldquo;off&rdquo; (closed), or arbitrary positions in between.</p>
+<p>If you configure a device to publish a specific configuration JSON payload to a standardized discovery topic (e.g., <code>homeassistant/cover/ac_stepper_cover/config</code>), Home Assistant will <em>automatically</em> discover the device and configure all of its entities, sensors, and controllers - all without you having to write a single line of YAML config!</p>
+<p>For a dial controller like this, I decided to expose it as an <a href="https://www.home-assistant.io/integrations/cover.mqtt/">MQTT Cover</a> integration. While &ldquo;covers&rdquo; are typically used for things like window blinds, motorized curtains, or garage doors&hellip; its schema supports opening, closing, stopping, which maps pretty well to our rotating dial.</p>
 <p>When the ESP32 boots up, it automatically connects to the MQTT broker and fires off this discovery JSON payload:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
   <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;AC Stepper Cover&#34;</span>,
@@ -426,14 +433,15 @@ That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwa
   }
 }
 </code></pre></div><p>Sending an <code>OPEN</code> payload makes the stepper motor rotate forward by a full revolution, wrapping the dial to &ldquo;Coldest&rdquo;, while <code>CLOSE</code> spins the stepper backward to turn it off.</p>
+<p>And just like that - Home Assistant can control the motor!</p>
 <p align="center">
   <img src="/blog/assets/automating-ac-nyc/ha-servo-as-cover.png" width="400px">
 </p>
 <h3 id="step-2-adding-a-thermostat">Step 2: Adding a Thermostat<a href="#step-2-adding-a-thermostat" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h3>
 <p>With the dial controllable via Home Assistant, the final step was telling it <em>when</em> to turn on and off.</p>
-<p>Normally, building a smart thermostat is a pain. But Home Assistant has an amazing built-in integration called <a href="https://www.home-assistant.io/integrations/generic_thermostat/">Generic Thermostat</a>. You just give it a switch/cover to toggle, and a temperature sensor to monitor, and it handles all the hysteresis logic for you.</p>
-<p>For the temperature sensor, I used my <a href="https://www.airgradient.com/indoor/">AirGradient ONE</a>, a high-quality smart air quality monitor that sits on my desk.</p>
-<p>I hooked them together in my <code>configuration.yaml</code>:</p>
+<p>Fortunately, Home Assistant has a built-in integration called <a href="https://www.home-assistant.io/integrations/generic_thermostat/">Generic Thermostat</a>. It&rsquo;s dead simple - point it at a switch/cover to toggle + a temperature sensor to monitor, and it handles all the hysteresis logic for you!</p>
+<p>For the temperature sensor, I&rsquo;m using an <a href="https://www.airgradient.com/indoor/">AirGradient ONE</a>, a high-quality smart air quality monitor that happens to live in the same room as the AC unit.</p>
+<p>Hooking the two together is as simple as adding this to my <code>configuration.yaml</code>:</p>
 <div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">climate</span>:
   - <span style="color:#66d9ef">platform</span>: generic_thermostat
     <span style="color:#66d9ef">name</span>: Living Room AC
@@ -442,19 +450,20 @@ That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwa
     <span style="color:#66d9ef">min_temp</span>: <span style="color:#ae81ff">65</span>
     <span style="color:#66d9ef">max_temp</span>: <span style="color:#ae81ff">80</span>
     <span style="color:#66d9ef">ac_mode</span>: <span style="color:#66d9ef">true</span>
-    <span style="color:#66d9ef">target_temp</span>: <span style="color:#ae81ff">72</span>
     <span style="color:#66d9ef">cold_tolerance</span>: <span style="color:#ae81ff">0.5</span>
     <span style="color:#66d9ef">hot_tolerance</span>: <span style="color:#ae81ff">0.5</span>
-</code></pre></div><p>And just like that, I had a fully automated smart thermostat running my analog AC unit.</p>
-<h2 id="-upgrading-to-v1-bedroom-edition">🛌 Upgrading to V1: Bedroom Edition<a href="#-upgrading-to-v1-bedroom-edition" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
-<p>Having the living room AC automated was life-changing. But it highlighted a new problem: the <em>unfathomable luxury</em> of living in a two-room apartment (a living room <em>and</em> a bedroom) meant I had a second, identical AC unit in my bedroom that was still dumb.</p>
-<p>I need to build another unit.</p>
-<p>But I was fresh out of leftover IKEA brackets and VESA screws, and I didn&rsquo;t want my bedroom to look like an electronics junkyard. It was time to build a &ldquo;production-ready&rdquo; V1 version.</p>
+</code></pre></div><p>And just like that, I had a fully automated smart thermostat running my AC unit!</p>
+<p align="center">
+  <img src="/blog/assets/automating-ac-nyc/ha-thermostat.png" width="400px">
+</p>
+<hr>
+<h2 id="-building-a-second-unit-upgrading-to-v1">🛌 Building a Second Unit, Upgrading to V1<a href="#-building-a-second-unit-upgrading-to-v1" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
+<p>Having the living room AC automated was awesome, but as someone who lives in an NYC apartment with the <em>unfathomable luxury</em> of having both a living room <em>and</em> a bedroom - I realized that I&rsquo;d need to build a second contraption to automate the second, identical AC unit in my bedroom.</p>
+<p>Unfortunately, I was fresh out of leftover IKEA brackets and VESA screws&hellip; so it was time to find some &ldquo;real&rdquo; components I could use to build a more &ldquo;production-ready&rdquo; V1 version.</p>
 <blockquote>
-<p>There&rsquo;s definately world where I decided to used this project as an excuse to finally buy a 3D printer and dip my feet into the world of more &ldquo;serious&rdquo; hardware engineering&hellip; but truth be told - I just wanted to solve my problem ASAP, so my smooth software-engineering brain decided to just KISS.</p>
+<p>There&rsquo;s definitely a world where I decided to use this project as an excuse to finally buy a 3D printer and dip my feet into the world of more &ldquo;serious&rdquo; hardware engineering&hellip; but truth be told - I just wanted to solve my problem ASAP, so my smooth software-engineering brain decided to just KISS.</p>
 </blockquote>
-<p>I went on a minor Temu and Amazon shopping spree to source some actual, proper hardware parts. The goal was to build a clean, repeatable mount that didn&rsquo;t rely on luck. Here is the bill of materials for the V1 build:</p>
-<p>&ldquo;Production&rdquo; v1:</p>
+<p>So I went on a little Temu and Amazon shopping spree, and sourced new parts. Here is the bill of materials for the V1 build:</p>
 <table>
 <thead>
 <tr>
@@ -509,18 +518,25 @@ That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwa
   <img src="/blog/assets/automating-ac-nyc/v1-assembly-back.jpg" width="30%">&nbsp;
   <img src="/blog/assets/automating-ac-nyc/v1-assembly-side.jpg" width="30%">
 </p>
-<p>Instead of letting the brackets float and bump against the back wall, I decided to mount the assembly securely to the vertical sheet metal inside the AC&rsquo;s control compartment using a large binder clip (wrapped in a bit of cardboard to prevent scratching).</p>
+<p>Instead of letting the brackets float and bump against the back wall, I decided to &ldquo;super securely mount&rdquo; the assembly to the vertical sheet metal inside the AC&rsquo;s control compartment using a large binder clip and some &ldquo;industrial grade&rdquo; cardboard (to get the spacing just right).</p>
 <p align="center">
-  <img src="/blog/assets/automating-ac-nyc/v1-working-poc.jpg" width="400px">
+  <img src="/blog/assets/automating-ac-nyc/v1-final-working.jpg" width="400px">
 </p>
-<p>It turns out a simple binder clip provides more than enough clamping force to resist the stepper motor&rsquo;s torque, keeping the entire assembly perfectly stable when the motor turns the dial.</p>
-<p>I plugged the small ESP32 board in, tucked it neatly into the compartment, and closed the lid. Looking at the AC unit from the outside, you would never even know it was smart!</p>
-<h2 id="-wrap-up">🎉 Wrap-up<a href="#-wrap-up" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
-<p>So, how is it?</p>
-<p>In a word: <strong>incredible</strong>.</p>
-<p>Being able to set a target temperature on my phone before going to sleep, and having the AC automatically click on and off throughout the night to keep the room comfortable, is a game-changer. No more waking up freezing at 3 AM, and no more getting out of bed to turn the dials.</p>
-<p>Is it the most elegant piece of mechatronics engineering? Absolutely not. It is held together with binder clips, cardboard padding, and cheap parts from China. But it solves the problem perfectly, cost less than $15 per unit, and leaves the apartment completely undamaged for when I eventually move out.</p>
-<p>If you have a dumb AC unit and a free weekend, I highly recommend giving this a shot. Janky home automation is the best kind of home automation!</p>
+<p>I plugged the small ESP32 board in, tucked it neatly into the compartment, and closed the lid. And thanks to some clever USB cable routing - if you look at the AC unit from the outside, you would never even know it was smart!</p>
+<h2 id="-real-world-feedback">📝 Real World Feedback<a href="#-real-world-feedback" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
+<p>So funny enough, I actually built this entire assembly <em>last</em> summer, and even wrote ~80% of this blog post shortly after deploying the project&hellip; but then I got sidetracked with other stuff, lol.</p>
+<p>On the bright side, this means that I&rsquo;ve had ample time to actually put this project through its paces, and with 1-and-a-half summers under its belt so far, I can safely report the following:</p>
+<p>It works <em>okay?</em></p>
+<p>Definitely not great&hellip; but maybe <em>~80% okay?</em></p>
+<p>Ultimately, the biggest issue is that binder clips and cardboard aren&rsquo;t quite as robust of a mounting mechanism as I&rsquo;d hoped they&rsquo;d be&hellip; and over time, the servo tends to &ldquo;sag&rdquo; a bit, resulting in a bit too much friction between the motor, the coupler, and the underlying knob, causing the mechanism to stall out until someone manually goes and reseats it&hellip;</p>
+<p>Is this annoying? Yeah.</p>
+<p>Is this less annoying than having to <em>constantly</em> adjust the AC manually? Absolutely.</p>
+<p>Who knows though? If I&rsquo;m still in this apartment next summer - maybe I&rsquo;ll actually invest in a 3D printed mounting solution to bring the reliability up to 100%?</p>
+<h2 id="-final-thoughts">🤔 Final Thoughts<a href="#-final-thoughts" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
+<p>Is it the most elegant piece of mechatronics engineering? Absolutely not.</p>
+<p>It&rsquo;s jank as hell, held together with binder clips, cardboard padding, running slopcode firmware, and built entirely out of cheap parts from China.</p>
+<p>But who cares! It solves my hyper-niche problem Well Enough™️, cost me less than $15, and has provably saved me a non-trivial amount of money on my electricity bill.</p>
+<p>So at the end of the day, I&rsquo;m pretty happy with how it all turned out :)</p>
 <section class="footnotes" role="doc-endnotes">
 <hr>
 <ol>

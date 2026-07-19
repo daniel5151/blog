@@ -11,7 +11,7 @@ tags = ["c++", "arduino", "homeassistant", "esp32"]
 
 My rental apartment's AC unit can only be controlled using these retro-looking _analog_ knob-based controls, mounted right onto the unit. No separate wall-mounted thermostat, no remote control... nothin' fancy whatsoever.
 
-These knobs work... but having to constantly stand up and and fiddle with them gets annoying pretty quick.
+These knobs work... but having to constantly stand up and fiddle with them gets annoying pretty quick.
 
 <p align="center">
   <img src="/blog/assets/automating-ac-nyc/aircon-controls-crop.jpg" width="400px">
@@ -29,11 +29,11 @@ And sure enough, after dropping ~$15 on parts, waiting for things to arrive from
 
 What you're looking at here is a jerry-rigged **esp32-controlled servo motor**, coupled to one of my AC unit's knobs using a **shaft coupler**, all affixed to the AC's back-plane using a **cheap L-bracket** and a **binder clip** (with some industrial-grade **cardboard padding** for good measure).
 
-This whole MacGyver'd up contraption talks to my **Home Assistant** instance over **MQTT**, which turns the AC unit on/off based on the state of a temperature sensor located in the same the room.
+This whole MacGyver'd up contraption talks to my **Home Assistant** instance over **MQTT**, which turns the AC unit on/off based on the state of a temperature sensor located in the same room.
 
 Et voila 🪄 ✨
 
-Just like that - I've managed to free myself from the schackles of having to get up off the couch just to tweak my AC!
+Just like that - I've managed to free myself from the shackles of having to get up off the couch just to tweak my AC!
 
 > For all you professional embedded and mechatronics folks out there: I _strongly_ suggest you stop reading here.
 >
@@ -49,7 +49,7 @@ In April 2025, I moved to New York City. After a brief apartment hunt, I managed
 
 ...well, except for the AC situation.
 
-See, for whatever reason, developers in NYC _really_ like using these loud, power-hungry, wall-mounted [PTAC units](https://en.wikipedia.org/wiki/Packaged_terminal_air_conditioner) in their apartment buildings. Some buildings might spend a bit extra in order to wire these unit up to wall-mounted thermostats... but often times, they'll just go with the cheapest option: completely _analog, unit-mounted knobs_.
+See, for whatever reason, developers in NYC _really_ like using these loud, power-hungry, wall-mounted [PTAC units](https://en.wikipedia.org/wiki/Packaged_terminal_air_conditioner) in their apartment buildings. Some buildings might spend a bit extra in order to wire these units up to wall-mounted thermostats... but oftentimes, they'll just go with the cheapest option: completely _analog, unit-mounted knobs_.
 
 Here's a picture of what I'm talking about:
 
@@ -63,7 +63,7 @@ Yeah - guess which option _my_ building went with 🙃
 
 Like any good renter, the first thing I did was gently ask my landlord if there was any way to "upgrade" the controls to something a bit more... modern. As expected, the response was roughly along the lines of "lol no, why would we do that?", which, to be fair, was basically the response I expected.
 
-Well, no matter, like and good engineer - _surely_ I can hack my way out of this pickle?
+Well, no matter, like any good engineer - _surely_ I can hack my way out of this pickle?
 
 After a bit of finessing, I managed to pop the cover off the unit, and expose its ~~soft underbelly~~ inner workings. Much to my surprise, not only did I find some info about the unit, but even a whole wiring diagram!
 
@@ -104,7 +104,7 @@ Alas, much to my chagrin - the unit plugs into the wall using one of those fancy
 
 Well shoot!
 
-If hooking into the wiring is a non-starter, and putting the unit behind a smart plug is a non-trivial... am I just out of luck?
+If hooking into the wiring is a non-starter, and putting the unit behind a smart plug is non-trivial... am I just out of luck?
 
 Of course not!
 
@@ -117,7 +117,7 @@ Looking at the unit, we find 2 dials:
 1. **Mode Control:** A stiff, discrete dial, clicking between 6 "modes" of operation (Off, Lo-Cool, Hi-Cool[^2], Vent, Exhaust, and Heat)
 2. **Temp Control:** A smooth, analog dial, connected to a simple bimetallic-strip based thermostat
 
-And fortunately - both plastic knobs pop right off, exposing a shaft that should be _too_ hard to mechanically couple with:
+And fortunately - both plastic knobs pop right off, exposing a shaft that shouldn't be _too_ hard to mechanically couple with:
 
 <p align="center">
 <img src="/blog/assets/automating-ac-nyc/aircon-controls-noknob.jpg" width="400px">
@@ -129,7 +129,7 @@ This gave me two options to toggle the AC unit on and off:
 
 - Leave the Temp Control dial set to "max cold"
 - Buy a servo motor with enough torque to overcome the stiff action of the dial
-  - ...which would probably need a 12V DC (if not more) power source, requiring extra circuity to power
+  - ...which would probably need a 12V DC (if not more) power source, requiring extra circuitry to power
   - ...and require some more robust mounting hardware, to counteract the torque, and ensure the servo stays in the right place
 - Precisely calibrate the servo motor to rotate the dial the right number of degrees between the "Off" state and the "Cool" state
 
@@ -151,7 +151,7 @@ Hopefully you can guess which one I went with 🥰
 
 ## 🔨 The road to V0
 
-I was _fairly_ sure this was gonna work, but obviously, the only way to find our was to hack together a proof-of-concept (ideally - with the least number of new purchases as possible).
+I was _fairly_ sure this was gonna work, but obviously, the only way to find out was to hack together a proof-of-concept (ideally - with the least number of new purchases as possible).
 
 To cut a long story short - here's what I came up with for V0:
 
@@ -187,13 +187,13 @@ By bolting these to the servo, it made the motor assembly physically "wider". Wh
 >
 > - I didn't get the right shaft-coupler the first time (or the second time (or the third time...)), so it took a few Amazon returns until I found the right one.
 > - Before buying the ESP32 Dev Board, I validated the servo motor + shaft coupler worked using a (really, really) old Arduino Leonardo I had lying around, and controlling it manually over serial (using a really long USB cable extending to my PC)
-> - My first attempt at mounting this thing involved wooden skewers, a glue stick, and a cut up Amazon box... a failed experiment, to say the least.
+> - My first attempt at mounting this thing involved wooden skewers, a glue stick, and a cut-up Amazon box... a failed experiment, to say the least.
 
 Of course, what good is some hardware without some software?
 
 ### 💻 Writing the Firmware
 
-The firmware here is _dead simple_: it connects to Wi-Fi, hosts a local web server, and listen for HTTP/MQTT commands to spin the motor.
+The firmware here is _dead simple_: it connects to Wi-Fi, hosts a local web server, and listens for HTTP/MQTT commands to spin the motor.
 
 While I do somewhat miss the Good Old Days where I'd spend a couple weekends hacking together this sort of one-off firmware... truth be told, I'm kinda glad that LLMs can one-shot code for these sorts of projects. I ended up using a combo of Claude and Gemini, and they did a Totally Fine™️ job hacking together something that works.
 
@@ -211,7 +211,7 @@ Code is available here, but honestly - it's not all that interesting: https://gi
 
 ## 🏠 Making it Useful with Home Assistant
 
-With the firmware flashed, the hardware jankily mounted in place, I decided to kick the tires on this thing by sitting comfortably on the couch, pulling up the web UI on my phone, and hitting the button to turn the motor.
+With the firmware flashed and the hardware jankily mounted in place, I decided to kick the tires on this thing by sitting comfortably on the couch, pulling up the web UI on my phone, and hitting the button to turn the motor.
 
 Lemme tell you - seeing the AC kick on/off without me leaving the couch?
 
@@ -231,7 +231,7 @@ Instead of writing some kind of custom API integration script, I took advantage 
 
 If you configure a device to publish a specific configuration JSON payload to a standardized discovery topic (e.g., `homeassistant/cover/ac_stepper_cover/config`), Home Assistant will *automatically* discover the device and configure all of its entities, sensors, and controllers - all without you having to write a single line of YAML config!
 
-For a dial controller like this, I decided to expose it as a [MQTT Cover](https://www.home-assistant.io/integrations/cover.mqtt/) integration. While "covers" are typically used for things like window blinds, motorized curtains, or garage doors... its schema supports opening, closing, stopping, which maps pretty well to our rotating dial.
+For a dial controller like this, I decided to expose it as an [MQTT Cover](https://www.home-assistant.io/integrations/cover.mqtt/) integration. While "covers" are typically used for things like window blinds, motorized curtains, or garage doors... its schema supports opening, closing, stopping, which maps pretty well to our rotating dial.
 
 When the ESP32 boots up, it automatically connects to the MQTT broker and fires off this discovery JSON payload:
 
@@ -294,7 +294,7 @@ Fortunately, Home Assistant has a built-in integration called [Generic Thermosta
 
 For the temperature sensor, I'm using an [AirGradient ONE](https://www.airgradient.com/indoor/), a high-quality smart air quality monitor that happens to live in the same room as the AC unit.
 
-Hooking the two together is as simple as this adding this to my `configuration.yaml`:
+Hooking the two together is as simple as adding this to my `configuration.yaml`:
 
 ```yaml
 climate:
@@ -305,7 +305,6 @@ climate:
     min_temp: 65
     max_temp: 80
     ac_mode: true
-    target_temp: 72
     cold_tolerance: 0.5
     hot_tolerance: 0.5
 ```
@@ -324,7 +323,7 @@ Having the living room AC automated was awesome, but as someone who lives in an 
 
 Unfortunately, I was fresh out of leftover IKEA brackets and VESA screws... so it was time to find some "real" components I could use to build a more "production-ready" V1 version.
 
-> There's definitely a world where I decided to used this project as an excuse to finally buy a 3D printer and dip my feet into the world of more "serious" hardware engineering... but truth be told - I just wanted to solve my problem ASAP, so my smooth software-engineering brain decided to just KISS.
+> There's definitely a world where I decided to use this project as an excuse to finally buy a 3D printer and dip my feet into the world of more "serious" hardware engineering... but truth be told - I just wanted to solve my problem ASAP, so my smooth software-engineering brain decided to just KISS.
 
 So I went on a little Temu and Amazon shopping spree, and sourced new parts. Here is the bill of materials for the V1 build:
 
@@ -363,19 +362,19 @@ I plugged the small ESP32 board in, tucked it neatly into the compartment, and c
 
 So funny enough, I actually built this entire assembly _last_ summer, and even wrote ~80% of this blog post shortly after deploying the project... but then I got sidetracked with other stuff, lol.
 
-On the bright side, this means that I've had ample time to actually put this project through its paces, and with 1-and-a-half summers under it's belt so far, I can safely report the following:
+On the bright side, this means that I've had ample time to actually put this project through its paces, and with 1-and-a-half summers under its belt so far, I can safely report the following:
 
 It works _okay?_
 
 Definitely not great... but maybe _~80% okay?_
 
-Ultimately, the biggest issue is that binder clips and cardboard aren't quite as robust of a mounting mechanism as I'd hoped they'd be... and over time, the servo tends to "sag" a bit, resulting in a bit too much friction between the motor, the coupler, and the underlying knob, causing the mechanism to stall-out until someone manually goes and re-seats it...
+Ultimately, the biggest issue is that binder clips and cardboard aren't quite as robust of a mounting mechanism as I'd hoped they'd be... and over time, the servo tends to "sag" a bit, resulting in a bit too much friction between the motor, the coupler, and the underlying knob, causing the mechanism to stall out until someone manually goes and reseats it...
 
 Is this annoying? Yeah.
 
 Is this less annoying than having to _constantly_ adjust the AC manually? Absolutely.
 
-Who knows though? If i'm still in this apartment next summer - maybe I'll actually invest in a 3D printed mounting solution to bring the reliability up to 100%?
+Who knows though? If I'm still in this apartment next summer - maybe I'll actually invest in a 3D printed mounting solution to bring the reliability up to 100%?
 
 ## 🤔 Final Thoughts
 
@@ -383,6 +382,6 @@ Is it the most elegant piece of mechatronics engineering? Absolutely not.
 
 It's jank as hell, held together with binder clips, cardboard padding, running slopcode firmware, and built entirely out of cheap parts from China.
 
-But who cared! It solves my hyper-niche problem Well Enough™️, cost me less than $15, and has provably saved me a non-trivial amount of money on my electricity bill.
+But who cares! It solves my hyper-niche problem Well Enough™️, cost me less than $15, and has provably saved me a non-trivial amount of money on my electricity bill.
 
 So at the end of the day, I'm pretty happy with how it all turned out :)
