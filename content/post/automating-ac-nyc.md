@@ -1,6 +1,6 @@
 +++
 title = "Turning a Dumb AC Unit Smart (Without Losing my Security Deposit)"
-date = 2025-11-02
+date = 2026-07-20
 draft = false
 tags = ["c++", "arduino", "homeassistant", "esp32"]
 +++
