@@ -45,7 +45,7 @@ Just like that - I've managed to free myself from the shackles of having to get 
 
 ## 🗽 Setting the stage
 
-In April 2025, I moved to New York City. After a brief apartment hunt, I managed to find a place I'm pretty happy with: the location is convenient, the building is fairly modern, and best of all - my rent is stabilized and _way_ below market value (woo!). There's not much to complain about!
+In April 2025, I moved to New York City. After a brief apartment hunt, I managed to find a place I'm pretty happy with: the location is convenient, the building is fairly modern, and the rent is an absolute steal. There's not much to complain about!
 
 ...well, except for the AC situation.
 
@@ -155,14 +155,14 @@ I was _fairly_ sure this was gonna work, but obviously, the only way to find out
 
 To cut a long story short - here's what I came up with for V0:
 
-| Part                      | Cost                | Source                                         |
-| ------------------------- | ------------------- | ---------------------------------------------- |
-| ESP32 Dev Board           | $6                  | [Amazon](https://www.amazon.com/dp/B0DDPJQX3X) |
-| Shaft Coupler             | $6.69               | [Amazon](https://www.amazon.com/dp/B0D4YBM6HB) |
-| Servo + controllers       | $2.66 ($8 / 3 pack) | [Amazon](https://www.amazon.com/dp/B0BG4ZCFLQ) |
-| L Brackets                | free                | leftover ikea parts (from a LAIVA bookshelf)   |
-| screws                    | free                | leftover monitor parts                         |
-| USB Cable + charger       | free                | found in the 'ol junk drawer                   |
+| Part                | Cost                | Source                                         |
+| ------------------- | ------------------- | ---------------------------------------------- |
+| ESP32 Dev Board     | $6                  | [Amazon](https://www.amazon.com/dp/B0DDPJQX3X) |
+| Shaft Coupler       | $6.69               | [Amazon](https://www.amazon.com/dp/B0D4YBM6HB) |
+| Servo + controllers | $2.66 ($8 / 3 pack) | [Amazon](https://www.amazon.com/dp/B0BG4ZCFLQ) |
+| L Brackets          | free                | leftover ikea parts (from a LAIVA bookshelf)   |
+| screws              | free                | leftover monitor parts                         |
+| USB Cable + charger | free                | found in the 'ol junk drawer                   |
 
 **Total:** ~$16
 
@@ -207,7 +207,7 @@ It even generated a little Web UI I could use to configure my Wi-Fi credentials 
   <img src="/blog/assets/automating-ac-nyc/fw_webui.png" width="360px">
 </p>
 
-Code is available here, but honestly - it's not all that interesting: https://gist.github.com/daniel5151/2d9950a27119e7e481db4446f2abcf13
+[Code](https://gist.github.com/daniel5151/2d9950a27119e7e481db4446f2abcf13) is available here, but honestly - it's not all that interesting.
 
 ## 🏠 Making it Useful with Home Assistant
 
