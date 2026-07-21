@@ -12,18 +12,12 @@
 <link rel="canonical" href="https://prilik.com/blog/post/" />
 
 
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-	ga('create', 'UA-58621690-1', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
+  
+    
+      
+    
+  
+
 
 
 
@@ -188,19 +182,19 @@ if (!doNotTrack) {
         <div class="post-content">
           
           
-          <p><strong>TL;DR:</strong> DIY home automation is ezpz with nothing more than a servo, an esp32, and a high tolerance for Jank.</p>
+          <p><strong>TL;DR:</strong> DIY home automation is ezpz with nothing more than a stepper motor, an esp32, and a high tolerance for Jank.</p>
 <hr>
 <p>My rental apartment&rsquo;s AC unit can only be controlled using these retro-looking <em>analog</em> knob-based controls, mounted right onto the unit. No separate wall-mounted thermostat, no remote control&hellip; nothin&rsquo; fancy whatsoever.</p>
 <p>These knobs work&hellip; but having to constantly stand up and fiddle with them gets annoying pretty quick.</p>
 <p align="center">
   <img src="/blog/assets/automating-ac-nyc/aircon-controls-crop.jpg" width="400px">
 </p>
-<p>Fortunately, there&rsquo;s an &lsquo;ol Prilik family saying that goes something like this: &ldquo;remember son - the hardest problems in life can usually be solved with nothing more than a servo, an esp32, and a dream&rdquo;<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup></p>
+<p>Fortunately, there&rsquo;s an &lsquo;ol Prilik family saying that goes something like this: &ldquo;remember son - the hardest problems in life can usually be solved with nothing more than a stepper motor, an esp32, and a dream&rdquo;<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup></p>
 <p>And sure enough, after dropping ~$15 on parts, waiting for things to arrive from China, and spending a few hours iterating on the hardware assembly and firmware&hellip; I hacked together this beautiful mess:</p>
 <p align="center">
 <img src="/blog/assets/automating-ac-nyc/v1-final-working-crop.jpg" width="400px">
 </p>
-<p>What you&rsquo;re looking at here is a jerry-rigged <strong>esp32-controlled servo</strong>, coupled to one of my AC unit&rsquo;s knobs using a <strong>shaft coupler</strong>, all affixed to the AC&rsquo;s back-plane using a <strong>cheap L-bracket</strong> and a <strong>binder clip</strong> (with some industrial-grade <strong>cardboard padding</strong> for good measure).</p>
+<p>What you&rsquo;re looking at here is a jerry-rigged <strong>esp32-controlled stepper motor</strong>, coupled to one of my AC unit&rsquo;s knobs using a <strong>shaft coupler</strong>, all affixed to the AC&rsquo;s back-plane using a <strong>cheap L-bracket</strong> and a <strong>binder clip</strong> (with some industrial-grade <strong>cardboard padding</strong> for good measure).</p>
 <p>This whole MacGyver&rsquo;d up contraption talks to my <strong>Home Assistant</strong> instance over <strong>MQTT</strong>, which turns the AC unit on/off based on the state of a temperature sensor located in the same room.</p>
 <p>Et voila 🪄 ✨</p>
 <p>Just like that - I&rsquo;ve managed to free myself from the shackles of having to get up off the couch just to tweak my AC!</p>

@@ -12,18 +12,12 @@
 <link rel="canonical" href="https://prilik.com/blog/post/widenes/" />
 
 
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-	ga('create', 'UA-58621690-1', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
+  
+    
+      
+    
+  
+
 
 
 
@@ -61,7 +55,7 @@ if (!doNotTrack) {
 <meta property="og:image:height" content="1024">
 
 
-  <meta property="article:published_time" content="2018-08-24 00:00:00 -0400 EDT" />
+  <meta property="article:published_time" content="2018-08-24 00:00:00 &#43;0000 UTC" />
 
 
 
@@ -339,7 +333,7 @@ Could such a technique even exist?</p>
 </p>
 <p>Hmm&hellip; That&rsquo;s not good.</p>
 <h3 id="ignoring-static-screen-elements">Ignoring Static Screen Elements<a href="#ignoring-static-screen-elements" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h3>
-<p>Many games have static-UI elements at the edges of the screen. In <em>SMB3</em>&lsquo;s case, there is a blue column on the left-side of the screen, and a status-bar at the bottom of the screen.</p>
+<p>Many games have static-UI elements at the edges of the screen. In <em>SMB3</em>&rsquo;s case, there is a blue column on the left-side of the screen, and a status-bar at the bottom of the screen.</p>
 <p>By default, wideNES samples in 16-pixel increments from the edges of the screen, which means any static elements at the edges are sampled. Not good!</p>
 <p>To work around this issue, wideNES implements several rules and heuristics that try to detect and mask-off static screen elements automatically.</p>
 <p>In general, there are 3 different types of static screen elements used in NES games: HUDs, Masks, and Status Bars.</p>

@@ -6,16 +6,16 @@
   
   <meta http-equiv="content-type" content="text/html; charset=utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<meta name="description" content="TL;DR: DIY home automation is ezpz with nothing more than a servo, an esp32, and a high tolerance for Jank.
- My rental apartment&amp;rsquo;s AC unit can only be controlled using these retro-looking analog knob-based controls, mounted right onto the unit. No separate wall-mounted thermostat, no remote control&amp;hellip; nothin&amp;rsquo; fancy whatsoever.
+<meta name="description" content="TL;DR: DIY home automation is ezpz with nothing more than a stepper motor, an esp32, and a high tolerance for Jank.
+My rental apartment&amp;rsquo;s AC unit can only be controlled using these retro-looking analog knob-based controls, mounted right onto the unit. No separate wall-mounted thermostat, no remote control&amp;hellip; nothin&amp;rsquo; fancy whatsoever.
 These knobs work&amp;hellip; but having to constantly stand up and fiddle with them gets annoying pretty quick.
-Fortunately, there&amp;rsquo;s an &amp;lsquo;ol Prilik family saying that goes something like this: &amp;ldquo;remember son - the hardest problems in life can usually be solved with nothing more than a servo, an esp32, and a dream&amp;rdquo;1
+Fortunately, there&amp;rsquo;s an &amp;lsquo;ol Prilik family saying that goes something like this: &amp;ldquo;remember son - the hardest problems in life can usually be solved with nothing more than a stepper motor, an esp32, and a dream&amp;rdquo;1
 And sure enough, after dropping ~$15 on parts, waiting for things to arrive from China, and spending a few hours iterating on the hardware assembly and firmware&amp;hellip; I hacked together this beautiful mess:
-What you&amp;rsquo;re looking at here is a jerry-rigged esp32-controlled servo, coupled to one of my AC unit&amp;rsquo;s knobs using a shaft coupler, all affixed to the AC&amp;rsquo;s back-plane using a cheap L-bracket and a binder clip (with some industrial-grade cardboard padding for good measure).
+What you&amp;rsquo;re looking at here is a jerry-rigged esp32-controlled stepper motor, coupled to one of my AC unit&amp;rsquo;s knobs using a shaft coupler, all affixed to the AC&amp;rsquo;s back-plane using a cheap L-bracket and a binder clip (with some industrial-grade cardboard padding for good measure).
 This whole MacGyver&amp;rsquo;d up contraption talks to my Home Assistant instance over MQTT, which turns the AC unit on/off based on the state of a temperature sensor located in the same room.
 Et voila 🪄 ✨
 Just like that - I&amp;rsquo;ve managed to free myself from the shackles of having to get up off the couch just to tweak my AC!
- For all you professional embedded and mechatronics folks out there: I strongly suggest you stop reading here.
+For all you professional embedded and mechatronics folks out there: I strongly suggest you stop reading here.
 The rest of this blog post is a walkthrough of a software engineer&amp;rsquo;s approach to home automation and building custom hardware, and let me tell you: both the final product, and the journey to get there, are hella jank.
 That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwards, and join me on this fun foray into how I managed to hack together some totally bespoke home-automation hardware with almost no budget, or experience!
 " />
@@ -24,18 +24,12 @@ That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwa
 <link rel="canonical" href="https://prilik.com/blog/post/automating-ac-nyc/" />
 
 
-<script type="application/javascript">
-var doNotTrack = false;
-if (!doNotTrack) {
-	(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-	(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-	m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-	})(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
-	ga('create', 'UA-58621690-1', 'auto');
-	
-	ga('send', 'pageview');
-}
-</script>
+  
+    
+      
+    
+  
+
 
 
 
@@ -61,16 +55,16 @@ if (!doNotTrack) {
 <meta property="og:locale" content="en" />
 <meta property="og:type" content="article" />
 <meta property="og:title" content="Turning a Dumb AC Unit Smart (Without Losing my Security Deposit)">
-<meta property="og:description" content="TL;DR: DIY home automation is ezpz with nothing more than a servo, an esp32, and a high tolerance for Jank.
- My rental apartment&amp;rsquo;s AC unit can only be controlled using these retro-looking analog knob-based controls, mounted right onto the unit. No separate wall-mounted thermostat, no remote control&amp;hellip; nothin&amp;rsquo; fancy whatsoever.
+<meta property="og:description" content="TL;DR: DIY home automation is ezpz with nothing more than a stepper motor, an esp32, and a high tolerance for Jank.
+My rental apartment&amp;rsquo;s AC unit can only be controlled using these retro-looking analog knob-based controls, mounted right onto the unit. No separate wall-mounted thermostat, no remote control&amp;hellip; nothin&amp;rsquo; fancy whatsoever.
 These knobs work&amp;hellip; but having to constantly stand up and fiddle with them gets annoying pretty quick.
-Fortunately, there&amp;rsquo;s an &amp;lsquo;ol Prilik family saying that goes something like this: &amp;ldquo;remember son - the hardest problems in life can usually be solved with nothing more than a servo, an esp32, and a dream&amp;rdquo;1
+Fortunately, there&amp;rsquo;s an &amp;lsquo;ol Prilik family saying that goes something like this: &amp;ldquo;remember son - the hardest problems in life can usually be solved with nothing more than a stepper motor, an esp32, and a dream&amp;rdquo;1
 And sure enough, after dropping ~$15 on parts, waiting for things to arrive from China, and spending a few hours iterating on the hardware assembly and firmware&amp;hellip; I hacked together this beautiful mess:
-What you&amp;rsquo;re looking at here is a jerry-rigged esp32-controlled servo, coupled to one of my AC unit&amp;rsquo;s knobs using a shaft coupler, all affixed to the AC&amp;rsquo;s back-plane using a cheap L-bracket and a binder clip (with some industrial-grade cardboard padding for good measure).
+What you&amp;rsquo;re looking at here is a jerry-rigged esp32-controlled stepper motor, coupled to one of my AC unit&amp;rsquo;s knobs using a shaft coupler, all affixed to the AC&amp;rsquo;s back-plane using a cheap L-bracket and a binder clip (with some industrial-grade cardboard padding for good measure).
 This whole MacGyver&amp;rsquo;d up contraption talks to my Home Assistant instance over MQTT, which turns the AC unit on/off based on the state of a temperature sensor located in the same room.
 Et voila 🪄 ✨
 Just like that - I&amp;rsquo;ve managed to free myself from the shackles of having to get up off the couch just to tweak my AC!
- For all you professional embedded and mechatronics folks out there: I strongly suggest you stop reading here.
+For all you professional embedded and mechatronics folks out there: I strongly suggest you stop reading here.
 The rest of this blog post is a walkthrough of a software engineer&amp;rsquo;s approach to home automation and building custom hardware, and let me tell you: both the final product, and the journey to get there, are hella jank.
 That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwards, and join me on this fun foray into how I managed to hack together some totally bespoke home-automation hardware with almost no budget, or experience!
 " />
@@ -85,7 +79,7 @@ That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwa
 <meta property="og:image:height" content="1024">
 
 
-  <meta property="article:published_time" content="2026-07-20 00:00:00 -0400 EDT" />
+  <meta property="article:published_time" content="2026-07-20 00:00:00 &#43;0000 UTC" />
 
 
 
@@ -210,19 +204,19 @@ That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwa
   
 
   <div class="post-content"><div>
-        <p><strong>TL;DR:</strong> DIY home automation is ezpz with nothing more than a servo, an esp32, and a high tolerance for Jank.</p>
+        <p><strong>TL;DR:</strong> DIY home automation is ezpz with nothing more than a stepper motor, an esp32, and a high tolerance for Jank.</p>
 <hr>
 <p>My rental apartment&rsquo;s AC unit can only be controlled using these retro-looking <em>analog</em> knob-based controls, mounted right onto the unit. No separate wall-mounted thermostat, no remote control&hellip; nothin&rsquo; fancy whatsoever.</p>
 <p>These knobs work&hellip; but having to constantly stand up and fiddle with them gets annoying pretty quick.</p>
 <p align="center">
   <img src="/blog/assets/automating-ac-nyc/aircon-controls-crop.jpg" width="400px">
 </p>
-<p>Fortunately, there&rsquo;s an &lsquo;ol Prilik family saying that goes something like this: &ldquo;remember son - the hardest problems in life can usually be solved with nothing more than a servo, an esp32, and a dream&rdquo;<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup></p>
+<p>Fortunately, there&rsquo;s an &lsquo;ol Prilik family saying that goes something like this: &ldquo;remember son - the hardest problems in life can usually be solved with nothing more than a stepper motor, an esp32, and a dream&rdquo;<sup id="fnref:1"><a href="#fn:1" class="footnote-ref" role="doc-noteref">1</a></sup></p>
 <p>And sure enough, after dropping ~$15 on parts, waiting for things to arrive from China, and spending a few hours iterating on the hardware assembly and firmware&hellip; I hacked together this beautiful mess:</p>
 <p align="center">
 <img src="/blog/assets/automating-ac-nyc/v1-final-working-crop.jpg" width="400px">
 </p>
-<p>What you&rsquo;re looking at here is a jerry-rigged <strong>esp32-controlled servo</strong>, coupled to one of my AC unit&rsquo;s knobs using a <strong>shaft coupler</strong>, all affixed to the AC&rsquo;s back-plane using a <strong>cheap L-bracket</strong> and a <strong>binder clip</strong> (with some industrial-grade <strong>cardboard padding</strong> for good measure).</p>
+<p>What you&rsquo;re looking at here is a jerry-rigged <strong>esp32-controlled stepper motor</strong>, coupled to one of my AC unit&rsquo;s knobs using a <strong>shaft coupler</strong>, all affixed to the AC&rsquo;s back-plane using a <strong>cheap L-bracket</strong> and a <strong>binder clip</strong> (with some industrial-grade <strong>cardboard padding</strong> for good measure).</p>
 <p>This whole MacGyver&rsquo;d up contraption talks to my <strong>Home Assistant</strong> instance over <strong>MQTT</strong>, which turns the AC unit on/off based on the state of a temperature sensor located in the same room.</p>
 <p>Et voila 🪄 ✨</p>
 <p>Just like that - I&rsquo;ve managed to free myself from the shackles of having to get up off the couch just to tweak my AC!</p>
@@ -241,7 +235,7 @@ That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwa
 </p>
 <p>Yeah - guess which option <em>my</em> building went with 🙃</p>
 <h2 id="-what-are-my-options-here">🤔 What are my options here?<a href="#-what-are-my-options-here" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
-<p>Like any good renter, the first thing I did was gently ask my landlord if there was any way to &ldquo;upgrade&rdquo; the controls to something a bit more&hellip; modern. As expected, the response was roughly along the lines of &ldquo;lol no, why would we do that?&quot;, which, to be fair, was basically the response I expected.</p>
+<p>Like any good renter, the first thing I did was gently ask my landlord if there was any way to &ldquo;upgrade&rdquo; the controls to something a bit more&hellip; modern. As expected, the response was roughly along the lines of &ldquo;lol no, why would we do that?&rdquo;, which, to be fair, was basically the response I expected.</p>
 <p>Well, no matter, like any good engineer - <em>surely</em> I can hack my way out of this pickle?</p>
 <p>After a bit of finessing, I managed to pop the cover off the unit, and expose its <del>soft underbelly</del> inner workings. Much to my surprise, not only did I find some info about the unit, but even a whole wiring diagram!</p>
 <p align="center">
@@ -257,7 +251,7 @@ That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwa
 <p>As far as I could tell, the only way to access those wires would be to yank the whole unit out of the wall&hellip; something that I wasn&rsquo;t particularly interested in doing. <a href="https://www.doityourself.com/forum/air-conditioning-cooling-systems/577337-older-ice-cap-ptac-add-thermostat.html">This thread</a> from ~2017 reinforced my impressions that this would be far more trouble than its worth.</p>
 <p>So&hellip; what now?</p>
 <h2 id="-smart-plugs">🔌 Smart Plugs?<a href="#-smart-plugs" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h2>
-<p>Ok, here&rsquo;s an idea: what if I just cut power to the unit using a <a href="https://www.amazon.com/s?k=smart+plug&amp;crid=2WEKKKT1D6E9M&amp;sprefix=smart+pl%2Caps%2C142&amp;ref=nb_sb_noss_2">smart plug</a>?</p>
+<p>Ok, here&rsquo;s an idea: what if I just cut power to the unit using a <a href="https://www.amazon.com/s?k=smart+plug&crid=2WEKKKT1D6E9M&sprefix=smart+pl%2Caps%2C142&ref=nb_sb_noss_2">smart plug</a>?</p>
 <blockquote>
 <p>Note: The internet was quick to warn me that toggling power to a running AC unit could potentially cause damage to the unit, especially if something goes wrong and you start rapidly cycling it on/off.</p>
 <p>While I&rsquo;m no expert in these sorts of things&hellip; for the sake of science (and because I&rsquo;m a bit stubborn), I nonetheless kept looking into this option.</p>
@@ -284,23 +278,23 @@ That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwa
 <p><strong>Option 1:</strong> hooking into the <strong>Mode Control</strong> dial</p>
 <ul>
 <li>Leave the Temp Control dial set to &ldquo;max cold&rdquo;</li>
-<li>Buy a servo with enough torque to overcome the stiff action of the dial
+<li>Buy a stepper motor with enough torque to overcome the stiff action of the dial
 <ul>
 <li>&hellip;which would probably need a 12V DC (if not more) power source, requiring extra circuitry to power</li>
-<li>&hellip;and require some more robust mounting hardware, to counteract the torque, and ensure the servo stays in the right place</li>
+<li>&hellip;and require some more robust mounting hardware, to counteract the torque, and ensure the stepper motor stays in the right place</li>
 </ul>
 </li>
-<li>Precisely calibrate the servo to rotate the dial the right number of degrees between the &ldquo;Off&rdquo; state and the &ldquo;Cool&rdquo; state</li>
+<li>Precisely calibrate the stepper motor to rotate the dial the right number of degrees between the &ldquo;Off&rdquo; state and the &ldquo;Cool&rdquo; state</li>
 </ul>
 <p><strong>Option 2:</strong> hooking into the <strong>Temp Control</strong> dial</p>
 <ul>
 <li>Leave the Mode Control dial on &ldquo;Lo-Cool&rdquo;<sup id="fnref:3"><a href="#fn:3" class="footnote-ref" role="doc-noteref">3</a></sup></li>
-<li>Buy a cheap, low-torque, low-power servo, <em>just</em> powerful enough to rotate the fairly loose dial
+<li>Buy a cheap, low-torque, low-power stepper motor, <em>just</em> powerful enough to rotate the fairly loose dial
 <ul>
 <li>&hellip;that doesn&rsquo;t need a lot of mounting hardware to stay in the right place, given that the torque is fairly low</li>
 </ul>
 </li>
-<li>Imprecisely yeet the servo all the way left/right, toggling the target temp between &ldquo;really really hot&rdquo; or &ldquo;really really cold&rdquo;</li>
+<li>Imprecisely yeet the stepper motor all the way left/right, toggling the target temp between &ldquo;really really hot&rdquo; or &ldquo;really really cold&rdquo;</li>
 </ul>
 <p>Hopefully you can guess which one I went with 🥰</p>
 <blockquote>
@@ -329,7 +323,7 @@ That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwa
 <td><a href="https://www.amazon.com/dp/B0D4YBM6HB">Amazon</a></td>
 </tr>
 <tr>
-<td>Servo + controllers</td>
+<td>Stepper motor + controllers</td>
 <td>$2.66 ($8 / 3 pack)</td>
 <td><a href="https://www.amazon.com/dp/B0BG4ZCFLQ">Amazon</a></td>
 </tr>
@@ -360,12 +354,12 @@ That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwa
   <img src="/blog/assets/automating-ac-nyc/v0-working-poc.jpg" width="400px">
 </p>
 <p>Since I couldn&rsquo;t screw anything into the AC chassis (remember: security deposit!), I had to get creative. I ended up grabbing a couple of metal L-brackets left over from an IKEA LAIVA bookshelf, and some spare screws from a monitor VESA mount.</p>
-<p>By bolting these to the servo, it made the motor assembly physically &ldquo;wider&rdquo;. When the motor rotates, the brackets bump against the back wall of the control cavity, which resists the torque and forces the rotational energy down into the shaft coupler and turns the dial. Truly <del>unintentional</del> ingenious design!</p>
+<p>By bolting these to the stepper motor, it made the motor assembly physically &ldquo;wider&rdquo;. When the motor rotates, the brackets bump against the back wall of the control cavity, which resists the torque and forces the rotational energy down into the shaft coupler and turns the dial. Truly <del>unintentional</del> ingenious design!</p>
 <blockquote>
 <p>Sidenote: I&rsquo;m leaving out a few intermediate steps that I took to get to this design:</p>
 <ul>
 <li>I didn&rsquo;t get the right shaft-coupler the first time (or the second time (or the third time&hellip;)), so it took a few Amazon returns until I found the right one.</li>
-<li>Before buying the ESP32 Dev Board, I validated the servo + shaft coupler worked using a (really, really) old Arduino Leonardo I had lying around, and controlling it manually over serial (using a really long USB cable extending to my PC)</li>
+<li>Before buying the ESP32 Dev Board, I validated the stepper motor + shaft coupler worked using a (really, really) old Arduino Leonardo I had lying around, and controlling it manually over serial (using a really long USB cable extending to my PC)</li>
 <li>My first attempt at mounting this thing involved wooden skewers, a glue stick, and a cut-up Amazon box&hellip; a failed experiment, to say the least.</li>
 </ul>
 </blockquote>
@@ -387,7 +381,7 @@ That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwa
 <p>Absolute Cinema.</p>
 <p>That said, while it <em>was</em> cool to see it working from the web UI&hellip; for this to be truly useful, I&rsquo;d need to get it integrated with Home Assistant.</p>
 <p>If you&rsquo;re not familiar, <a href="https://www.home-assistant.io/">Home Assistant</a> is an open-source home automation platform that acts as a local brain for all your smart devices. It is absolutely fantastic, and if you do <em>any</em> remotely non-trivial smart home stuff - you should <em>absolutely</em> set it up.</p>
-<h3 id="step-1-exposing-the-servo-as-an-mqtt-cover">Step 1: Exposing the Servo as an MQTT Cover<a href="#step-1-exposing-the-servo-as-an-mqtt-cover" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h3>
+<h3 id="step-1-exposing-the-stepper-motor-as-an-mqtt-cover">Step 1: Exposing the Stepper Motor as an MQTT Cover<a href="#step-1-exposing-the-stepper-motor-as-an-mqtt-cover" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h3>
 <p>Instead of writing some kind of custom API integration script, I took advantage of Home Assistant&rsquo;s excellent support for <strong>MQTT Discovery</strong>.</p>
 <blockquote>
 <p>If you&rsquo;re not familiar with MQTT, think of it as a super lightweight pub/sub messaging protocol designed for resource-constrained IoT devices.</p>
@@ -396,63 +390,63 @@ That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwa
 <p>If you configure a device to publish a specific configuration JSON payload to a standardized discovery topic (e.g., <code>homeassistant/cover/ac_stepper_cover/config</code>), Home Assistant will <em>automatically</em> discover the device and configure all of its entities, sensors, and controllers - all without you having to write a single line of YAML config!</p>
 <p>For a dial controller like this, I decided to expose it as an <a href="https://www.home-assistant.io/integrations/cover.mqtt/">MQTT Cover</a> integration. While &ldquo;covers&rdquo; are typically used for things like window blinds, motorized curtains, or garage doors&hellip; its schema supports opening, closing, stopping, which maps pretty well to our rotating dial.</p>
 <p>When the ESP32 boots up, it automatically connects to the MQTT broker and fires off this discovery JSON payload:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-json" data-lang="json">{
-  <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;AC Stepper Cover&#34;</span>,
-  <span style="color:#f92672">&#34;unique_id&#34;</span>: <span style="color:#e6db74">&#34;ac_stepper_esp32_01&#34;</span>,
-  <span style="color:#f92672">&#34;object_id&#34;</span>: <span style="color:#e6db74">&#34;ac_stepper_cover&#34;</span>,
-  <span style="color:#f92672">&#34;command_topic&#34;</span>: <span style="color:#e6db74">&#34;homeassistant/cover/ac_stepper_cover/set&#34;</span>,
-  <span style="color:#f92672">&#34;state_topic&#34;</span>: <span style="color:#e6db74">&#34;homeassistant/cover/ac_stepper_cover/state&#34;</span>,
-  <span style="color:#f92672">&#34;position_topic&#34;</span>: <span style="color:#e6db74">&#34;homeassistant/cover/ac_stepper_cover/position&#34;</span>,
-  <span style="color:#f92672">&#34;set_position_topic&#34;</span>: <span style="color:#e6db74">&#34;homeassistant/cover/ac_stepper_cover/position/set&#34;</span>,
-  <span style="color:#f92672">&#34;payload_open&#34;</span>: <span style="color:#e6db74">&#34;OPEN&#34;</span>,
-  <span style="color:#f92672">&#34;payload_close&#34;</span>: <span style="color:#e6db74">&#34;CLOSE&#34;</span>,
-  <span style="color:#f92672">&#34;payload_stop&#34;</span>: <span style="color:#e6db74">&#34;STOP&#34;</span>,
-  <span style="color:#f92672">&#34;device_class&#34;</span>: <span style="color:#e6db74">&#34;damper&#34;</span>,
-  <span style="color:#f92672">&#34;device&#34;</span>: {
-    <span style="color:#f92672">&#34;identifiers&#34;</span>: <span style="color:#e6db74">&#34;ac_stepper_esp32&#34;</span>,
-    <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;AC Control Stepper&#34;</span>
-  }
-}
-</code></pre></div><p>Once Home Assistant registers the cover, it listens for user interaction on the UI and publishes corresponding commands to the <code>command_topic</code>. On the ESP32, the MQTT callback parses the message and drives the stepper motor:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-cpp" data-lang="cpp"><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">mqttCallback</span>(<span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> topic, byte<span style="color:#f92672">*</span> payload, <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> length) {
-  String message <span style="color:#f92672">=</span> extractMessageFromPayload(payload, length);
-  <span style="color:#66d9ef">if</span> (String(topic) <span style="color:#f92672">==</span> COMMAND_TOPIC) {
-    handleCoverCommand(message);
-  }
-}
-
-<span style="color:#66d9ef">void</span> <span style="color:#a6e22e">handleCoverCommand</span>(<span style="color:#66d9ef">const</span> String<span style="color:#f92672">&amp;</span> command) {
-  <span style="color:#66d9ef">if</span> (command <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;OPEN&#34;</span>) {
-    motorState.isOpening <span style="color:#f92672">=</span> true;
-    moveMotor(STEPS_PER_REVOLUTION, motorState.currentSpeed);
-  } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (command <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;CLOSE&#34;</span>) {
-    motorState.isOpening <span style="color:#f92672">=</span> false;
-    moveMotor(<span style="color:#f92672">-</span>STEPS_PER_REVOLUTION, motorState.currentSpeed);
-  } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (command <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;STOP&#34;</span>) {
-    stopMotor();
-  }
-}
-</code></pre></div><p>Sending an <code>OPEN</code> payload makes the stepper motor rotate forward by a full revolution, wrapping the dial to &ldquo;Coldest&rdquo;, while <code>CLOSE</code> spins the stepper backward to turn it off.</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-json" data-lang="json"><span style="display:flex;"><span>{
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;AC Stepper Cover&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;unique_id&#34;</span>: <span style="color:#e6db74">&#34;ac_stepper_esp32_01&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;object_id&#34;</span>: <span style="color:#e6db74">&#34;ac_stepper_cover&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;command_topic&#34;</span>: <span style="color:#e6db74">&#34;homeassistant/cover/ac_stepper_cover/set&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;state_topic&#34;</span>: <span style="color:#e6db74">&#34;homeassistant/cover/ac_stepper_cover/state&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;position_topic&#34;</span>: <span style="color:#e6db74">&#34;homeassistant/cover/ac_stepper_cover/position&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;set_position_topic&#34;</span>: <span style="color:#e6db74">&#34;homeassistant/cover/ac_stepper_cover/position/set&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;payload_open&#34;</span>: <span style="color:#e6db74">&#34;OPEN&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;payload_close&#34;</span>: <span style="color:#e6db74">&#34;CLOSE&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;payload_stop&#34;</span>: <span style="color:#e6db74">&#34;STOP&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;device_class&#34;</span>: <span style="color:#e6db74">&#34;damper&#34;</span>,
+</span></span><span style="display:flex;"><span>  <span style="color:#f92672">&#34;device&#34;</span>: {
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;identifiers&#34;</span>: <span style="color:#e6db74">&#34;ac_stepper_esp32&#34;</span>,
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">&#34;name&#34;</span>: <span style="color:#e6db74">&#34;AC Control Stepper&#34;</span>
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Once Home Assistant registers the cover, it listens for user interaction on the UI and publishes corresponding commands to the <code>command_topic</code>. On the ESP32, the MQTT callback parses the message and drives the stepper motor:</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-cpp" data-lang="cpp"><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">mqttCallback</span>(<span style="color:#66d9ef">char</span><span style="color:#f92672">*</span> topic, byte<span style="color:#f92672">*</span> payload, <span style="color:#66d9ef">unsigned</span> <span style="color:#66d9ef">int</span> length) {
+</span></span><span style="display:flex;"><span>  String message <span style="color:#f92672">=</span> extractMessageFromPayload(payload, length);
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (String(topic) <span style="color:#f92672">==</span> COMMAND_TOPIC) {
+</span></span><span style="display:flex;"><span>    handleCoverCommand(message);
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span><span style="display:flex;"><span>
+</span></span><span style="display:flex;"><span><span style="color:#66d9ef">void</span> <span style="color:#a6e22e">handleCoverCommand</span>(<span style="color:#66d9ef">const</span> String<span style="color:#f92672">&amp;</span> command) {
+</span></span><span style="display:flex;"><span>  <span style="color:#66d9ef">if</span> (command <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;OPEN&#34;</span>) {
+</span></span><span style="display:flex;"><span>    motorState.isOpening <span style="color:#f92672">=</span> true;
+</span></span><span style="display:flex;"><span>    moveMotor(STEPS_PER_REVOLUTION, motorState.currentSpeed);
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (command <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;CLOSE&#34;</span>) {
+</span></span><span style="display:flex;"><span>    motorState.isOpening <span style="color:#f92672">=</span> false;
+</span></span><span style="display:flex;"><span>    moveMotor(<span style="color:#f92672">-</span>STEPS_PER_REVOLUTION, motorState.currentSpeed);
+</span></span><span style="display:flex;"><span>  } <span style="color:#66d9ef">else</span> <span style="color:#66d9ef">if</span> (command <span style="color:#f92672">==</span> <span style="color:#e6db74">&#34;STOP&#34;</span>) {
+</span></span><span style="display:flex;"><span>    stopMotor();
+</span></span><span style="display:flex;"><span>  }
+</span></span><span style="display:flex;"><span>}
+</span></span></code></pre></div><p>Sending an <code>OPEN</code> payload makes the stepper motor rotate forward by a full revolution, wrapping the dial to &ldquo;Coldest&rdquo;, while <code>CLOSE</code> spins the stepper backward to turn it off.</p>
 <p>And just like that - Home Assistant can control the motor!</p>
 <p align="center">
-  <img src="/blog/assets/automating-ac-nyc/ha-servo-as-cover.png" width="400px">
+  <img src="/blog/assets/automating-ac-nyc/ha-stepper-as-cover.png" width="400px">
 </p>
 <h3 id="step-2-adding-a-thermostat">Step 2: Adding a Thermostat<a href="#step-2-adding-a-thermostat" class="hanchor" ariaLabel="Anchor">&#8983;</a> </h3>
 <p>With the dial controllable via Home Assistant, the final step was telling it <em>when</em> to turn on and off.</p>
 <p>Fortunately, Home Assistant has a built-in integration called <a href="https://www.home-assistant.io/integrations/generic_thermostat/">Generic Thermostat</a>. It&rsquo;s dead simple - point it at a switch/cover to toggle + a temperature sensor to monitor, and it handles all the hysteresis logic for you!</p>
 <p>For the temperature sensor, I&rsquo;m using an <a href="https://www.airgradient.com/indoor/">AirGradient ONE</a>, a high-quality smart air quality monitor that happens to live in the same room as the AC unit.</p>
 <p>Hooking the two together is as simple as adding this to my <code>configuration.yaml</code>:</p>
-<div class="highlight"><pre style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4"><code class="language-yaml" data-lang="yaml"><span style="color:#66d9ef">climate</span>:
-  - <span style="color:#66d9ef">platform</span>: generic_thermostat
-    <span style="color:#66d9ef">name</span>: Living Room AC
-    <span style="color:#66d9ef">heater</span>: cover.ac_servo_cover
-    <span style="color:#66d9ef">target_sensor</span>: sensor.airgradient_temperature
-    <span style="color:#66d9ef">min_temp</span>: <span style="color:#ae81ff">65</span>
-    <span style="color:#66d9ef">max_temp</span>: <span style="color:#ae81ff">80</span>
-    <span style="color:#66d9ef">ac_mode</span>: <span style="color:#66d9ef">true</span>
-    <span style="color:#66d9ef">cold_tolerance</span>: <span style="color:#ae81ff">0.5</span>
-    <span style="color:#66d9ef">hot_tolerance</span>: <span style="color:#ae81ff">0.5</span>
-</code></pre></div><p>And just like that, I had a fully automated smart thermostat running my AC unit!</p>
+<div class="highlight"><pre tabindex="0" style="color:#f8f8f2;background-color:#272822;-moz-tab-size:4;-o-tab-size:4;tab-size:4;"><code class="language-yaml" data-lang="yaml"><span style="display:flex;"><span><span style="color:#f92672">climate</span>:
+</span></span><span style="display:flex;"><span>  - <span style="color:#f92672">platform</span>: <span style="color:#ae81ff">generic_thermostat</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">name</span>: <span style="color:#ae81ff">Living Room AC</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">heater</span>: <span style="color:#ae81ff">cover.ac_stepper_cover</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">target_sensor</span>: <span style="color:#ae81ff">sensor.airgradient_temperature</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">min_temp</span>: <span style="color:#ae81ff">65</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">max_temp</span>: <span style="color:#ae81ff">80</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">ac_mode</span>: <span style="color:#66d9ef">true</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">cold_tolerance</span>: <span style="color:#ae81ff">0.5</span>
+</span></span><span style="display:flex;"><span>    <span style="color:#f92672">hot_tolerance</span>: <span style="color:#ae81ff">0.5</span>
+</span></span></code></pre></div><p>And just like that, I had a fully automated smart thermostat running my AC unit!</p>
 <p align="center">
   <img src="/blog/assets/automating-ac-nyc/ha-thermostat.png" width="400px">
 </p>
@@ -476,15 +470,15 @@ That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwa
 <tr>
 <td>ESP32 Dev Board (but smaller)</td>
 <td>$3.30</td>
-<td><a href="https://www.temu.com/goods.html?_bg_fs=1&amp;goods_id=601100253124451">Temu</a></td>
+<td><a href="https://www.temu.com/goods.html?_bg_fs=1&goods_id=601100253124451">Temu</a></td>
 </tr>
 <tr>
 <td>Shaft Coupler</td>
 <td>$2.42</td>
-<td><a href="https://www.temu.com/goods.html?_bg_fs=1&amp;goods_id=601099519071638&amp;sku_id=17592227065720">Temu</a></td>
+<td><a href="https://www.temu.com/goods.html?_bg_fs=1&goods_id=601099519071638&sku_id=17592227065720">Temu</a></td>
 </tr>
 <tr>
-<td>Servo + controllers</td>
+<td>Stepper motor + controllers</td>
 <td>$2.66 ($8 / 3 pack)</td>
 <td><a href="https://www.amazon.com/dp/B0BG4ZCFLQ">Amazon</a></td>
 </tr>
@@ -528,7 +522,7 @@ That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwa
 <p>On the bright side, this means that I&rsquo;ve had ample time to actually put this project through its paces, and with 1-and-a-half summers under its belt so far, I can safely report the following:</p>
 <p>It works <em>okay?</em></p>
 <p>Definitely not great&hellip; but maybe <em>~80% okay?</em></p>
-<p>Ultimately, the biggest issue is that binder clips and cardboard aren&rsquo;t quite as robust of a mounting mechanism as I&rsquo;d hoped they&rsquo;d be&hellip; and over time, the servo tends to &ldquo;sag&rdquo; a bit, resulting in a bit too much friction between the motor, the coupler, and the underlying knob, causing the mechanism to stall out until someone manually goes and reseats it&hellip;</p>
+<p>Ultimately, the biggest issue is that binder clips and cardboard aren&rsquo;t quite as robust of a mounting mechanism as I&rsquo;d hoped they&rsquo;d be&hellip; and over time, the stepper motor tends to &ldquo;sag&rdquo; a bit, resulting in a bit too much friction between the motor, the coupler, and the underlying knob, causing the mechanism to stall out until someone manually goes and reseats it&hellip;</p>
 <p>Is this annoying? Yeah.</p>
 <p>Is this less annoying than having to <em>constantly</em> adjust the AC manually? Absolutely.</p>
 <p>Who knows though? If I&rsquo;m still in this apartment next summer - maybe I&rsquo;ll actually invest in a 3D printed mounting solution to bring the reliability up to 100%?</p>
@@ -537,23 +531,23 @@ That said&amp;hellip; if you&amp;rsquo;re not afraid of a bit of jank: read onwa
 <p>It&rsquo;s jank as hell, held together with binder clips, cardboard padding, running slopcode firmware, and built entirely out of cheap parts from China.</p>
 <p>But who cares! It solves my hyper-niche problem Well Enough™️, cost me less than $15, and has provably saved me a non-trivial amount of money on my electricity bill.</p>
 <p>So at the end of the day, I&rsquo;m pretty happy with how it all turned out :)</p>
-<section class="footnotes" role="doc-endnotes">
+<div class="footnotes" role="doc-endnotes">
 <hr>
 <ol>
-<li id="fn:1" role="doc-endnote">
-<p>oddly specific, I know <a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+<li id="fn:1">
+<p>oddly specific, I know&#160;<a href="#fnref:1" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:2" role="doc-endnote">
-<p>The only real diff between these two modes is how fast the dispersion fan runs. Empirically, hi-cool <em>does</em> make the room cool a <em>bit</em> faster&hellip; at the expense of the fan being extra-loud. I usually stick to lo-cool. <a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+<li id="fn:2">
+<p>The only real diff between these two modes is how fast the dispersion fan runs. Empirically, hi-cool <em>does</em> make the room cool a <em>bit</em> faster&hellip; at the expense of the fan being extra-loud. I usually stick to lo-cool.&#160;<a href="#fnref:2" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:3" role="doc-endnote">
-<p>This works thanks to a nice property my unit has: when the target temp has been hit, and no more cooling is needed - the unit goes totally silent and inert (until the temp goes back up, and the unit needs to kick back in) <a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+<li id="fn:3">
+<p>This works thanks to a nice property my unit has: when the target temp has been hit, and no more cooling is needed - the unit goes totally silent and inert (until the temp goes back up, and the unit needs to kick back in)&#160;<a href="#fnref:3" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
-<li id="fn:4" role="doc-endnote">
-<p>It was ~$7 for a pack that&rsquo;ll last me for years to come <a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
+<li id="fn:4">
+<p>It was ~$7 for a pack that&rsquo;ll last me for years to come&#160;<a href="#fnref:4" class="footnote-backref" role="doc-backlink">&#x21a9;&#xfe0e;</a></p>
 </li>
 </ol>
-</section>
+</div>
       </div></div>
 
   

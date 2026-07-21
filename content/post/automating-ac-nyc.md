@@ -5,7 +5,7 @@ draft = false
 tags = ["c++", "arduino", "homeassistant", "esp32"]
 +++
 
-**TL;DR:** DIY home automation is ezpz with nothing more than a servo, an esp32, and a high tolerance for Jank.
+**TL;DR:** DIY home automation is ezpz with nothing more than a stepper motor, an esp32, and a high tolerance for Jank.
 
 * * *
 
@@ -17,7 +17,7 @@ These knobs work... but having to constantly stand up and fiddle with them gets 
   <img src="/blog/assets/automating-ac-nyc/aircon-controls-crop.jpg" width="400px">
 </p>
 
-Fortunately, there's an 'ol Prilik family saying that goes something like this: "remember son - the hardest problems in life can usually be solved with nothing more than a servo, an esp32, and a dream"[^1]
+Fortunately, there's an 'ol Prilik family saying that goes something like this: "remember son - the hardest problems in life can usually be solved with nothing more than a stepper motor, an esp32, and a dream"[^1]
 
 [^1]: oddly specific, I know
 
@@ -27,7 +27,7 @@ And sure enough, after dropping ~$15 on parts, waiting for things to arrive from
 <img src="/blog/assets/automating-ac-nyc/v1-final-working-crop.jpg" width="400px">
 </p>
 
-What you're looking at here is a jerry-rigged **esp32-controlled servo**, coupled to one of my AC unit's knobs using a **shaft coupler**, all affixed to the AC's back-plane using a **cheap L-bracket** and a **binder clip** (with some industrial-grade **cardboard padding** for good measure).
+What you're looking at here is a jerry-rigged **esp32-controlled stepper motor**, coupled to one of my AC unit's knobs using a **shaft coupler**, all affixed to the AC's back-plane using a **cheap L-bracket** and a **binder clip** (with some industrial-grade **cardboard padding** for good measure).
 
 This whole MacGyver'd up contraption talks to my **Home Assistant** instance over **MQTT**, which turns the AC unit on/off based on the state of a temperature sensor located in the same room.
 
@@ -128,17 +128,17 @@ This gave me two options to toggle the AC unit on and off:
 **Option 1:** hooking into the **Mode Control** dial
 
 - Leave the Temp Control dial set to "max cold"
-- Buy a servo with enough torque to overcome the stiff action of the dial
+- Buy a stepper motor with enough torque to overcome the stiff action of the dial
   - ...which would probably need a 12V DC (if not more) power source, requiring extra circuitry to power
-  - ...and require some more robust mounting hardware, to counteract the torque, and ensure the servo stays in the right place
-- Precisely calibrate the servo to rotate the dial the right number of degrees between the "Off" state and the "Cool" state
+  - ...and require some more robust mounting hardware, to counteract the torque, and ensure the stepper motor stays in the right place
+- Precisely calibrate the stepper motor to rotate the dial the right number of degrees between the "Off" state and the "Cool" state
 
 **Option 2:** hooking into the **Temp Control** dial
 
 - Leave the Mode Control dial on "Lo-Cool"[^3]
-- Buy a cheap, low-torque, low-power servo, _just_ powerful enough to rotate the fairly loose dial
+- Buy a cheap, low-torque, low-power stepper motor, _just_ powerful enough to rotate the fairly loose dial
   - ...that doesn't need a lot of mounting hardware to stay in the right place, given that the torque is fairly low
-- Imprecisely yeet the servo all the way left/right, toggling the target temp between "really really hot" or "really really cold"
+- Imprecisely yeet the stepper motor all the way left/right, toggling the target temp between "really really hot" or "really really cold"
 
 Hopefully you can guess which one I went with 🥰
 
@@ -159,7 +159,7 @@ To cut a long story short - here's what I came up with for V0:
 | ------------------- | ------------------- | ---------------------------------------------- |
 | ESP32 Dev Board     | $6                  | [Amazon](https://www.amazon.com/dp/B0DDPJQX3X) |
 | Shaft Coupler       | $6.69               | [Amazon](https://www.amazon.com/dp/B0D4YBM6HB) |
-| Servo + controllers | $2.66 ($8 / 3 pack) | [Amazon](https://www.amazon.com/dp/B0BG4ZCFLQ) |
+| Stepper motor + controllers | $2.66 ($8 / 3 pack) | [Amazon](https://www.amazon.com/dp/B0BG4ZCFLQ) |
 | L Brackets          | free                | leftover ikea parts (from a LAIVA bookshelf)   |
 | screws              | free                | leftover monitor parts                         |
 | USB Cable + charger | free                | found in the 'ol junk drawer                   |
@@ -180,13 +180,13 @@ _(breadboard with the rest of the hardware out-of-frame)_
 
 Since I couldn't screw anything into the AC chassis (remember: security deposit!), I had to get creative. I ended up grabbing a couple of metal L-brackets left over from an IKEA LAIVA bookshelf, and some spare screws from a monitor VESA mount.
 
-By bolting these to the servo, it made the motor assembly physically "wider". When the motor rotates, the brackets bump against the back wall of the control cavity, which resists the torque and forces the rotational energy down into the shaft coupler and turns the dial. Truly ~~unintentional~~ ingenious design!
+By bolting these to the stepper motor, it made the motor assembly physically "wider". When the motor rotates, the brackets bump against the back wall of the control cavity, which resists the torque and forces the rotational energy down into the shaft coupler and turns the dial. Truly ~~unintentional~~ ingenious design!
 
 
 > Sidenote: I'm leaving out a few intermediate steps that I took to get to this design:
 >
 > - I didn't get the right shaft-coupler the first time (or the second time (or the third time...)), so it took a few Amazon returns until I found the right one.
-> - Before buying the ESP32 Dev Board, I validated the servo + shaft coupler worked using a (really, really) old Arduino Leonardo I had lying around, and controlling it manually over serial (using a really long USB cable extending to my PC)
+> - Before buying the ESP32 Dev Board, I validated the stepper motor + shaft coupler worked using a (really, really) old Arduino Leonardo I had lying around, and controlling it manually over serial (using a really long USB cable extending to my PC)
 > - My first attempt at mounting this thing involved wooden skewers, a glue stick, and a cut-up Amazon box... a failed experiment, to say the least.
 
 Of course, what good is some hardware without some software?
@@ -221,7 +221,7 @@ That said, while it _was_ cool to see it working from the web UI... for this to 
 
 If you're not familiar, [Home Assistant](https://www.home-assistant.io/) is an open-source home automation platform that acts as a local brain for all your smart devices. It is absolutely fantastic, and if you do _any_ remotely non-trivial smart home stuff - you should _absolutely_ set it up.
 
-### Step 1: Exposing the Servo as an MQTT Cover
+### Step 1: Exposing the Stepper Motor as an MQTT Cover
 
 Instead of writing some kind of custom API integration script, I took advantage of Home Assistant's excellent support for **MQTT Discovery**.
 
@@ -283,7 +283,7 @@ Sending an `OPEN` payload makes the stepper motor rotate forward by a full revol
 And just like that - Home Assistant can control the motor!
 
 <p align="center">
-  <img src="/blog/assets/automating-ac-nyc/ha-servo-as-cover.png" width="400px">
+  <img src="/blog/assets/automating-ac-nyc/ha-stepper-as-cover.png" width="400px">
 </p>
 
 ### Step 2: Adding a Thermostat
@@ -300,7 +300,7 @@ Hooking the two together is as simple as adding this to my `configuration.yaml`:
 climate:
   - platform: generic_thermostat
     name: Living Room AC
-    heater: cover.ac_servo_cover
+    heater: cover.ac_stepper_cover
     target_sensor: sensor.airgradient_temperature
     min_temp: 65
     max_temp: 80
@@ -331,7 +331,7 @@ So I went on a little Temu and Amazon shopping spree, and sourced new parts. Her
 | ----------------------------- | ------------------- | ----------------------------------------------------------------------------------------------- |
 | ESP32 Dev Board (but smaller) | $3.30               | [Temu](https://www.temu.com/goods.html?_bg_fs=1&goods_id=601100253124451)                       |
 | Shaft Coupler                 | $2.42               | [Temu](https://www.temu.com/goods.html?_bg_fs=1&goods_id=601099519071638&sku_id=17592227065720) |
-| Servo + controllers           | $2.66 ($8 / 3 pack) | [Amazon](https://www.amazon.com/dp/B0BG4ZCFLQ)                                                  |
+| Stepper motor + controllers   | $2.66 ($8 / 3 pack) | [Amazon](https://www.amazon.com/dp/B0BG4ZCFLQ)                                                  |
 | L Bracket                     | $0.50 ($4 / 8 pack) | [Amazon](https://www.amazon.com/dp/B0DBFX6HL6)                                                  |
 | Nuts and bolts                | negligible[^4]      | [Amazon](https://www.amazon.com/dp/B09KS23KQ6)                                                  |
 | USB cable + charger           | $5                  | Temu (take your pick)                                                                           |
@@ -368,7 +368,7 @@ It works _okay?_
 
 Definitely not great... but maybe _~80% okay?_
 
-Ultimately, the biggest issue is that binder clips and cardboard aren't quite as robust of a mounting mechanism as I'd hoped they'd be... and over time, the servo tends to "sag" a bit, resulting in a bit too much friction between the motor, the coupler, and the underlying knob, causing the mechanism to stall out until someone manually goes and reseats it...
+Ultimately, the biggest issue is that binder clips and cardboard aren't quite as robust of a mounting mechanism as I'd hoped they'd be... and over time, the stepper motor tends to "sag" a bit, resulting in a bit too much friction between the motor, the coupler, and the underlying knob, causing the mechanism to stall out until someone manually goes and reseats it...
 
 Is this annoying? Yeah.
 
